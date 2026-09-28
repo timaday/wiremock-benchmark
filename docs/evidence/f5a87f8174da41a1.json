@@ -1,0 +1,205 @@
+{
+  "runId": "f5a87f8174da41a1",
+  "configuration": {
+    "mode": "official",
+    "capture": "on",
+    "target": 1000,
+    "offered": 1020,
+    "seconds": 120,
+    "warmup": 60,
+    "threads": 7068,
+    "case": "json-51200-6000",
+    "port": 18880,
+    "keep": false,
+    "continuous": false,
+    "runId": "f5a87f8174da41a1",
+    "arrivalModel": "JMeter Constant Throughput Timer, non-shared current thread group",
+    "engines": 4,
+    "perEngineOffered": 255.0,
+    "host": {
+      "system": "Linux",
+      "node": "tad-devbox",
+      "release": "7.0.0-31-generic",
+      "version": "#31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2",
+      "machine": "x86_64",
+      "processor": "x86_64"
+    },
+    "started": 1790362249.949664
+  },
+  "measurementUtc": {
+    "startMs": "2026-09-25T18:52:27.834000+00:00",
+    "endMs": "2026-09-25T18:54:27.834000+00:00"
+  },
+  "window": {
+    "startedMs": 1790362287834,
+    "startMs": 1790362347834,
+    "endMs": 1790362467834
+  },
+  "verdict": {
+    "pass": true,
+    "checks": {
+      "httpCorrect": true,
+      "uniqueClientIds": true,
+      "averageOfferedTarget": true,
+      "averageCompletedTarget": true,
+      "everyFullMinuteAtTarget": true,
+      "captureReconciled": true,
+      "scheduledRateRespected": true,
+      "noOomOrRestart": true,
+      "fourEnginesCompleted": true
+    },
+    "measuredSeconds": 120.0,
+    "targetRps": 1000,
+    "measuredRequests": 122143,
+    "errors": 0,
+    "offeredRps": 1017.8583333333333,
+    "completedRps": 1015.25,
+    "minutes": [
+      {
+        "minute": 0,
+        "startedRps": 1017.0333333333333,
+        "completedRps": 1020.5333333333333
+      },
+      {
+        "minute": 1,
+        "startedRps": 1018.6833333333333,
+        "completedRps": 1009.9666666666667
+      }
+    ],
+    "latencyMs": {
+      "p50": 6028,
+      "p95": 6080,
+      "p99": 6119,
+      "max": 6220
+    },
+    "delayAdjustedLatencyMs": {
+      "p50": 28,
+      "p95": 80,
+      "p99": 119,
+      "max": 220
+    },
+    "capture": {
+      "enabled": true,
+      "events": 366429,
+      "expectedEvents": 366429,
+      "missingOrCorruptExchanges": 0,
+      "pending": 0,
+      "errors": 0
+    }
+  },
+  "runtime": {
+    "enabled": true,
+    "errors": 0,
+    "java": "17.0.19+10",
+    "pending": 0,
+    "committed": 0,
+    "confirmed": 0,
+    "brokerConnected": true,
+    "reconnects": 0,
+    "heapUsed": 27918368
+  },
+  "engineSampleCounts": {
+    "1": 44352,
+    "2": 44253,
+    "3": 44474,
+    "4": 44354
+  },
+  "logicalCpus": 20,
+  "cpuModel": "Intel(R) Core(TM) Ultra 7 265",
+  "memoryTotal": "32293156 kB",
+  "images": {
+    "rabbitmq:3.13.7-management-alpine": "sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+    "wiremock-benchmark-archive:local": "sha256:0d68c4cc45440b81d6ae66bee9b1fc36dfea67755b3dd3219a4b676b1f78eba0",
+    "wiremock-benchmark-jmeter:local": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+    "wiremock-benchmark-official:local": "sha256:fe285eca6d966195de0abd74737222cdb4aa300498b82c2309d0951d0aaca25c"
+  },
+  "containerStability": [
+    {
+      "name": "/wmb-f5a87f8174da41a1-archive-1",
+      "image": "sha256:0d68c4cc45440b81d6ae66bee9b1fc36dfea67755b3dd3219a4b676b1f78eba0",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-f5a87f8174da41a1-official-1",
+      "image": "sha256:fe285eca6d966195de0abd74737222cdb4aa300498b82c2309d0951d0aaca25c",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-f5a87f8174da41a1-rabbit-1",
+      "image": "sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-f5a87f8174da41a1-engines_injector.1.rt4k7nok3sgm7hjeuu6yv8fd8",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-f5a87f8174da41a1-engines_injector.2.w68ytgah5omedkme0dl2tho79",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-f5a87f8174da41a1-engines_injector.3.ugeo72msni528h9jbsrbdo92g",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-f5a87f8174da41a1-engines_injector.4.hw25i7m4jl0ygly56loutgkxy",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    }
+  ],
+  "measuredTelemetry": {
+    "samples": 10,
+    "pendingMaximum": 163,
+    "heapBytesMinimum": 1983999024,
+    "heapBytesMaximum": 2593521144,
+    "reconnectsMaximum": 0
+  },
+  "sourceSha256": {
+    "Dockerfile": "ba85b1711d0c40330dc1bd473cdec920ace756b1afedaec2dc7b043edb1b1be8",
+    "compose.swarm.yaml": "23062d1d73d95074d47c53373d15b98f83cfcc5c5e936d02e9545f9d365037e8",
+    "compose.yaml": "293f62d6082f8ea3bd2b9741107bd7a7e90c4b6b7f09e119c8e43e74a17a8e54",
+    "pom.xml": "6f9cbe74e9e8275cc742ad487de1acbb4dadc5aac4bc9c217a31ab8a8f8050cc",
+    "src/main/java/bench/Archive.java": "6c8d04e5c1df20fff938d9b7435454706406f32c4ae53d926fe6eaa422891fbc",
+    "src/main/java/bench/CaptureCodec.java": "7ff4c8427f913ce6c8a39ec65e0427511c372d833a6eef2ad849a26076ee3b2c",
+    "src/main/java/bench/CaptureEvent.java": "a3eba35aabff7d8aac54e718ebc43dc6bfc75ea358ccd36731c0458ba2713fbe",
+    "src/main/java/bench/CaptureExtension.java": "1004b330b610a5e4247966e678349cd32845284c5062a342534f6071ba327bc3",
+    "src/main/java/bench/DurableOutbox.java": "f66840487f1ae5aa8d19b9811c4dcea803f20797c16e781079e2f6536ad6c8e4",
+    "src/main/java/bench/Headless.java": "12e89054507d6ced567c2ec9d40a353c55afa38b32f63826163fbddface1c1c7",
+    "src/main/java/bench/Json.java": "3036b8da3b769084c63aa40add128baf082b4a890989d4f5d8c7ca92672aa614",
+    "src/main/java/bench/OutboxRow.java": "3d3b392d23d07ed0c48966a007f016eac7738fffa2aa0dfd854a5703fa4afd92",
+    "src/main/java/bench/Phase.java": "175b02a4349a43ddbec4abdcd7b894748cdc572963b6560d6cd66e54a088df4c",
+    "src/main/java/bench/RabbitPublisher.java": "c04c57489fa6ba1afd4e910b0c23bba61a7d23848782b3ef478bcbba38a5ec62",
+    "src/main/java/bench/Settings.java": "4e8e30294d4a10987aa926b526cf0a79bb22b9674dc807f36b12ea71dd434bef",
+    "src/test/java/bench/CaptureCodecTest.java": "dc52e2a5da9b90376db7b99fdda3eb7b7cc267eaa1eb79b239f9292a01057f54",
+    "src/test/java/bench/DurableOutboxTest.java": "971b0fa6a81ddbb47e435060ba1d5a8c8360c1ef3f8b9f65aa8c6f42554fe55b",
+    "swarm.yaml": "96af395c4a2c60d56cf379a4e646398fd0c31cc597872ced79846066077b4c62",
+    "tests/perf/assert.groovy": "64c5ae8a338d6b68fe122959b0e21d4c8b3eb87d79c92b1128a676a8616de33a",
+    "tests/perf/benchmark.jmx": "4d1272252970c40be7f6e15e51c80e9257544ff334a40ba313e2093c7d35b9b5",
+    "tests/perf/init.groovy": "f32371fbd5bf8728d599b4705f6a94aca67ed24252d73230be3f360986b68c4d",
+    "tests/perf/request.groovy": "b16ff1bfd60f9ece3587bd3a990c1fffb311807a40580a86e9a8526a965b90f1",
+    "tests/perf/start-engine.sh": "d056a8f89d22adcb899101d9f52b4cb6f382b7b2b974ac121707922eb2fb3b10",
+    "tools/bench.py": "8698ad4eb30639e51ab9bdd1d6364fe0fbfaabfcf6094e115ffde7498b53440b",
+    "tools/fault_probe.py": "1f53d76837bd2c9758d0c3bbb175e487df90cbb6fc48eb7e0a512f50504d86d0",
+    "tools/fixtures.py": "23432f9afe8ae3c25443a7c491a314f5ec0f4db8b106cdcf48563c972d5ee99a",
+    "tools/jmx.py": "449b903258990c9f643041433d3f5d2ba7e92781402cc2fba7a2d973177518e8",
+    "tools/read_capture.py": "22e2ff37d01d3b593c4012a65a260d27ec122988fea6df518ffce10ab12a1964",
+    "tools/swarm.py": "66054bfad79a510a2bcc2071df92941171262ea6855f776b8c1d3e5fea6a8ef0",
+    "tools/test_swarm.py": "acf0da11706d36a64805ef146f4c3ead791e5cf8cbbe78436c013aaa7e69f5f9",
+    "tools/test_verdict.py": "4185b6f279993cfe6207d4ff25d8e3e556f1f79de78a122a08369a08398eb28a",
+    "tools/verdict.py": "f88ad014b6b6db65f606f49a9276ffc1def09c1a1cda0e35a69c07ee16877f89"
+  },
+  "rawEvidence": {
+    "results": "results/f5a87f8174da41a1",
+    "state": "state/f5a87f8174da41a1"
+  }
+}

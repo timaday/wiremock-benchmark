@@ -1,0 +1,496 @@
+{
+  "runId": "e1a567c274974dee",
+  "configuration": {
+    "mode": "official",
+    "capture": "on",
+    "target": 1000,
+    "offered": 1020,
+    "seconds": 3600,
+    "warmup": 60,
+    "threads": 7068,
+    "case": "mixed",
+    "port": 18880,
+    "keep": false,
+    "continuous": false,
+    "runId": "e1a567c274974dee",
+    "arrivalModel": "JMeter Constant Throughput Timer, non-shared current thread group",
+    "engines": 4,
+    "perEngineOffered": 255.0,
+    "host": {
+      "system": "Linux",
+      "node": "tad-devbox",
+      "release": "7.0.0-31-generic",
+      "version": "#31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2",
+      "machine": "x86_64",
+      "processor": "x86_64"
+    },
+    "started": 1790363486.4563048
+  },
+  "measurementUtc": {
+    "startMs": "2026-09-25T19:13:04.332000+00:00",
+    "endMs": "2026-09-25T20:13:04.332000+00:00"
+  },
+  "window": {
+    "startedMs": 1790363524332,
+    "startMs": 1790363584332,
+    "endMs": 1790367184332
+  },
+  "verdict": {
+    "pass": true,
+    "checks": {
+      "httpCorrect": true,
+      "uniqueClientIds": true,
+      "averageOfferedTarget": true,
+      "averageCompletedTarget": true,
+      "everyFullMinuteAtTarget": true,
+      "captureReconciled": true,
+      "scheduledRateRespected": true,
+      "noOomOrRestart": true,
+      "fourEnginesCompleted": true
+    },
+    "measuredSeconds": 3600.0,
+    "targetRps": 1000,
+    "measuredRequests": 3673152,
+    "errors": 0,
+    "offeredRps": 1020.32,
+    "completedRps": 1020.1438888888889,
+    "minutes": [
+      {
+        "minute": 0,
+        "startedRps": 1019.8166666666667,
+        "completedRps": 1019.4666666666667
+      },
+      {
+        "minute": 1,
+        "startedRps": 1024.9333333333334,
+        "completedRps": 1019.6833333333333
+      },
+      {
+        "minute": 2,
+        "startedRps": 1015.4833333333333,
+        "completedRps": 1021.15
+      },
+      {
+        "minute": 3,
+        "startedRps": 1019.8,
+        "completedRps": 1018.5166666666667
+      },
+      {
+        "minute": 4,
+        "startedRps": 1024.4,
+        "completedRps": 1020.9833333333333
+      },
+      {
+        "minute": 5,
+        "startedRps": 1015.9166666666666,
+        "completedRps": 1020.3666666666667
+      },
+      {
+        "minute": 6,
+        "startedRps": 1020.1666666666666,
+        "completedRps": 1019.3333333333334
+      },
+      {
+        "minute": 7,
+        "startedRps": 1023.3,
+        "completedRps": 1020.7166666666667
+      },
+      {
+        "minute": 8,
+        "startedRps": 1016.2166666666667,
+        "completedRps": 1020.6166666666667
+      },
+      {
+        "minute": 9,
+        "startedRps": 1021.25,
+        "completedRps": 1019.8
+      },
+      {
+        "minute": 10,
+        "startedRps": 1022.2666666666667,
+        "completedRps": 1019.7666666666667
+      },
+      {
+        "minute": 11,
+        "startedRps": 1016.7333333333333,
+        "completedRps": 1019.95
+      },
+      {
+        "minute": 12,
+        "startedRps": 1021.3833333333333,
+        "completedRps": 1020.3166666666667
+      },
+      {
+        "minute": 13,
+        "startedRps": 1021.5833333333334,
+        "completedRps": 1021.35
+      },
+      {
+        "minute": 14,
+        "startedRps": 1016.9666666666667,
+        "completedRps": 1018.45
+      },
+      {
+        "minute": 15,
+        "startedRps": 1021.9,
+        "completedRps": 1019.3333333333334
+      },
+      {
+        "minute": 16,
+        "startedRps": 1020.5166666666667,
+        "completedRps": 1021.9333333333333
+      },
+      {
+        "minute": 17,
+        "startedRps": 1017.9333333333333,
+        "completedRps": 1019.5333333333333
+      },
+      {
+        "minute": 18,
+        "startedRps": 1021.8166666666667,
+        "completedRps": 1019.65
+      },
+      {
+        "minute": 19,
+        "startedRps": 1020.3333333333334,
+        "completedRps": 1019.6666666666666
+      },
+      {
+        "minute": 20,
+        "startedRps": 1017.9333333333333,
+        "completedRps": 1019.9833333333333
+      },
+      {
+        "minute": 21,
+        "startedRps": 1022.0666666666667,
+        "completedRps": 1021.1666666666666
+      },
+      {
+        "minute": 22,
+        "startedRps": 1019.6166666666667,
+        "completedRps": 1019.65
+      },
+      {
+        "minute": 23,
+        "startedRps": 1018.9833333333333,
+        "completedRps": 1019.9333333333333
+      },
+      {
+        "minute": 24,
+        "startedRps": 1021.85,
+        "completedRps": 1020.15
+      },
+      {
+        "minute": 25,
+        "startedRps": 1018.9833333333333,
+        "completedRps": 1019.7166666666667
+      },
+      {
+        "minute": 26,
+        "startedRps": 1019.5666666666667,
+        "completedRps": 1019.7
+      },
+      {
+        "minute": 27,
+        "startedRps": 1022.0833333333334,
+        "completedRps": 1021.8166666666667
+      },
+      {
+        "minute": 28,
+        "startedRps": 1018.4833333333333,
+        "completedRps": 1017.7
+      },
+      {
+        "minute": 29,
+        "startedRps": 1019.7,
+        "completedRps": 1020.7
+      },
+      {
+        "minute": 30,
+        "startedRps": 1022.5333333333333,
+        "completedRps": 1020.9
+      },
+      {
+        "minute": 31,
+        "startedRps": 1018.0333333333333,
+        "completedRps": 1020.7666666666667
+      },
+      {
+        "minute": 32,
+        "startedRps": 1019.4666666666667,
+        "completedRps": 1018.3333333333334
+      },
+      {
+        "minute": 33,
+        "startedRps": 1023.4833333333333,
+        "completedRps": 1020.3333333333334
+      },
+      {
+        "minute": 34,
+        "startedRps": 1017.1,
+        "completedRps": 1019.9
+      },
+      {
+        "minute": 35,
+        "startedRps": 1019.55,
+        "completedRps": 1020.6166666666667
+      },
+      {
+        "minute": 36,
+        "startedRps": 1024.1666666666667,
+        "completedRps": 1019.8166666666667
+      },
+      {
+        "minute": 37,
+        "startedRps": 1016.3166666666667,
+        "completedRps": 1020.45
+      },
+      {
+        "minute": 38,
+        "startedRps": 1019.8166666666667,
+        "completedRps": 1019.2833333333333
+      },
+      {
+        "minute": 39,
+        "startedRps": 1024.1166666666666,
+        "completedRps": 1020.4833333333333
+      },
+      {
+        "minute": 40,
+        "startedRps": 1016.3,
+        "completedRps": 1019.8333333333334
+      },
+      {
+        "minute": 41,
+        "startedRps": 1019.6666666666666,
+        "completedRps": 1020.9666666666667
+      },
+      {
+        "minute": 42,
+        "startedRps": 1024.7833333333333,
+        "completedRps": 1020.1333333333333
+      },
+      {
+        "minute": 43,
+        "startedRps": 1015.5,
+        "completedRps": 1018.6666666666666
+      },
+      {
+        "minute": 44,
+        "startedRps": 1019.65,
+        "completedRps": 1019.7
+      },
+      {
+        "minute": 45,
+        "startedRps": 1025.0166666666667,
+        "completedRps": 1022.4166666666666
+      },
+      {
+        "minute": 46,
+        "startedRps": 1015.25,
+        "completedRps": 1019.4833333333333
+      },
+      {
+        "minute": 47,
+        "startedRps": 1019.95,
+        "completedRps": 1020.1166666666667
+      },
+      {
+        "minute": 48,
+        "startedRps": 1024.5833333333333,
+        "completedRps": 1019.1166666666667
+      },
+      {
+        "minute": 49,
+        "startedRps": 1015.7166666666667,
+        "completedRps": 1020.3
+      },
+      {
+        "minute": 50,
+        "startedRps": 1020.2166666666667,
+        "completedRps": 1019.2
+      },
+      {
+        "minute": 51,
+        "startedRps": 1023.35,
+        "completedRps": 1021.2166666666667
+      },
+      {
+        "minute": 52,
+        "startedRps": 1016.45,
+        "completedRps": 1019.6833333333333
+      },
+      {
+        "minute": 53,
+        "startedRps": 1020.6333333333333,
+        "completedRps": 1019.7666666666667
+      },
+      {
+        "minute": 54,
+        "startedRps": 1022.7166666666667,
+        "completedRps": 1019.9833333333333
+      },
+      {
+        "minute": 55,
+        "startedRps": 1016.5333333333333,
+        "completedRps": 1020.35
+      },
+      {
+        "minute": 56,
+        "startedRps": 1021.35,
+        "completedRps": 1021.25
+      },
+      {
+        "minute": 57,
+        "startedRps": 1021.7666666666667,
+        "completedRps": 1020.0333333333333
+      },
+      {
+        "minute": 58,
+        "startedRps": 1016.95,
+        "completedRps": 1019.2833333333333
+      },
+      {
+        "minute": 59,
+        "startedRps": 1036.25,
+        "completedRps": 1025.15
+      }
+    ],
+    "latencyMs": {
+      "p50": 3025,
+      "p95": 6030,
+      "p99": 6043,
+      "max": 6191
+    },
+    "delayAdjustedLatencyMs": {
+      "p50": 25,
+      "p95": 45,
+      "p99": 63,
+      "max": 221
+    },
+    "capture": {
+      "enabled": true,
+      "events": 11019456,
+      "expectedEvents": 11019456,
+      "missingOrCorruptExchanges": 0,
+      "pending": 0,
+      "errors": 0
+    }
+  },
+  "runtime": {
+    "enabled": true,
+    "errors": 0,
+    "java": "17.0.19+10",
+    "pending": 0,
+    "committed": 0,
+    "confirmed": 0,
+    "brokerConnected": true,
+    "reconnects": 0,
+    "heapUsed": 28785064
+  },
+  "engineSampleCounts": {
+    "1": 933070,
+    "2": 933105,
+    "3": 933049,
+    "4": 933079
+  },
+  "logicalCpus": 20,
+  "cpuModel": "Intel(R) Core(TM) Ultra 7 265",
+  "memoryTotal": "32293156 kB",
+  "images": {
+    "rabbitmq:3.13.7-management-alpine": "sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+    "wiremock-benchmark-archive:local": "sha256:0d68c4cc45440b81d6ae66bee9b1fc36dfea67755b3dd3219a4b676b1f78eba0",
+    "wiremock-benchmark-jmeter:local": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+    "wiremock-benchmark-official:local": "sha256:fe285eca6d966195de0abd74737222cdb4aa300498b82c2309d0951d0aaca25c"
+  },
+  "containerStability": [
+    {
+      "name": "/wmb-e1a567c274974dee-archive-1",
+      "image": "sha256:0d68c4cc45440b81d6ae66bee9b1fc36dfea67755b3dd3219a4b676b1f78eba0",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-e1a567c274974dee-official-1",
+      "image": "sha256:fe285eca6d966195de0abd74737222cdb4aa300498b82c2309d0951d0aaca25c",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-e1a567c274974dee-rabbit-1",
+      "image": "sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-e1a567c274974dee-engines_injector.1.iwq904m9io2jkfxep7xpzpdi3",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-e1a567c274974dee-engines_injector.2.4efpif9mwqq1t73c9wr7mfaey",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-e1a567c274974dee-engines_injector.3.xx4xy0xs3ajorlgyusz3r8gtm",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-e1a567c274974dee-engines_injector.4.2bg82keg64j2u0j0nxu2muq9m",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    }
+  ],
+  "measuredTelemetry": {
+    "samples": 299,
+    "pendingMaximum": 1857,
+    "heapBytesMinimum": 1013355296,
+    "heapBytesMaximum": 2595837456,
+    "reconnectsMaximum": 0
+  },
+  "sourceSha256": {
+    "Dockerfile": "ba85b1711d0c40330dc1bd473cdec920ace756b1afedaec2dc7b043edb1b1be8",
+    "compose.swarm.yaml": "23062d1d73d95074d47c53373d15b98f83cfcc5c5e936d02e9545f9d365037e8",
+    "compose.yaml": "293f62d6082f8ea3bd2b9741107bd7a7e90c4b6b7f09e119c8e43e74a17a8e54",
+    "pom.xml": "6f9cbe74e9e8275cc742ad487de1acbb4dadc5aac4bc9c217a31ab8a8f8050cc",
+    "src/main/java/bench/Archive.java": "6c8d04e5c1df20fff938d9b7435454706406f32c4ae53d926fe6eaa422891fbc",
+    "src/main/java/bench/CaptureCodec.java": "7ff4c8427f913ce6c8a39ec65e0427511c372d833a6eef2ad849a26076ee3b2c",
+    "src/main/java/bench/CaptureEvent.java": "a3eba35aabff7d8aac54e718ebc43dc6bfc75ea358ccd36731c0458ba2713fbe",
+    "src/main/java/bench/CaptureExtension.java": "1004b330b610a5e4247966e678349cd32845284c5062a342534f6071ba327bc3",
+    "src/main/java/bench/DurableOutbox.java": "f66840487f1ae5aa8d19b9811c4dcea803f20797c16e781079e2f6536ad6c8e4",
+    "src/main/java/bench/Headless.java": "12e89054507d6ced567c2ec9d40a353c55afa38b32f63826163fbddface1c1c7",
+    "src/main/java/bench/Json.java": "3036b8da3b769084c63aa40add128baf082b4a890989d4f5d8c7ca92672aa614",
+    "src/main/java/bench/OutboxRow.java": "3d3b392d23d07ed0c48966a007f016eac7738fffa2aa0dfd854a5703fa4afd92",
+    "src/main/java/bench/Phase.java": "175b02a4349a43ddbec4abdcd7b894748cdc572963b6560d6cd66e54a088df4c",
+    "src/main/java/bench/RabbitPublisher.java": "c04c57489fa6ba1afd4e910b0c23bba61a7d23848782b3ef478bcbba38a5ec62",
+    "src/main/java/bench/Settings.java": "4e8e30294d4a10987aa926b526cf0a79bb22b9674dc807f36b12ea71dd434bef",
+    "src/test/java/bench/CaptureCodecTest.java": "dc52e2a5da9b90376db7b99fdda3eb7b7cc267eaa1eb79b239f9292a01057f54",
+    "src/test/java/bench/DurableOutboxTest.java": "971b0fa6a81ddbb47e435060ba1d5a8c8360c1ef3f8b9f65aa8c6f42554fe55b",
+    "swarm.yaml": "96af395c4a2c60d56cf379a4e646398fd0c31cc597872ced79846066077b4c62",
+    "tests/perf/assert.groovy": "64c5ae8a338d6b68fe122959b0e21d4c8b3eb87d79c92b1128a676a8616de33a",
+    "tests/perf/benchmark.jmx": "4d1272252970c40be7f6e15e51c80e9257544ff334a40ba313e2093c7d35b9b5",
+    "tests/perf/init.groovy": "f32371fbd5bf8728d599b4705f6a94aca67ed24252d73230be3f360986b68c4d",
+    "tests/perf/request.groovy": "b16ff1bfd60f9ece3587bd3a990c1fffb311807a40580a86e9a8526a965b90f1",
+    "tests/perf/start-engine.sh": "d056a8f89d22adcb899101d9f52b4cb6f382b7b2b974ac121707922eb2fb3b10",
+    "tools/bench.py": "60cdbe8ca3c0b32cb5f00af0346d3cd19506ee121b90ca38a6b40bba1945ba35",
+    "tools/fault_probe.py": "1f53d76837bd2c9758d0c3bbb175e487df90cbb6fc48eb7e0a512f50504d86d0",
+    "tools/fixtures.py": "23432f9afe8ae3c25443a7c491a314f5ec0f4db8b106cdcf48563c972d5ee99a",
+    "tools/jmx.py": "449b903258990c9f643041433d3f5d2ba7e92781402cc2fba7a2d973177518e8",
+    "tools/read_capture.py": "22e2ff37d01d3b593c4012a65a260d27ec122988fea6df518ffce10ab12a1964",
+    "tools/swarm.py": "66054bfad79a510a2bcc2071df92941171262ea6855f776b8c1d3e5fea6a8ef0",
+    "tools/test_bench.py": "842e7eb1a29dec03b6893bec7e7778b0cf8bdad58077e33d400dfe96d0708481",
+    "tools/test_swarm.py": "acf0da11706d36a64805ef146f4c3ead791e5cf8cbbe78436c013aaa7e69f5f9",
+    "tools/test_verdict.py": "4185b6f279993cfe6207d4ff25d8e3e556f1f79de78a122a08369a08398eb28a",
+    "tools/verdict.py": "f88ad014b6b6db65f606f49a9276ffc1def09c1a1cda0e35a69c07ee16877f89"
+  },
+  "rawEvidence": {
+    "results": "results/e1a567c274974dee",
+    "state": "state/e1a567c274974dee"
+  }
+}

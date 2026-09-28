@@ -1,0 +1,10 @@
+{
+  "mode": "headless",
+  "runId": "0074aec89e5d4496",
+  "checks": {
+    "brokerOutageRetains120Events": true,
+    "mockKillPreserves120CommittedEvents": true,
+    "externalArchiveReconcilesEveryPhase": true
+  },
+  "pass": true
+}

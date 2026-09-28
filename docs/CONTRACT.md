@@ -1,0 +1,178 @@
+# Benchmark contract
+
+Goal: demonstrate WireMock 3.13.2 at 100–1,000 successful requests/s with 0–6s
+intentional delay, full external request/response capture, and a one-hour hold.
+Results are measurements on declared hardware, not a guarantee on every host.
+
+## Workloads and comparisons
+
+Sizes are exact UTF-8 **KiB (1024 bytes)**; the matrix uses equal 1/5/10/50 KiB bodies. Templates are
+static JSON, dynamic JSON correlation and dynamic text correlation. Delays are
+0/1000/1500/2000/3000/4000/5000/6000ms. Padding is deterministic and compressible;
+HTTP compression is disabled. Archive compression does not reduce network load.
+
+One generated case catalogue owns fixtures and client expectations. Both modes
+use identical WireMock tuning, fixtures and the exact same extension jar:
+- official `wiremock/wiremock:3.13.2`, retaining its supplied Java runtime;
+- embedded WireMockServer on OpenJDK 27 GA (headless, also runnable outside Docker).
+The second mode is containerised for portability; this is not a pure isolation of
+container overhead. Record JVM, image digests, host, quotas and extension state.
+Hooks-off baselines and hooks-on runs are separate named experiments. MockServer
+is optional later work, not a substitute for the primary WireMock deliverable.
+
+## Durable capture
+
+The extension writes REQUEST before matching, RESPONSE_PREPARED before send, and
+SEND_COMPLETED after WireMock's completion callback. Payloads contain run/request
+IDs, phase, timestamp, method/URL, headers and complete body bytes. Completion
+means server callback observed, **not proof the client received the response**.
+Headers are the WireMock lifecycle view, before any transport headers added by
+the HTTP container; this is application capture, not a raw packet recording.
+If a process dies after response preparation, delivery remains unknown unless the
+completion event exists. Requests not yet durably accepted at hook entry cannot
+be promised to survive a process/OS failure. No replay of HTTP requests occurs.
+
+The full JSON capture envelope is zlib-compressed (level 1) before disk commit
+and is published with `content_type=application/json`, `content_encoding=deflate`.
+The consumer stores those exact compressed envelope bytes. Decoding is bounded
+to a 1 MiB JSON envelope, well above the declared 50 KiB body workloads. This
+reduces capture IO for the explicitly compressible fixtures; HTTP remains
+uncompressed and all decoded body bytes are retained.
+
+SQLite WAL with synchronous=FULL is the disk outbox. A single writer batches
+commits; the callback waits for its own durable commit. This unavoidable disk cost
+is measured. RabbitMQ IO occurs on a separate publisher thread. Persistent
+messages, durable queue, mandatory routing and publisher confirms precede outbox
+deletion. Recovery can duplicate a publish, so event IDs are stable and archive
+insertion is idempotent. No memory-only success and no silent drop policy.
+Broker outage retains committed records and reconnects to that same configured
+broker. Outbox/disk exhaustion fails the benchmark, never silently discards data.
+In-memory batching is bounded. Process termination on capture storage failure
+prevents continuing to claim a healthy lossless capture service.
+
+An independent RabbitMQ consumer durably archives the complete compressed event
+before acknowledging delivery. This both proves external receipt and bounds
+broker queue growth for soak. Archive size/disk headroom are monitored. Consuming
+is explicit test processing, not an assertion RabbitMQ retains acknowledged data.
+The archive remains a portable SQLite file containing full replayable events.
+
+## Verdict
+
+Warmup (60s by default), measured hold and final response/capture drain are distinct.
+The thread ramp lasts 20s within warmup. Pass requires:
+- all started measured HTTP requests finish successfully with exact payload size,
+  template content/correlation and at least the configured delay;
+- injector arrivals stay within 5% of the configured offered rate overall and
+  per full measured minute (for runs of at least a minute); startup catch-up
+  cannot masquerade as the configured stimulus;
+- delivered throughput reaches the declared target overall and in every full
+  measured minute; no generator shortfall may be called a WireMock pass;
+- REQUEST/RESPONSE_PREPARED/SEND_COMPLETED unique archive IDs reconcile with each
+  completed client request; pending outbox is drained, no capture error or lost ID;
+- no OOM/restart and no sustained unbounded queue growth. Record memory/CPU/disk,
+  capture lag, per-minute throughput and delay-adjusted p50/p95/p99/max latency.
+
+The offered rate and pass target are separate, visible inputs. Qualification may
+explicitly offer 1,020/s to establish at least 1,000/s in every minute despite
+scheduler jitter; it must report the actual 1,020/s stimulus. A finite test cannot
+prove indefinite stability. A one-hour pass proves that run; continuous mode
+keeps the same processes running until explicitly stopped (one-year scheduler ceiling),
+then drains and reports the actual observed interval.
+
+Broker outage/recovery and process-kill/outbox replay are separate functional
+proofs; a failed fault run never becomes a normal throughput pass. Disk cannot
+buffer an unlimited outage; capacity is part of the recorded envelope.
+
+JMeter uses reusable standard thread-group clients and its Constant Throughput
+Timer in non-shared, current-thread-group mode (mode 2). Concurrency is declared in run
+configuration; memory/process caps bound the injector. The scheduler stops new
+work at the end of the hold and active requests drain before verdict generation.
+Automatic concurrency uses the longest selected delay, not the mean: a reusable
+client must have room for its slowest case without missing its pacing interval.
+
+## Four-engine Docker Swarm execution
+
+The user requested four Docker Swarm engines. Run four independent JMeter CLI
+processes against one mock; each receives one quarter of the aggregate offered
+rate (255/s for 1,020/s total). They share an absolute measurement window and use
+engine-specific request IDs. Rates are combined;
+the target is 1,000/s total, not 1,000/s per engine. Keep every engine's JTL and
+merge all four streams for the same identity/body reconciliation gate.
+
+The local qualifier pins tasks to this manager node with prebuilt local images
+and a run-specific attachable overlay. Engine images include the plan and fixture
+catalogue. Each task has 2 CPU, 1.75 GiB RAM and a 1 GiB heap; no task restart is
+allowed. A missing/failed/replaced engine fails the run. The injector resource
+owner is `swarm.yaml`; mock/broker/archive limits remain in `compose.yaml`.
+This is four engines on one host, not a multi-host qualification. Multi-host use
+requires distributable images, reachable mock endpoints, synchronised clocks,
+and result storage/collection on each node.
+
+## Fixed-delay qualification suite
+
+`tools/qualify.py` schedules official then headless at each catalogue delay:
+0, 1, 1.5, 2, 3, 4, 5 and 6 seconds. Each of the 16 runs has 60 seconds
+warmup and 3,600 measured seconds, capture on, four engines, target 1,000/s,
+and explicit offered rate 1,020/s. Each delay mixes all four body sizes and
+all three templates (dynamic JSON, dynamic text and a static control).
+`bench.py --delay-ms` selects one delay; it cannot combine with an exact `--case`.
+The runner writes the selected catalogue into each result directory; engines
+read that same selection rather than implementing their own selection policy.
+
+`qualify.py --delay-ms 6000` explicitly limits the suite to both runtimes at 6s.
+`--max-runs` limits a batch without changing the saved schedule.
+The suite stops on the first failure. Resume skips only previously successful
+full-duration verdicts; failed/interrupted attempts and all capture data remain.
+A plan alone is not a qualification. Raw CPU/container memory time series,
+sampled mock heap, JVM metadata, mock/engine GC logs, JTL, captures and verdicts
+are retained per run. Suite JSON and Markdown link these artifacts and summarize
+throughput, errors and sampled heap. Heap samples do not constitute a heap dump
+or proof of absence of memory leaks.
+
+Before executing, require 12 GiB per remaining run plus 10 GiB reserve, based on
+the observed 11.6 GiB/hour footprint; this estimate is not a storage guarantee.
+Repeat the check between runs and keep the existing 2 GiB live-run abort gate.
+Never delete previous evidence automatically. Run the repository on a filesystem
+with enough space. Building engines and starting a suite require no other
+benchmark stack to be active. Optional explicit Compose project/file arguments
+pause only that stack's currently running containers and restore those same
+containers on normal exit, failure, SIGINT or SIGTERM. Restoration errors fail
+the suite. SIGKILL/host power loss cannot execute cleanup; restoration evidence
+and container IDs are retained for manual recovery.
+
+## Portable workload selection and resource reports
+
+The supported runner environment is Python 3.10+ on a Linux Docker host (including
+Windows through WSL2). macOS Docker Desktop can use the same recipes and shared
+bind paths but is not qualified here; native Windows Python is unsupported by the
+POSIX suite lock. No PocketHive installation or user-specific paths are required.
+
+`bench.py --size-kib 10` fixes both request and response at 10 KiB;
+`--size-kib 1 50` cycles that subset. Omission selects all catalogue sizes.
+`--template json text` selects dynamic templates; omission also includes the static
+control. These filters compose with `--delay-ms` (one of 0/1000/1500/2000/3000/4000/
+5000/6000), or omitted delay cycles the full range. Exact `--case` is mutually
+exclusive with all workload filters. Selection is shared by concurrency budgeting,
+client assertions and the persisted per-run catalogue. `qualify.py` accepts the
+same size/template filters and saves them for all runs and resume.
+
+Each completed run writes `summary.json` and `REPORT.md`: measured-window sampled
+mock heap min/mean/max; JVM version and declared JVM flags; per-container sampled
+CPU percent and memory bytes; latency including and excluding intentional delay;
+throughput, errors, capture verdict and links to raw JVM/GC/telemetry evidence.
+CPU 100% represents one CPU core; sample means are arithmetic, not time-weighted.
+Missing metrics remain explicitly unavailable, never zero. Sampled heap peaks are
+not allocation totals, retained heap, or proof of leak freedom. GC files cover the
+whole process including warmup and remain available for inspection.
+
+`tools/report.py compare --kind capture BASELINE CANDIDATE` compares capture off
+then on for the same runtime. `--kind runtime` compares official then headless
+at the same capture setting. Reject comparisons with differing selected cases,
+measurement duration, rates, warmup, injector threads/count, host, source workload,
+container quotas/JVM flags, or injector image. Capture comparisons additionally
+require the same mock image and JVM. Both verdicts must pass. Runtime comparisons
+explicitly include different JVM implementations/versions and are not a pure
+Docker-overhead experiment. Reports show absolute deltas and percentage changes
+(where the baseline is nonzero) for throughput, delay-adjusted latency, sampled
+heap and mock/whole-stack CPU and memory. A fixed offered rate cannot measure
+maximum capacity; these are observed paired differences, not causal guarantees.

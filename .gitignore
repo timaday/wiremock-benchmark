@@ -1,0 +1,8 @@
+target/
+results/
+state/
+fixtures/
+.runtime/
+__pycache__/
+*.pyc
+.env

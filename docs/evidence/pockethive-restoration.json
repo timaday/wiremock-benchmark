@@ -1,0 +1,102 @@
+{
+  "checkedAtUtc": "2026-09-25T21:28:32.230574+00:00",
+  "project": "ph-release-manual-20260925",
+  "containers": [
+    {
+      "name": "/ph-release-manual-20260925-tcp-mock-native-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-tcp-mock-server-tls-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-tcp-mock-server-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-ui-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-pockethive-mcp-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-orchestrator-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-redis-commander-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-network-proxy-manager-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-postgres-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-rabbitmq-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-redis-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-wiremock-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-artemis-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-scenario-manager-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-clickhouse-1",
+      "running": true,
+      "health": "not-configured"
+    },
+    {
+      "name": "/ph-release-manual-20260925-auth-service-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-grafana-1",
+      "running": true,
+      "health": "not-configured"
+    },
+    {
+      "name": "/ph-release-manual-20260925-haproxy-1",
+      "running": true,
+      "health": "healthy"
+    },
+    {
+      "name": "/ph-release-manual-20260925-toxiproxy-1",
+      "running": true,
+      "health": "healthy"
+    }
+  ],
+  "port18089HttpStatus": 200
+}

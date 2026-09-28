@@ -1,0 +1,71 @@
+x-capture: &capture
+  CAPTURE_ENABLED: ${CAPTURE_ENABLED:?set capture mode}
+  OUTBOX_PATH: /state/outbox.db
+  RABBIT_URI: amqp://benchmark:benchmark@rabbit:5672/%2f
+  RABBIT_QUEUE: captures
+  FIXTURES: /home/wiremock
+x-mock: &mock
+  cpus: 4
+  mem_limit: 4g
+  memswap_limit: 4g
+  pids_limit: 1024
+  ulimits:
+    nofile: {soft: 65536, hard: 65536}
+  environment:
+    <<: *capture
+    JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
+  volumes:
+    - ./fixtures:/home/wiremock:ro
+    - ./state/${RUN_NAMESPACE:?set namespace}/outbox:/state
+  ports:
+    - 127.0.0.1:${MOCK_PORT:-18880}:8080
+    - 127.0.0.1:${METRICS_PORT:-18881}:8081
+  healthcheck:
+    test: [CMD, curl, -fsS, http://localhost:8080/__admin/health]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+  stop_grace_period: 45s
+services:
+  rabbit:
+    image: rabbitmq:3.13.7-management-alpine
+    cpus: 2
+    mem_limit: 1536m
+    memswap_limit: 1536m
+    environment:
+      RABBITMQ_DEFAULT_USER: benchmark
+      RABBITMQ_DEFAULT_PASS: benchmark
+    volumes: ["./state/${RUN_NAMESPACE}/rabbit:/var/lib/rabbitmq"]
+    healthcheck:
+      test: [CMD, rabbitmq-diagnostics, -q, ping]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  archive:
+    build: {context: ., target: archive}
+    image: wiremock-benchmark-archive:local
+    cpus: 2
+    mem_limit: 768m
+    memswap_limit: 768m
+    environment:
+      <<: *capture
+      ARCHIVE_PATH: /archive/events.db
+    volumes: ["./state/${RUN_NAMESPACE}/archive:/archive"]
+    depends_on: {rabbit: {condition: service_healthy}}
+  official:
+    <<: *mock
+    build: {context: ., target: official}
+    image: wiremock-benchmark-official:local
+    profiles: [official]
+    command: [--port, '8080', --no-request-journal, --disable-request-logging, --container-threads, '128', --async-response-enabled, 'true', --async-response-threads, '64', --disable-gzip, --disable-http2-plain, --disable-http2-tls, --max-template-cache-entries, '1000', --extensions, bench.CaptureExtension]
+    depends_on: {rabbit: {condition: service_healthy}}
+  headless:
+    <<: *mock
+    build: {context: ., target: headless}
+    image: wiremock-benchmark-headless:local
+    profiles: [headless]
+    depends_on: {rabbit: {condition: service_healthy}}
+  jmeter:
+    build: {context: ., target: jmeter}
+    image: wiremock-benchmark-jmeter:local
+    profiles: [tools]

@@ -1,0 +1,500 @@
+{
+  "runId": "c0038d8802844d1f",
+  "configuration": {
+    "mode": "official",
+    "capture": "on",
+    "target": 1000,
+    "offered": 1020,
+    "seconds": 3600,
+    "warmup": 60,
+    "threads": 7068,
+    "case": "mixed",
+    "port": 18880,
+    "keep": false,
+    "continuous": false,
+    "runId": "c0038d8802844d1f",
+    "arrivalModel": "JMeter Constant Throughput Timer, non-shared current thread group",
+    "engines": 4,
+    "perEngineOffered": 255.0,
+    "host": {
+      "system": "Linux",
+      "node": "tad-devbox",
+      "release": "7.0.0-31-generic",
+      "version": "#31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2",
+      "machine": "x86_64",
+      "processor": "x86_64"
+    },
+    "started": 1790372417.2514114
+  },
+  "measurementUtc": {
+    "startMs": "2026-09-25T21:41:55.195000+00:00",
+    "endMs": "2026-09-25T22:41:55.195000+00:00"
+  },
+  "window": {
+    "startedMs": 1790372455195,
+    "startMs": 1790372515195,
+    "endMs": 1790376115195
+  },
+  "verdict": {
+    "pass": true,
+    "checks": {
+      "httpCorrect": true,
+      "uniqueClientIds": true,
+      "averageOfferedTarget": true,
+      "averageCompletedTarget": true,
+      "everyFullMinuteAtTarget": true,
+      "captureReconciled": true,
+      "scheduledRateRespected": true,
+      "noOomOrRestart": true,
+      "fourEnginesCompleted": true
+    },
+    "measuredSeconds": 3600.0,
+    "targetRps": 1000,
+    "measuredRequests": 3673130,
+    "errors": 0,
+    "offeredRps": 1020.3138888888889,
+    "completedRps": 1020.1558333333334,
+    "minutes": [
+      {
+        "minute": 0,
+        "startedRps": 1019.2833333333333,
+        "completedRps": 1020.6833333333333
+      },
+      {
+        "minute": 1,
+        "startedRps": 1024.2666666666667,
+        "completedRps": 1021.45
+      },
+      {
+        "minute": 2,
+        "startedRps": 1016.35,
+        "completedRps": 1018.6833333333333
+      },
+      {
+        "minute": 3,
+        "startedRps": 1019.95,
+        "completedRps": 1020.75
+      },
+      {
+        "minute": 4,
+        "startedRps": 1023.3,
+        "completedRps": 1019.3666666666667
+      },
+      {
+        "minute": 5,
+        "startedRps": 1016.7833333333333,
+        "completedRps": 1020.9666666666667
+      },
+      {
+        "minute": 6,
+        "startedRps": 1020.0666666666667,
+        "completedRps": 1020.2666666666667
+      },
+      {
+        "minute": 7,
+        "startedRps": 1023.05,
+        "completedRps": 1020.15
+      },
+      {
+        "minute": 8,
+        "startedRps": 1017.0166666666667,
+        "completedRps": 1019.6
+      },
+      {
+        "minute": 9,
+        "startedRps": 1020.5333333333333,
+        "completedRps": 1020.95
+      },
+      {
+        "minute": 10,
+        "startedRps": 1022.0,
+        "completedRps": 1019.1833333333333
+      },
+      {
+        "minute": 11,
+        "startedRps": 1017.4166666666666,
+        "completedRps": 1019.35
+      },
+      {
+        "minute": 12,
+        "startedRps": 1021.1,
+        "completedRps": 1021.3
+      },
+      {
+        "minute": 13,
+        "startedRps": 1021.7666666666667,
+        "completedRps": 1020.1666666666666
+      },
+      {
+        "minute": 14,
+        "startedRps": 1017.4833333333333,
+        "completedRps": 1018.8833333333333
+      },
+      {
+        "minute": 15,
+        "startedRps": 1021.15,
+        "completedRps": 1020.2
+      },
+      {
+        "minute": 16,
+        "startedRps": 1021.0833333333334,
+        "completedRps": 1020.2666666666667
+      },
+      {
+        "minute": 17,
+        "startedRps": 1017.8666666666667,
+        "completedRps": 1019.6833333333333
+      },
+      {
+        "minute": 18,
+        "startedRps": 1021.2333333333333,
+        "completedRps": 1020.4833333333333
+      },
+      {
+        "minute": 19,
+        "startedRps": 1020.9833333333333,
+        "completedRps": 1020.3333333333334
+      },
+      {
+        "minute": 20,
+        "startedRps": 1017.7666666666667,
+        "completedRps": 1020.55
+      },
+      {
+        "minute": 21,
+        "startedRps": 1021.6166666666667,
+        "completedRps": 1020.6833333333333
+      },
+      {
+        "minute": 22,
+        "startedRps": 1020.55,
+        "completedRps": 1018.5666666666667
+      },
+      {
+        "minute": 23,
+        "startedRps": 1017.7666666666667,
+        "completedRps": 1020.3833333333333
+      },
+      {
+        "minute": 24,
+        "startedRps": 1022.1,
+        "completedRps": 1020.1333333333333
+      },
+      {
+        "minute": 25,
+        "startedRps": 1020.0166666666667,
+        "completedRps": 1019.4833333333333
+      },
+      {
+        "minute": 26,
+        "startedRps": 1018.2833333333333,
+        "completedRps": 1018.5833333333334
+      },
+      {
+        "minute": 27,
+        "startedRps": 1022.3833333333333,
+        "completedRps": 1021.0666666666667
+      },
+      {
+        "minute": 28,
+        "startedRps": 1019.3166666666667,
+        "completedRps": 1021.7666666666667
+      },
+      {
+        "minute": 29,
+        "startedRps": 1018.25,
+        "completedRps": 1020.95
+      },
+      {
+        "minute": 30,
+        "startedRps": 1023.1,
+        "completedRps": 1019.1166666666667
+      },
+      {
+        "minute": 31,
+        "startedRps": 1018.9166666666666,
+        "completedRps": 1019.1166666666667
+      },
+      {
+        "minute": 32,
+        "startedRps": 1018.05,
+        "completedRps": 1020.15
+      },
+      {
+        "minute": 33,
+        "startedRps": 1023.8333333333334,
+        "completedRps": 1020.6
+      },
+      {
+        "minute": 34,
+        "startedRps": 1018.2166666666667,
+        "completedRps": 1019.1833333333333
+      },
+      {
+        "minute": 35,
+        "startedRps": 1018.2833333333333,
+        "completedRps": 1021.9166666666666
+      },
+      {
+        "minute": 36,
+        "startedRps": 1024.5,
+        "completedRps": 1018.1666666666666
+      },
+      {
+        "minute": 37,
+        "startedRps": 1017.35,
+        "completedRps": 1020.0
+      },
+      {
+        "minute": 38,
+        "startedRps": 1018.6,
+        "completedRps": 1020.35
+      },
+      {
+        "minute": 39,
+        "startedRps": 1024.5666666666666,
+        "completedRps": 1019.3166666666667
+      },
+      {
+        "minute": 40,
+        "startedRps": 1016.8,
+        "completedRps": 1021.8666666666667
+      },
+      {
+        "minute": 41,
+        "startedRps": 1018.75,
+        "completedRps": 1019.05
+      },
+      {
+        "minute": 42,
+        "startedRps": 1024.9166666666667,
+        "completedRps": 1021.0333333333333
+      },
+      {
+        "minute": 43,
+        "startedRps": 1016.2166666666667,
+        "completedRps": 1019.4166666666666
+      },
+      {
+        "minute": 44,
+        "startedRps": 1018.9,
+        "completedRps": 1018.4666666666667
+      },
+      {
+        "minute": 45,
+        "startedRps": 1024.45,
+        "completedRps": 1021.9
+      },
+      {
+        "minute": 46,
+        "startedRps": 1016.3666666666667,
+        "completedRps": 1018.7166666666667
+      },
+      {
+        "minute": 47,
+        "startedRps": 1019.7833333333333,
+        "completedRps": 1022.05
+      },
+      {
+        "minute": 48,
+        "startedRps": 1023.7,
+        "completedRps": 1019.2666666666667
+      },
+      {
+        "minute": 49,
+        "startedRps": 1016.85,
+        "completedRps": 1019.4166666666666
+      },
+      {
+        "minute": 50,
+        "startedRps": 1019.6666666666666,
+        "completedRps": 1021.0
+      },
+      {
+        "minute": 51,
+        "startedRps": 1023.0833333333334,
+        "completedRps": 1019.3
+      },
+      {
+        "minute": 52,
+        "startedRps": 1017.0666666666667,
+        "completedRps": 1021.15
+      },
+      {
+        "minute": 53,
+        "startedRps": 1020.2333333333333,
+        "completedRps": 1019.3333333333334
+      },
+      {
+        "minute": 54,
+        "startedRps": 1022.45,
+        "completedRps": 1020.0333333333333
+      },
+      {
+        "minute": 55,
+        "startedRps": 1017.3666666666667,
+        "completedRps": 1019.0833333333334
+      },
+      {
+        "minute": 56,
+        "startedRps": 1020.9333333333333,
+        "completedRps": 1020.4833333333333
+      },
+      {
+        "minute": 57,
+        "startedRps": 1021.7,
+        "completedRps": 1021.0666666666667
+      },
+      {
+        "minute": 58,
+        "startedRps": 1017.7666666666667,
+        "completedRps": 1020.2166666666667
+      },
+      {
+        "minute": 59,
+        "startedRps": 1035.6833333333334,
+        "completedRps": 1023.7
+      }
+    ],
+    "latencyMs": {
+      "p50": 3025,
+      "p95": 6030,
+      "p99": 6043,
+      "max": 6153
+    },
+    "delayAdjustedLatencyMs": {
+      "p50": 25,
+      "p95": 45,
+      "p99": 62,
+      "max": 159
+    },
+    "capture": {
+      "enabled": true,
+      "events": 11019390,
+      "expectedEvents": 11019390,
+      "missingOrCorruptExchanges": 0,
+      "pending": 0,
+      "errors": 0
+    }
+  },
+  "runtime": {
+    "enabled": true,
+    "errors": 0,
+    "java": "17.0.19+10",
+    "pending": 0,
+    "committed": 0,
+    "confirmed": 0,
+    "brokerConnected": true,
+    "reconnects": 0,
+    "heapUsed": 27305784
+  },
+  "engineSampleCounts": {
+    "1": 933066,
+    "2": 933076,
+    "3": 933076,
+    "4": 933044
+  },
+  "logicalCpus": 20,
+  "cpuModel": "Intel(R) Core(TM) Ultra 7 265",
+  "memoryTotal": "32293156 kB",
+  "images": {
+    "rabbitmq:3.13.7-management-alpine": "sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+    "wiremock-benchmark-archive:local": "sha256:0d68c4cc45440b81d6ae66bee9b1fc36dfea67755b3dd3219a4b676b1f78eba0",
+    "wiremock-benchmark-jmeter:local": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+    "wiremock-benchmark-official:local": "sha256:fe285eca6d966195de0abd74737222cdb4aa300498b82c2309d0951d0aaca25c"
+  },
+  "containerStability": [
+    {
+      "name": "/wmb-c0038d8802844d1f-archive-1",
+      "image": "sha256:0d68c4cc45440b81d6ae66bee9b1fc36dfea67755b3dd3219a4b676b1f78eba0",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-c0038d8802844d1f-official-1",
+      "image": "sha256:fe285eca6d966195de0abd74737222cdb4aa300498b82c2309d0951d0aaca25c",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-c0038d8802844d1f-rabbit-1",
+      "image": "sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-c0038d8802844d1f-engines_injector.1.jvz05nqsoiqdyn901hlfsx9jt",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-c0038d8802844d1f-engines_injector.2.zh22jkaulsih7nn2od72o4vpn",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-c0038d8802844d1f-engines_injector.3.l2g4rxd4i0cerws4py79cwjbr",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    },
+    {
+      "name": "/wmb-c0038d8802844d1f-engines_injector.4.6dxm8wjut0snjag4dqvm5o4h5",
+      "image": "sha256:8f097203c6efcef3cca9d87d018fdb5114ebdcc14f9815b73968011493a373bc",
+      "oomKilled": false,
+      "restartCount": 0
+    }
+  ],
+  "measuredTelemetry": {
+    "samples": 299,
+    "pendingMaximum": 1564,
+    "heapBytesMinimum": 1049059472,
+    "heapBytesMaximum": 2573022264,
+    "reconnectsMaximum": 0
+  },
+  "sourceSha256": {
+    "Dockerfile": "ba85b1711d0c40330dc1bd473cdec920ace756b1afedaec2dc7b043edb1b1be8",
+    "compose.swarm.yaml": "23062d1d73d95074d47c53373d15b98f83cfcc5c5e936d02e9545f9d365037e8",
+    "compose.yaml": "293f62d6082f8ea3bd2b9741107bd7a7e90c4b6b7f09e119c8e43e74a17a8e54",
+    "pom.xml": "6f9cbe74e9e8275cc742ad487de1acbb4dadc5aac4bc9c217a31ab8a8f8050cc",
+    "src/main/java/bench/Archive.java": "6c8d04e5c1df20fff938d9b7435454706406f32c4ae53d926fe6eaa422891fbc",
+    "src/main/java/bench/CaptureCodec.java": "7ff4c8427f913ce6c8a39ec65e0427511c372d833a6eef2ad849a26076ee3b2c",
+    "src/main/java/bench/CaptureEvent.java": "a3eba35aabff7d8aac54e718ebc43dc6bfc75ea358ccd36731c0458ba2713fbe",
+    "src/main/java/bench/CaptureExtension.java": "1004b330b610a5e4247966e678349cd32845284c5062a342534f6071ba327bc3",
+    "src/main/java/bench/DurableOutbox.java": "f66840487f1ae5aa8d19b9811c4dcea803f20797c16e781079e2f6536ad6c8e4",
+    "src/main/java/bench/Headless.java": "12e89054507d6ced567c2ec9d40a353c55afa38b32f63826163fbddface1c1c7",
+    "src/main/java/bench/Json.java": "3036b8da3b769084c63aa40add128baf082b4a890989d4f5d8c7ca92672aa614",
+    "src/main/java/bench/OutboxRow.java": "3d3b392d23d07ed0c48966a007f016eac7738fffa2aa0dfd854a5703fa4afd92",
+    "src/main/java/bench/Phase.java": "175b02a4349a43ddbec4abdcd7b894748cdc572963b6560d6cd66e54a088df4c",
+    "src/main/java/bench/RabbitPublisher.java": "c04c57489fa6ba1afd4e910b0c23bba61a7d23848782b3ef478bcbba38a5ec62",
+    "src/main/java/bench/Settings.java": "4e8e30294d4a10987aa926b526cf0a79bb22b9674dc807f36b12ea71dd434bef",
+    "src/test/java/bench/CaptureCodecTest.java": "dc52e2a5da9b90376db7b99fdda3eb7b7cc267eaa1eb79b239f9292a01057f54",
+    "src/test/java/bench/DurableOutboxTest.java": "971b0fa6a81ddbb47e435060ba1d5a8c8360c1ef3f8b9f65aa8c6f42554fe55b",
+    "swarm.yaml": "96af395c4a2c60d56cf379a4e646398fd0c31cc597872ced79846066077b4c62",
+    "tests/perf/assert.groovy": "64c5ae8a338d6b68fe122959b0e21d4c8b3eb87d79c92b1128a676a8616de33a",
+    "tests/perf/benchmark.jmx": "4d1272252970c40be7f6e15e51c80e9257544ff334a40ba313e2093c7d35b9b5",
+    "tests/perf/init.groovy": "f32371fbd5bf8728d599b4705f6a94aca67ed24252d73230be3f360986b68c4d",
+    "tests/perf/request.groovy": "b16ff1bfd60f9ece3587bd3a990c1fffb311807a40580a86e9a8526a965b90f1",
+    "tests/perf/start-engine.sh": "d056a8f89d22adcb899101d9f52b4cb6f382b7b2b974ac121707922eb2fb3b10",
+    "tools/bench.py": "3412be9ea1996e94c6cf704e228f410313dbf0481a3bc855a285287f61cd5c81",
+    "tools/fault_probe.py": "1f53d76837bd2c9758d0c3bbb175e487df90cbb6fc48eb7e0a512f50504d86d0",
+    "tools/fixtures.py": "23432f9afe8ae3c25443a7c491a314f5ec0f4db8b106cdcf48563c972d5ee99a",
+    "tools/jmx.py": "449b903258990c9f643041433d3f5d2ba7e92781402cc2fba7a2d973177518e8",
+    "tools/read_capture.py": "22e2ff37d01d3b593c4012a65a260d27ec122988fea6df518ffce10ab12a1964",
+    "tools/swarm.py": "84c43aea1b6bda00273c8c7abfc8fbee762710bde6d72d2f4d54caa38fbf2620",
+    "tools/test_bench.py": "ffec3dd49a94cafd78d9ab8149270c65e825b3c4b139ece719e3e24e0b0d8fc4",
+    "tools/test_swarm.py": "c64104584fbd6dd3e6a9d6351df0eed0bed3c1ce269b5bfde99ee7cbf29f81e5",
+    "tools/test_verdict.py": "4185b6f279993cfe6207d4ff25d8e3e556f1f79de78a122a08369a08398eb28a",
+    "tools/verdict.py": "f88ad014b6b6db65f606f49a9276ffc1def09c1a1cda0e35a69c07ee16877f89"
+  },
+  "rawEvidence": {
+    "results": "results/c0038d8802844d1f",
+    "state": "state/c0038d8802844d1f"
+  },
+  "diagnosticLogExport": {
+    "complete": false,
+    "reason": "Service-log export exceeded 30s"
+  }
+}

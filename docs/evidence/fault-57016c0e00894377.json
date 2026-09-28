@@ -1,0 +1,10 @@
+{
+  "mode": "official",
+  "runId": "57016c0e00894377",
+  "checks": {
+    "brokerOutageRetains120Events": true,
+    "mockKillPreserves120CommittedEvents": true,
+    "externalArchiveReconcilesEveryPhase": true
+  },
+  "pass": true
+}

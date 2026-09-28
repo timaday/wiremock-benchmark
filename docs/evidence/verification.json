@@ -1,0 +1,28 @@
+{
+  "checkedAtUtc": "2026-09-25T21:28:32.230574+00:00",
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tools -p test_*.py -q",
+      "tests": 14,
+      "result": "pass"
+    },
+    {
+      "command": "black --check tools",
+      "files": 10,
+      "result": "pass"
+    },
+    {
+      "command": "RUN_NAMESPACE=validation CAPTURE_ENABLED=true docker compose --profile official --profile headless --profile tools config --quiet",
+      "result": "pass"
+    },
+    {
+      "command": "Dockerfile build stage: mvn -B -ntp package",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "result": "pass",
+      "evidence": "Previously completed compressed-capture image build; Java sources unchanged since that build."
+    }
+  ]
+}

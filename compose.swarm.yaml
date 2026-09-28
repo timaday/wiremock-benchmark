@@ -1,0 +1,4 @@
+networks:
+  default:
+    external: true
+    name: ${BENCH_NETWORK:?set benchmark overlay}

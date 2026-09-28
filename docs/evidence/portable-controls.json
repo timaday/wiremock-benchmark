@@ -1,0 +1,747 @@
+{
+  "observedAt": "2026-09-27T20:21:14.075418+00:00",
+  "scope": "Functional portability/control/report smoke on Linux x86-64; not a new throughput qualification",
+  "unitTestsPassed": 28,
+  "runs": [
+    {
+      "runId": "e2fc2f5011cb4432",
+      "mode": "official",
+      "capture": "off",
+      "target": 10,
+      "offered": 12,
+      "seconds": 60.0,
+      "delayMs": 0,
+      "sizeKiB": [
+        10
+      ],
+      "templates": [
+        "json",
+        "text"
+      ],
+      "verdict": {
+        "pass": true,
+        "checks": {
+          "httpCorrect": true,
+          "uniqueClientIds": true,
+          "averageOfferedTarget": true,
+          "averageCompletedTarget": true,
+          "everyFullMinuteAtTarget": true,
+          "captureReconciled": true,
+          "scheduledRateRespected": true,
+          "noOomOrRestart": true,
+          "fourEnginesCompleted": true
+        },
+        "measuredSeconds": 60.0,
+        "targetRps": 10,
+        "measuredRequests": 720,
+        "errors": 0,
+        "offeredRps": 12.0,
+        "completedRps": 12.0,
+        "minutes": [
+          {
+            "minute": 0,
+            "startedRps": 12.0,
+            "completedRps": 12.0
+          }
+        ],
+        "latencyMs": {
+          "p50": 2,
+          "p95": 2,
+          "p99": 3,
+          "max": 8
+        },
+        "delayAdjustedLatencyMs": {
+          "p50": 2,
+          "p95": 2,
+          "p99": 3,
+          "max": 8
+        },
+        "capture": {
+          "enabled": false
+        }
+      },
+      "resources": {
+        "mock": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 1.17,
+            "mean": 2.876,
+            "max": 4.54
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 354313830.4,
+            "mean": 366162739.2,
+            "max": 376543641.6
+          }
+        },
+        "archive": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 0.08,
+            "mean": 0.10400000000000001,
+            "max": 0.14
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 85070970.88,
+            "mean": 85079359.488,
+            "max": 85091942.4
+          }
+        },
+        "engines": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 3.2800000000000002,
+            "mean": 5.778,
+            "max": 11.34
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1084332441.6,
+            "mean": 1107149455.36,
+            "max": 1120718028.8
+          }
+        },
+        "rabbit": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 0.1,
+            "mean": 0.152,
+            "max": 0.3
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 144284057.6,
+            "mean": 144284057.6,
+            "max": 144284057.6
+          }
+        },
+        "total": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 4.66,
+            "mean": 8.91,
+            "max": 13.959999999999999
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1668001300.4799998,
+            "mean": 1702675611.648,
+            "max": 1719926784.0
+          }
+        }
+      },
+      "heapUsedBytes": {
+        "samples": 5,
+        "min": 38993688,
+        "mean": 98639523.2,
+        "max": 174487888
+      },
+      "java": "17.0.19+10"
+    },
+    {
+      "runId": "ed8a560cdcdd4ca0",
+      "mode": "official",
+      "capture": "on",
+      "target": 10,
+      "offered": 12,
+      "seconds": 60.0,
+      "delayMs": 0,
+      "sizeKiB": [
+        10
+      ],
+      "templates": [
+        "json",
+        "text"
+      ],
+      "verdict": {
+        "pass": true,
+        "checks": {
+          "httpCorrect": true,
+          "uniqueClientIds": true,
+          "averageOfferedTarget": true,
+          "averageCompletedTarget": true,
+          "everyFullMinuteAtTarget": true,
+          "captureReconciled": true,
+          "scheduledRateRespected": true,
+          "noOomOrRestart": true,
+          "fourEnginesCompleted": true
+        },
+        "measuredSeconds": 60.0,
+        "targetRps": 10,
+        "measuredRequests": 720,
+        "errors": 0,
+        "offeredRps": 12.0,
+        "completedRps": 12.0,
+        "minutes": [
+          {
+            "minute": 0,
+            "startedRps": 12.0,
+            "completedRps": 12.0
+          }
+        ],
+        "latencyMs": {
+          "p50": 8,
+          "p95": 9,
+          "p99": 10,
+          "max": 16
+        },
+        "delayAdjustedLatencyMs": {
+          "p50": 8,
+          "p95": 9,
+          "p99": 10,
+          "max": 16
+        },
+        "capture": {
+          "enabled": true,
+          "events": 2160,
+          "expectedEvents": 2160,
+          "missingOrCorruptExchanges": 0,
+          "pending": 0,
+          "errors": 0
+        }
+      },
+      "resources": {
+        "mock": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 6.44,
+            "mean": 7.79,
+            "max": 9.5
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 319920537.6,
+            "mean": 323737354.24,
+            "max": 327680000.0
+          }
+        },
+        "rabbit": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 1.41,
+            "mean": 12.713999999999999,
+            "max": 57.23
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 145227776.0,
+            "mean": 145773035.52,
+            "max": 146486067.2
+          }
+        },
+        "engines": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 3.95,
+            "mean": 4.704,
+            "max": 6.96
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1015545856.0,
+            "mean": 1040585850.88,
+            "max": 1058852044.8
+          }
+        },
+        "archive": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 1.22,
+            "mean": 1.354,
+            "max": 1.54
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 125199974.4,
+            "mean": 132686807.04,
+            "max": 136734310.4
+          }
+        },
+        "total": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 14.129999999999999,
+            "mean": 26.561999999999998,
+            "max": 71.85
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1607152435.2,
+            "mean": 1642783047.68,
+            "max": 1669123276.8000002
+          }
+        }
+      },
+      "heapUsedBytes": {
+        "samples": 5,
+        "min": 25874112,
+        "mean": 92401054.4,
+        "max": 154420824
+      },
+      "java": "17.0.19+10"
+    },
+    {
+      "runId": "7f15f875ae584d0b",
+      "mode": "headless",
+      "capture": "off",
+      "target": 10,
+      "offered": 12,
+      "seconds": 60.0,
+      "delayMs": 0,
+      "sizeKiB": [
+        10
+      ],
+      "templates": [
+        "json",
+        "text"
+      ],
+      "verdict": {
+        "pass": true,
+        "checks": {
+          "httpCorrect": true,
+          "uniqueClientIds": true,
+          "averageOfferedTarget": true,
+          "averageCompletedTarget": true,
+          "everyFullMinuteAtTarget": true,
+          "captureReconciled": true,
+          "scheduledRateRespected": true,
+          "noOomOrRestart": true,
+          "fourEnginesCompleted": true
+        },
+        "measuredSeconds": 60.0,
+        "targetRps": 10,
+        "measuredRequests": 720,
+        "errors": 0,
+        "offeredRps": 12.0,
+        "completedRps": 12.0,
+        "minutes": [
+          {
+            "minute": 0,
+            "startedRps": 12.0,
+            "completedRps": 12.0
+          }
+        ],
+        "latencyMs": {
+          "p50": 2,
+          "p95": 3,
+          "p99": 4,
+          "max": 9
+        },
+        "delayAdjustedLatencyMs": {
+          "p50": 2,
+          "p95": 3,
+          "p99": 4,
+          "max": 9
+        },
+        "capture": {
+          "enabled": false
+        }
+      },
+      "resources": {
+        "mock": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 1.58,
+            "mean": 3.118,
+            "max": 6.35
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 307232768.0,
+            "mean": 315034173.44,
+            "max": 327260569.6
+          }
+        },
+        "archive": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 0.09,
+            "mean": 0.102,
+            "max": 0.12
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 47689236.48,
+            "mean": 47722790.912,
+            "max": 47741665.28
+          }
+        },
+        "engines": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 3.65,
+            "mean": 5.798,
+            "max": 9.75
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 968150220.8,
+            "mean": 971547607.04,
+            "max": 972763955.2
+          }
+        },
+        "rabbit": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 0.1,
+            "mean": 0.302,
+            "max": 0.61
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 144388915.2,
+            "mean": 144514744.32,
+            "max": 144703488.0
+          }
+        },
+        "total": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 6.61,
+            "mean": 9.32,
+            "max": 13.110000000000001
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1471760302.08,
+            "mean": 1478819315.712,
+            "max": 1492469678.08
+          }
+        }
+      },
+      "heapUsedBytes": {
+        "samples": 5,
+        "min": 25536992,
+        "mean": 85376516.8,
+        "max": 140061296
+      },
+      "java": "27+35-2325"
+    },
+    {
+      "runId": "df3ce08602b84c13",
+      "mode": "headless",
+      "capture": "on",
+      "target": 10,
+      "offered": 12,
+      "seconds": 60.0,
+      "delayMs": 0,
+      "sizeKiB": [
+        10
+      ],
+      "templates": [
+        "json",
+        "text"
+      ],
+      "verdict": {
+        "pass": true,
+        "checks": {
+          "httpCorrect": true,
+          "uniqueClientIds": true,
+          "averageOfferedTarget": true,
+          "averageCompletedTarget": true,
+          "everyFullMinuteAtTarget": true,
+          "captureReconciled": true,
+          "scheduledRateRespected": true,
+          "noOomOrRestart": true,
+          "fourEnginesCompleted": true
+        },
+        "measuredSeconds": 60.0,
+        "targetRps": 10,
+        "measuredRequests": 720,
+        "errors": 0,
+        "offeredRps": 12.0,
+        "completedRps": 12.0,
+        "minutes": [
+          {
+            "minute": 0,
+            "startedRps": 12.0,
+            "completedRps": 12.0
+          }
+        ],
+        "latencyMs": {
+          "p50": 8,
+          "p95": 10,
+          "p99": 15,
+          "max": 26
+        },
+        "delayAdjustedLatencyMs": {
+          "p50": 8,
+          "p95": 10,
+          "p99": 15,
+          "max": 26
+        },
+        "capture": {
+          "enabled": true,
+          "events": 2160,
+          "expectedEvents": 2160,
+          "missingOrCorruptExchanges": 0,
+          "pending": 0,
+          "errors": 0
+        }
+      },
+      "resources": {
+        "archive": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 0.88,
+            "mean": 1.708,
+            "max": 3.78
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 123207680.0,
+            "mean": 131638231.03999999,
+            "max": 136524595.2
+          }
+        },
+        "engines": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 4.13,
+            "mean": 5.478,
+            "max": 7.76
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1086324736.0,
+            "mean": 1116712468.48,
+            "max": 1135293235.2
+          }
+        },
+        "mock": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 6.59,
+            "mean": 7.412,
+            "max": 8.15
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 332713164.8,
+            "mean": 334202142.72,
+            "max": 336907468.8
+          }
+        },
+        "rabbit": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 1.0,
+            "mean": 12.816,
+            "max": 58.93
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 146066636.8,
+            "mean": 146528010.24,
+            "max": 146905497.6
+          }
+        },
+        "total": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 14.41,
+            "mean": 27.414,
+            "max": 72.21000000000001
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1689046220.8,
+            "mean": 1729080852.4799998,
+            "max": 1755525939.2
+          }
+        }
+      },
+      "heapUsedBytes": {
+        "samples": 5,
+        "min": 43201104,
+        "mean": 100608323.2,
+        "max": 158304568
+      },
+      "java": "27+35-2325"
+    }
+  ],
+  "comparisons": [
+    {
+      "kind": "capture",
+      "baseline": "e2fc2f5011cb4432",
+      "candidate": "ed8a560cdcdd4ca0",
+      "changes": {
+        "completedRps": {
+          "baseline": 12.0,
+          "candidate": 12.0,
+          "delta": 0.0,
+          "percentChange": 0.0
+        },
+        "delayAdjustedP95Ms": {
+          "baseline": 2,
+          "candidate": 9,
+          "delta": 7,
+          "percentChange": 350.0
+        },
+        "delayAdjustedP99Ms": {
+          "baseline": 3,
+          "candidate": 10,
+          "delta": 7,
+          "percentChange": 233.33333333333334
+        },
+        "heapPeakBytes": {
+          "baseline": 174487888,
+          "candidate": 154420824,
+          "delta": -20067064,
+          "percentChange": -11.500548393364701
+        },
+        "mockMeanCpuPercent": {
+          "baseline": 2.876,
+          "candidate": 7.79,
+          "delta": 4.914,
+          "percentChange": 170.86230876216968
+        },
+        "mockPeakMemoryBytes": {
+          "baseline": 376543641.6,
+          "candidate": 327680000.0,
+          "delta": -48863641.600000024,
+          "percentChange": -12.976886661097192
+        },
+        "totalMeanCpuPercent": {
+          "baseline": 8.91,
+          "candidate": 26.561999999999998,
+          "delta": 17.651999999999997,
+          "percentChange": 198.1144781144781
+        },
+        "totalPeakMemoryBytes": {
+          "baseline": 1719926784.0,
+          "candidate": 1669123276.8,
+          "delta": -50803507.20000005,
+          "percentChange": -2.9538180155464135
+        }
+      },
+      "java": {
+        "baseline": "17.0.19+10",
+        "candidate": "17.0.19+10"
+      },
+      "limitation": "Observed paired differences at fixed offered rate, not maximum capacity or causal proof. Runtime comparison includes JVM differences."
+    },
+    {
+      "kind": "capture",
+      "baseline": "7f15f875ae584d0b",
+      "candidate": "df3ce08602b84c13",
+      "changes": {
+        "completedRps": {
+          "baseline": 12.0,
+          "candidate": 12.0,
+          "delta": 0.0,
+          "percentChange": 0.0
+        },
+        "delayAdjustedP95Ms": {
+          "baseline": 3,
+          "candidate": 10,
+          "delta": 7,
+          "percentChange": 233.33333333333334
+        },
+        "delayAdjustedP99Ms": {
+          "baseline": 4,
+          "candidate": 15,
+          "delta": 11,
+          "percentChange": 275.0
+        },
+        "heapPeakBytes": {
+          "baseline": 140061296,
+          "candidate": 158304568,
+          "delta": 18243272,
+          "percentChange": 13.02520576419627
+        },
+        "mockMeanCpuPercent": {
+          "baseline": 3.118,
+          "candidate": 7.412,
+          "delta": 4.2940000000000005,
+          "percentChange": 137.71648492623478
+        },
+        "mockPeakMemoryBytes": {
+          "baseline": 327260569.6,
+          "candidate": 336907468.8,
+          "delta": 9646899.199999988,
+          "percentChange": 2.9477731496315247
+        },
+        "totalMeanCpuPercent": {
+          "baseline": 9.32,
+          "candidate": 27.413999999999998,
+          "delta": 18.093999999999998,
+          "percentChange": 194.14163090128753
+        },
+        "totalPeakMemoryBytes": {
+          "baseline": 1492469678.08,
+          "candidate": 1755525939.2,
+          "delta": 263056261.12000012,
+          "percentChange": 17.625568209761624
+        }
+      },
+      "java": {
+        "baseline": "27+35-2325",
+        "candidate": "27+35-2325"
+      },
+      "limitation": "Observed paired differences at fixed offered rate, not maximum capacity or causal proof. Runtime comparison includes JVM differences."
+    },
+    {
+      "kind": "runtime",
+      "baseline": "ed8a560cdcdd4ca0",
+      "candidate": "df3ce08602b84c13",
+      "changes": {
+        "completedRps": {
+          "baseline": 12.0,
+          "candidate": 12.0,
+          "delta": 0.0,
+          "percentChange": 0.0
+        },
+        "delayAdjustedP95Ms": {
+          "baseline": 9,
+          "candidate": 10,
+          "delta": 1,
+          "percentChange": 11.11111111111111
+        },
+        "delayAdjustedP99Ms": {
+          "baseline": 10,
+          "candidate": 15,
+          "delta": 5,
+          "percentChange": 50.0
+        },
+        "heapPeakBytes": {
+          "baseline": 154420824,
+          "candidate": 158304568,
+          "delta": 3883744,
+          "percentChange": 2.5150390338546567
+        },
+        "mockMeanCpuPercent": {
+          "baseline": 7.79,
+          "candidate": 7.412,
+          "delta": -0.3780000000000001,
+          "percentChange": -4.8523748395378705
+        },
+        "mockPeakMemoryBytes": {
+          "baseline": 327680000.0,
+          "candidate": 336907468.8,
+          "delta": 9227468.800000012,
+          "percentChange": 2.816000000000004
+        },
+        "totalMeanCpuPercent": {
+          "baseline": 26.561999999999998,
+          "candidate": 27.414,
+          "delta": 0.8520000000000039,
+          "percentChange": 3.207589789925472
+        },
+        "totalPeakMemoryBytes": {
+          "baseline": 1669123276.8,
+          "candidate": 1755525939.2,
+          "delta": 86402662.4000001,
+          "percentChange": 5.176529714788296
+        }
+      },
+      "java": {
+        "baseline": "17.0.19+10",
+        "candidate": "27+35-2325"
+      },
+      "limitation": "Observed paired differences at fixed offered rate, not maximum capacity or causal proof. Runtime comparison includes JVM differences."
+    }
+  ]
+}
