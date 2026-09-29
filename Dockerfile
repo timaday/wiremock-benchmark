@@ -31,13 +31,15 @@ WORKDIR /app
 COPY --from=build /src/target/capture.jar /app/capture.jar
 ENTRYPOINT ["java","--enable-native-access=ALL-UNNAMED","-Xms128m","-Xmx512m","-cp","/app/capture.jar","bench.Archive"]
 
-FROM eclipse-temurin:21-jre AS jmeter
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && apt-get clean \
- && curl -fsSL https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz -o /tmp/jmeter.tgz \
- && echo '5978a1a35edb5a7d428e270564ff49d2b1b257a65e17a759d259a9283fc17093e522fe46f474a043864aea6910683486340706d745fcdf3db1505fd71e689083  /tmp/jmeter.tgz' | sha512sum -c - \
- && tar xzf /tmp/jmeter.tgz -C /opt
-ENV HEAP="-Xms512m -Xmx1536m" JVM_ARGS="-Xss256k -XX:MaxMetaspaceSize=256m"
-WORKDIR /work
-COPY tests/perf /work/tests
-COPY fixtures/cases.json /work/fixtures/cases.json
-ENTRYPOINT ["/opt/apache-jmeter-5.6.3/bin/jmeter"]
+FROM maven:3.9.16-eclipse-temurin-21 AS gatling-build
+WORKDIR /src
+COPY tests/perf/gatling/pom.xml .
+COPY tests/perf/gatling/src src
+RUN mvn -B -ntp package dependency:copy-dependencies -DincludeScope=runtime
+
+FROM eclipse-temurin:21-jre AS gatling
+COPY --from=gatling-build /src/target/classes /opt/gatling/classes
+COPY --from=gatling-build /src/target/dependency /opt/gatling/dependency
+COPY tests/perf/start-engine.sh /work/tests/start-engine.sh
+ENV HEAP="-Xms128m -Xmx1g" JVM_ARGS="-Xss256k -XX:MaxMetaspaceSize=160m -XX:+ExitOnOutOfMemoryError"
+ENTRYPOINT ["/bin/sh", "/work/tests/start-engine.sh"]

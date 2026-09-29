@@ -4,3 +4,4 @@ state
 .runtime
 target
 __pycache__
+**/target

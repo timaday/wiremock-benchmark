@@ -1,8 +1,7 @@
-"""Four independent JMeter CLI tasks in an explicitly owned Docker Swarm stack."""
+"""Four independent Gatling CLI tasks in an explicitly owned Docker Swarm stack."""
 
 import csv
 import json
-import math
 import subprocess
 import time
 from pathlib import Path
@@ -44,7 +43,7 @@ class SwarmEngines:
         self.network_created = True
         return self.network
 
-    def start(self, mode, offered, threads, case, warmup, seconds):
+    def start(self, mode, offered, warmup, seconds):
         load_start = int(time.time() * 1000) + 30000
         window = dict(
             startedMs=load_start,
@@ -55,10 +54,8 @@ class SwarmEngines:
         self.environment.update(
             BENCH_HOST=mode,
             ENGINE_RATE=str(offered / ENGINE_COUNT),
-            ENGINE_THREADS=str(math.ceil(threads / ENGINE_COUNT)),
             LOAD_START_MS=str(load_start),
             MEASURE_END_MS=str(window["endMs"]),
-            BENCH_CASE=case,
             RESULTS_PATH=str(self.root.parent.resolve()),
         )
         self.deployed = True
@@ -87,7 +84,6 @@ class SwarmEngines:
         )
         for name in [
             "ENGINE_RATE",
-            "ENGINE_THREADS",
             "LOAD_START_MS",
             "MEASURE_END_MS",
             "RUN_ID",
@@ -141,38 +137,49 @@ class SwarmEngines:
         )
 
     def graceful_stop(self):
-        for identifier in self.container_ids:
-            self.call(
-                [
-                    "docker",
-                    "exec",
-                    identifier,
-                    "/opt/apache-jmeter-5.6.3/bin/shutdown.sh",
-                ],
-                check=False,
-            )
+        (self.root / "stop.requested").touch()
 
     def merge(self):
         header = None
         counts = {}
-        with (self.root / "samples.jtl").open("w", newline="") as output:
+        with (self.root / "samples.csv").open("w", newline="") as output:
             writer = csv.writer(output)
             for engine in range(1, ENGINE_COUNT + 1):
-                path = self.root / f"engine-{engine}.jtl"
+                path = self.root / f"engine-{engine}.csv"
                 count = 0
                 with path.open(newline="") as source:
                     reader = csv.reader(source)
                     current = next(reader)
+                    expected = [
+                        "timeStamp",
+                        "elapsed",
+                        "success",
+                        "bench_id",
+                        "case_id",
+                        "delay_ms",
+                        "payload_bytes",
+                        "request_sha256",
+                        "response_sha256",
+                    ]
+                    if current != expected:
+                        raise ValueError("Invalid engine CSV schema")
                     if header is None:
                         header = current
                         writer.writerow(header)
                     elif current != header:
-                        raise ValueError("Engine JTL headers differ")
+                        raise ValueError("Engine CSV headers differ")
                     for row in reader:
                         writer.writerow(row)
                         count += 1
-                if count <= 1:
+                if count == 0:
                     raise ValueError(f"Engine {engine} supplied no HTTP samples")
+                completion = json.loads(
+                    (self.root / f"engine-{engine}-completion.json").read_text()
+                )
+                if completion != {"started": count, "completed": count}:
+                    raise ValueError(
+                        f"Engine {engine} did not account for every request"
+                    )
                 counts[str(engine)] = count
         (self.root / "engine-sample-counts.json").write_text(
             json.dumps(counts, indent=2)

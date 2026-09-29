@@ -2,16 +2,16 @@
 
 Portable WireMock **3.13.2** comparison: official Docker runtime versus embedded,
 headless **OpenJDK 27**, with the same RabbitMQ capture extension in both.
-Four JMeter 5.6.3 engines run as Docker Swarm tasks and generate the combined load. MockServer is an optional future comparator.
+Four Gatling 3.15.1 engines run as Docker Swarm tasks and generate the combined load. MockServer is an optional future comparator.
 
 **A build or smoke pass is not a 1,000 requests/sec qualification.** See the
-[qualification report](docs/QUALIFICATION.md), per-run `verdict.json` and
+[historical JMeter qualification report](docs/QUALIFICATION.md), per-run `verdict.json` and
 [contract](docs/CONTRACT.md) for measured results, exact gates and scope.
 
 ## Run
 
 Requires Docker Engine/Compose, a local Swarm manager, and Python 3.10+ on a Linux
-Docker host (Windows: run inside WSL2). No local Java, Maven, RabbitMQ or JMeter
+Docker host (Windows: run inside WSL2). No local Java, Maven, RabbitMQ or Gatling
 is needed. Linux x86-64 is the initial test host. Image recipes also select upstream
 Linux ARM64 JDK27, but that architecture needs its own qualification. macOS Docker Desktop can use the Linux images and shared bind paths, but has not
 been qualified here. Native Windows Python is unsupported by the POSIX suite lock.
@@ -45,7 +45,7 @@ actual offered/completed rates are reported. Use `--offered 1000` for a strict
 1,000/s stimulus; short delivery is a failed target, not rounded into a pass.
 For continuous checking, add `--continuous`: the same mock and injector processes
 run until Ctrl+C (a one-year scheduler ceiling is explicit). Ctrl+C requests
-graceful JMeter shutdown, drains responses/capture and reports the actual observed
+graceful Gatling stop, drains responses/capture and reports the actual observed
 interval. Use `--seconds 86400` for a bounded 24-hour hold. Interrupted setup or
 a stop before warmup completes is not a qualification pass.
 
@@ -68,8 +68,8 @@ Supported delays: **0, 1, 1.5, 2, 3, 4, 5, 6 seconds** (`--delay-ms` uses millis
 Fixtures contain 96 combinations: 1/5/10/50KiB request and response, three response
 templates, eight delays from 0–6s. `--case mixed` cycles all combinations. Individual
 case runs isolate a maximum; a mixed pass does not prove every case at the full rate.
-The `.jmx` plan and Groovy fixtures live in `tests/perf/`; they are standard JMeter
-components (Constant Throughput Timer, non-shared current-thread-group mode). Injector starvation, HTTP failures, capture mismatch and failed minute
+The Java simulation lives in `tests/perf/gatling/` and uses Gatling’s native
+`constantUsersPerSec` open-arrival scheduler with shared HTTP connections. Injector starvation, HTTP failures, capture mismatch and failed minute
 targets make the runner return nonzero. No dashboard listener runs under load.
 
 ## Capture and durability
@@ -95,28 +95,29 @@ response versus actual client delivery and requests interrupted before commit.
 ## Evidence and resources
 
 Each run has a unique Compose project, `results/<run-id>` and `state/<run-id>`.
-Evidence includes configuration, exact runtime/container inspection, raw JTL,
+Evidence includes configuration, exact runtime/container inspection, raw CSV,
 per-minute counts, latency percentiles, telemetry and capture identity
 reconciliation. Archives/outboxes are retained after containers stop. No global
 Docker prune, shared-volume deletion or PocketHive configuration change is used.
 `--keep` leaves the isolated containers running for diagnosis. Fixture credentials
 are local benchmark values; only loopback mock/metrics ports are published.
 The runner prints capture/heap progress about once a minute. Progress is not a
-verdict; successful throughput is computed from the completed JTL files.
+verdict; successful throughput is computed from the completed CSV files.
 Swarm's aggregate service-log export is limited to 30s. A timeout is recorded in
-`engine-log-status.json` and cleanup continues; the per-engine JTL, application
+`engine-log-status.json` and cleanup continues; the per-engine CSV, application
 and GC logs remain on the result bind mount.
 
 Four engines offer 255/s each for the default aggregate 1,020/s stimulus. They
 share an absolute measurement window and use disjoint request IDs. Raw per-engine
-JTLs, task states and the merged JTL are retained. Failure or replacement of any
+CSVs, task states and the merged CSV are retained. Failure or replacement of any
 engine fails the run. The Swarm qualifier pins all four engines to this machine;
 this does not claim multi-host qualification or extra physical capacity.
 
 Resource caps: mock 4 CPU/4 GiB (3 GiB heap); each of four engines 2 CPU/1.75 GiB
 (1 GiB heap); RabbitMQ 2 CPU/1.5 GiB; archive 2 CPU/768 MiB. `swarm.yaml` owns
-injector limits; `compose.yaml` owns server/broker/archive limits. `--threads`
-overrides the total client-thread budget, divided evenly across four engines.
+injector limits; `compose.yaml` owns server/broker/archive limits. Gatling creates
+asynchronous users at the offered rate; `--threads` has been removed. Six-second
+responses at 1,000/s require about 6,000 in-flight requests across the engines.
 Reserve host capacity and disk before a soak. The run aborts at 2 GiB remaining
 disk, retaining existing evidence. Each run removes only its own Swarm stack,
 Compose services and overlay; the manager remains available for subsequent runs.
@@ -218,3 +219,25 @@ The runner has no PocketHive dependency. Stop/restore arguments are optional and
 refer only to an explicitly authorized Compose stack. Historical suites created
 before explicit size/template selection remain evidence; start a new suite for
 those filters rather than changing the meaning of an old run.
+
+## Gatling migration validation
+
+Run Python gates with `python3 -m unittest discover -s tools -p 'test_*.py'`.
+The `gatling` Docker build runs the injector Java tests. Run
+`python3 tests/perf/verify-failures.py` after building official/Gatling images to
+verify corrupt responses, closed connections, actual hashes and absence of POST
+replay. A bounded integration:
+
+```sh
+RUN_NAMESPACE=build CAPTURE_ENABLED=false docker compose --profile tools build gatling
+python3 tools/bench.py --mode official --capture on --target 10 --offered 12 \
+  --warmup 10 --seconds 60 --delay-ms 6000 --size-kib 1
+```
+
+Repeat with `--mode headless`. For the stop path, add `--continuous`, allow
+warmup and a measured interval, then press Ctrl+C once. All four engines drain
+and write completion records before CSV reconciliation. Native Gatling logs are
+under `engine-N-gatling/`; `engine-N.csv` and `samples.csv` own hash evidence.
+Prior reports in `docs/QUALIFICATION.md` describe JMeter runs; the migration does
+not relabel those hour-long results as Gatling qualification. Start a new suite;
+resuming a saved JMeter suite is rejected.

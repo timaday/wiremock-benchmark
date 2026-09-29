@@ -50,12 +50,17 @@ class QualificationTest(unittest.TestCase):
         ):
             root = Path(directory) / "results" / "example"
             root.mkdir(parents=True)
+            (root / "config.json").write_text(
+                json.dumps({"generator": qualify.GENERATOR})
+            )
             verdict = root / "verdict.json"
             attempt = dict(state="passed", runId="example")
             verdict.write_text(json.dumps({"pass": True, "measuredSeconds": 1800}))
             self.assertFalse(qualify.completed(attempt))
             verdict.write_text(json.dumps({"pass": True, "measuredSeconds": 3600}))
             self.assertTrue(qualify.completed(attempt))
+            (root / "config.json").write_text(json.dumps({"generator": "jmeter-5.6.3"}))
+            self.assertFalse(qualify.completed(attempt))
 
     def test_failure_stops_sequence_and_restores_only_paused_containers(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -80,6 +85,7 @@ class QualificationTest(unittest.TestCase):
                 pause_file="/test/compose.yaml",
             )
             state = dict(
+                generator=qualify.GENERATOR,
                 state="planned",
                 attempts=[],
                 workload=dict(sizeKiB=[10], templates=["json"]),

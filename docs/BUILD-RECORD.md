@@ -169,3 +169,45 @@ overhead comparisons and the official/headless comparison generated successfully
 Evidence: [portable-controls.json](evidence/portable-controls.json). This is
 functional verification, not a replacement for the earlier1,000/s hour proofs.
 No application/runtime changes, commits, pushes or evidence deletions were made.
+
+## 2026-09-29: replace the maintained JMeter injector with Gatling
+
+Authority: the user selected this repository for the migration and explicitly
+requested a push. PocketHive source and its repository-specific Git rules are
+out of scope. No global Codex configuration was changed. Checks below are local
+development proof, not governed HiveGate execution.
+
+- Replaced the JMX/Groovy plan and image with Gatling 3.15.1/Java 21. Native open
+  arrivals, one request per user and shared connections replace client threads.
+  Preserved four Swarm engines, quotas, catalogue selection, exact body/delay
+  checks, request IDs, actual-byte capture reconciliation and minute gates.
+- Added completion counters so missing client results cannot pass. Continuous
+  stop closes admission, drains HTTP requests and closes evidence before exit.
+- Removed `--threads`; results use per-engine CSV plus native Gatling logs.
+  Generator identity comes from the pinned POM. Suite resume rejects historical
+  generators; matched comparisons require identical generator/arrival model.
+- Source review found the legacy AHC retry setting is ignored by this Gatling
+  client. Consumable request streams prevent replay of a consumed POST after a
+  pooled connection closes. The maintained fault probe verifies actual server
+  counts and IDs, not just logical Gatling samples.
+- Checks: 30 Python tests, five injector Java tests in the Docker build, Python
+  formatting/compilation, shell syntax, Compose/Swarm rendering and diff checks.
+  Fault probe `4af8831e316c4ccf`: eight admitted/completed failed samples, nonzero
+  exit, exact corrupt/empty-response hashes, eight distinct server requests.
+- Final-image headless continuous run `96b3489cf6644047`: Ctrl+C after 66.195
+  measured seconds, 796 measured requests, zero errors, 2,388/2,388 capture
+  events, all 916 admitted requests (including warmup) drained across four engines.
+  Workload: all sizes/templates at six seconds, target10/s, offered12/s.
+
+Validation runs use an isolated copy under `/tmp` because the repository's
+filesystem is below its 2 GiB reserve. Existing evidence and other application
+stacks were preserved. Historical JMeter hour-long qualifications remain labeled
+as JMeter evidence; these migration checks do not establish a new one-hour hold.
+
+Final-image official capacity run `b5417d23f3e64bb2` passed: 60 measured seconds,
+20s warmup, target1,000/s, offered1,020/s, six-second delay, all sizes/templates,
+capture on. Measured61,200 requests, completed1,019.65/s, zero errors,
+p99=6,079ms (79ms excluding delay), 183,600/183,600 capture records reconciled.
+All engines completed without OOM/restart. Owned containers and networks were
+removed. Compact configurations, verdicts, counters, source hashes, image IDs
+and resource summaries: [gatling-migration.json](evidence/gatling-migration.json).

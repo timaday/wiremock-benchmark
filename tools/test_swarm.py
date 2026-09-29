@@ -45,12 +45,48 @@ class SwarmGateTest(unittest.TestCase):
     def test_missing_fourth_result_cannot_be_merged_as_success(self):
         with tempfile.TemporaryDirectory() as root:
             for i in range(1, 4):
-                with (Path(root) / f"engine-{i}.jtl").open("w") as output:
+                with (Path(root) / f"engine-{i}.csv").open("w") as output:
                     writer = csv.writer(output)
-                    writer.writerows([["id"], ["setup"], [str(i)]])
+                    writer.writerows(
+                        [
+                            [
+                                "timeStamp",
+                                "elapsed",
+                                "success",
+                                "bench_id",
+                                "case_id",
+                                "delay_ms",
+                                "payload_bytes",
+                                "request_sha256",
+                                "response_sha256",
+                            ],
+                            ["1", "0", "true", str(i), "case", "0", "1024", "a", "b"],
+                        ]
+                    )
+                (Path(root) / f"engine-{i}-completion.json").write_text(
+                    json.dumps({"started": 1, "completed": 1})
+                )
             engines = self.engines(root, [("complete", 0)] * 4)
             with self.assertRaises(FileNotFoundError):
                 engines.merge()
+
+    def test_unfinished_request_cannot_disappear_from_results(self):
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root)
+            (path / "engine-1.csv").write_text(
+                "timeStamp,elapsed,success,bench_id,case_id,delay_ms,payload_bytes,request_sha256,response_sha256\n"
+                "1,0,true,id,case,0,1024,a,b\n"
+            )
+            (path / "engine-1-completion.json").write_text(
+                json.dumps({"started": 2, "completed": 1})
+            )
+            with self.assertRaisesRegex(ValueError, "every request"):
+                self.engines(root, []).merge()
+
+    def test_graceful_stop_publishes_shared_signal(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.engines(root, []).graceful_stop()
+            self.assertTrue((Path(root) / "stop.requested").exists())
 
     def test_log_export_timeout_does_not_prevent_owned_stack_cleanup(self):
         with tempfile.TemporaryDirectory() as root:

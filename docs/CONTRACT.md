@@ -59,7 +59,7 @@ The archive remains a portable SQLite file containing full replayable events.
 ## Verdict
 
 Warmup (60s by default), measured hold and final response/capture drain are distinct.
-The thread ramp lasts 20s within warmup. Pass requires:
+Gatling uses native constant open arrivals from the common launch barrier. Pass requires:
 - all started measured HTTP requests finish successfully with exact payload size,
   template content/correlation and at least the configured delay;
 - injector arrivals stay within 5% of the configured offered rate overall and
@@ -83,25 +83,50 @@ Broker outage/recovery and process-kill/outbox replay are separate functional
 proofs; a failed fault run never becomes a normal throughput pass. Disk cannot
 buffer an unlimited outage; capacity is part of the recorded envelope.
 
-JMeter uses reusable standard thread-group clients and its Constant Throughput
-Timer in non-shared, current-thread-group mode (mode 2). Concurrency is declared in run
-configuration; memory/process caps bound the injector. The scheduler stops new
-work at the end of the hold and active requests drain before verdict generation.
-Automatic concurrency uses the longest selected delay, not the mean: a reusable
-client must have room for its slowest case without missing its pacing interval.
+Gatling 3.15.1 on Java 21 owns scheduling through `constantUsersPerSec`:
+one virtual user performs one request; all users share reusable HTTP connections.
+There is no thread-per-client budget and `--threads` is removed. At 1,000/s and
+six-second responses, about 6,000 requests must be in flight across the four
+engines. Container and heap limits remain explicit in `swarm.yaml`.
+No scenario retry loop is used. Bodies use Gatling’s consumable input-stream
+transport so a consumed POST cannot be replayed after a pooled connection closes.
+Redirects, caching and HTTP compression are disabled. Requests time out after 30s. Each request verifies status 200, exact body bytes/correlation and
+elapsed time plus 2ms at least the declared delay.
+
+Each engine starts its JVM before the absolute launch barrier; missing that
+barrier fails the engine. New requests stop at the absolute hold end or when
+`stop.requested` appears in the run directory. A control scenario waits for all
+admitted requests to finish before calling Gatling's `stopLoadGenerator`.
+The one-year injection ceiling also applies to continuous mode. No process restart
+or repeated short runs implement continuous mode.
+
+`engine-N.csv` is the client evidence contract (UTF-8, comma-separated header):
+`timeStamp,elapsed,success,bench_id,case_id,delay_ms,payload_bytes,request_sha256,response_sha256`.
+Times are request start epoch milliseconds and client-observed elapsed milliseconds;
+`success` is lowercase `true`/`false`. Hashes describe actual transmitted request
+and completed response bytes, including invalid HTTP responses, never the expected
+body. A transport failure without a complete response records `success=false` and
+the empty-body hash; partial transport bytes are not exposed by Gatling checks.
+Each admitted request produces exactly one row, including transport failures.
+`engine-N-completion.json` records admitted/completed counts after the CSV closes.
+All four nonempty CSVs must match those counters before merging into `samples.csv`.
+A missing completion record or unfinished request fails the run. Native Gatling
+binary logs and engine application/GC logs are retained alongside this projection.
+Old JMeter evidence remains historical; it is not Gatling qualification.
 
 ## Four-engine Docker Swarm execution
 
-The user requested four Docker Swarm engines. Run four independent JMeter CLI
+The user requested four Docker Swarm engines. Run four independent Gatling CLI
 processes against one mock; each receives one quarter of the aggregate offered
 rate (255/s for 1,020/s total). They share an absolute measurement window and use
 engine-specific request IDs. Rates are combined;
-the target is 1,000/s total, not 1,000/s per engine. Keep every engine's JTL and
+the target is 1,000/s total, not 1,000/s per engine. Keep every engine's CSV and
 merge all four streams for the same identity/body reconciliation gate.
 
 The local qualifier pins tasks to this manager node with prebuilt local images
-and a run-specific attachable overlay. Engine images include the plan and fixture
-catalogue. Each task has 2 CPU, 1.75 GiB RAM and a 1 GiB heap; no task restart is
+and a run-specific attachable overlay. Images include the compiled simulation;
+the selected catalogue is read from the run directory. Each task has 2 CPU,
+1.75 GiB RAM and a 1 GiB heap; no task restart is
 allowed. A missing/failed/replaced engine fails the run. The injector resource
 owner is `swarm.yaml`; mock/broker/archive limits remain in `compose.yaml`.
 This is four engines on one host, not a multi-host qualification. Multi-host use
@@ -121,10 +146,12 @@ read that same selection rather than implementing their own selection policy.
 
 `qualify.py --delay-ms 6000` explicitly limits the suite to both runtimes at 6s.
 `--max-runs` limits a batch without changing the saved schedule.
-The suite stops on the first failure. Resume skips only previously successful
-full-duration verdicts; failed/interrupted attempts and all capture data remain.
+The suite records the pinned generator identity and stops on the first failure.
+Resume rejects suites from another generator (including pre-migration suites),
+and skips only matching-generator, successful full-duration verdicts.
+Failed/interrupted attempts and all capture data remain.
 A plan alone is not a qualification. Raw CPU/container memory time series,
-sampled mock heap, JVM metadata, mock/engine GC logs, JTL, captures and verdicts
+sampled mock heap, JVM metadata, mock/engine GC logs, CSV, captures and verdicts
 are retained per run. Suite JSON and Markdown link these artifacts and summarize
 throughput, errors and sampled heap. Heap samples do not constitute a heap dump
 or proof of absence of memory leaks.
@@ -152,7 +179,7 @@ POSIX suite lock. No PocketHive installation or user-specific paths are required
 `--template json text` selects dynamic templates; omission also includes the static
 control. These filters compose with `--delay-ms` (one of 0/1000/1500/2000/3000/4000/
 5000/6000), or omitted delay cycles the full range. Exact `--case` is mutually
-exclusive with all workload filters. Selection is shared by concurrency budgeting,
+exclusive with all workload filters. Selection is shared by
 client assertions and the persisted per-run catalogue. `qualify.py` accepts the
 same size/template filters and saves them for all runs and resume.
 
@@ -168,7 +195,7 @@ whole process including warmup and remain available for inspection.
 `tools/report.py compare --kind capture BASELINE CANDIDATE` compares capture off
 then on for the same runtime. `--kind runtime` compares official then headless
 at the same capture setting. Reject comparisons with differing selected cases,
-measurement duration, rates, warmup, injector threads/count, host, source workload,
+measurement duration, rates, warmup, injector version/arrival model/count, host, source workload,
 container quotas/JVM flags, or injector image. Capture comparisons additionally
 require the same mock image and JVM. Both verdicts must pass. Runtime comparisons
 explicitly include different JVM implementations/versions and are not a pure

@@ -1,4 +1,4 @@
-"""Streaming JTL verdict with disk-backed identity reconciliation; never averages away failed minutes."""
+"""Streaming CSV verdict with disk-backed identity reconciliation; never averages away failed minutes."""
 
 import csv, json, math, sqlite3, time
 from collections import Counter
@@ -26,10 +26,8 @@ def evaluate(result_dir, archive, target, capture, metrics):
     overhead = Counter()
     total = errors = duplicate = 0
     batch = []
-    with (root / "samples.jtl").open() as stream:
+    with (root / "samples.csv").open() as stream:
         for row in csv.DictReader(stream):
-            if row.get("label") == "Initialize run":
-                continue
             if row.get("bench_id") in [None, "", "null"] or row.get("case_id") in [
                 None,
                 "",
@@ -126,8 +124,11 @@ def evaluate(result_dir, archive, target, capture, metrics):
         "captureReconciled": capture_ok,
         "scheduledRateRespected": seconds < 60
         or (
-            total / seconds <= config["offered"] * 1.05
-            and all(m["startedRps"] <= config["offered"] * 1.05 for m in minutes)
+            config["offered"] * 0.95 <= total / seconds <= config["offered"] * 1.05
+            and all(
+                config["offered"] * 0.95 <= m["startedRps"] <= config["offered"] * 1.05
+                for m in minutes
+            )
         ),
     }
     report = {

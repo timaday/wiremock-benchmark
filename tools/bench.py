@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Portable isolated Compose server + four-engine Swarm JMeter runner. All configuration and verdicts are retained."""
+"""Portable isolated Compose server + four-engine Swarm Gatling runner. All configuration and verdicts are retained."""
+
 import argparse, hashlib, json, os, platform, shutil, subprocess, sys, threading, time, urllib.request, uuid, signal
 from pathlib import Path
+from injector import GENERATOR, ARRIVAL_MODEL
 from fixtures import DELAYS, SIZES, TEMPLATES, generate
 from report import write_summary
 from verdict import evaluate
@@ -26,11 +28,6 @@ def call(command, *, env=None, output=None, check=True, timeout=None):
 def get(url):
     with urllib.request.urlopen(url, timeout=5) as response:
         return json.load(response)
-
-
-def client_threads(cases, offered):
-    maximum_delay = max(c["delay"] for c in cases) / 1000
-    return max(32, int(offered * (maximum_delay + 0.3) * 1.1))
 
 
 def select_cases(cases, case, delay_ms, sizes=None, templates=None):
@@ -78,11 +75,10 @@ def run(args):
         cases, args.case, args.delay_ms, args.size_kib, args.template
     )
     (root / "selected-cases.json").write_text(json.dumps(selected, indent=2))
-    threads = args.threads or client_threads(selected, args.offered)
     config = vars(args) | dict(
         runId=identifier,
-        arrivalModel="JMeter Constant Throughput Timer, non-shared current thread group",
-        threads=threads,
+        arrivalModel=ARRIVAL_MODEL,
+        generator=GENERATOR,
         engines=ENGINE_COUNT,
         perEngineOffered=args.offered / ENGINE_COUNT,
         host=platform.uname()._asdict(),
@@ -115,7 +111,7 @@ def run(args):
         source_files.extend(
             p
             for p in (ROOT / folder).rglob("*")
-            if p.is_file() and "__pycache__" not in p.parts
+            if p.is_file() and not {"__pycache__", "target"}.intersection(p.parts)
         )
     fingerprint = {
         str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
@@ -226,9 +222,7 @@ def run(args):
         (root / "mock-runtime.json").write_text(json.dumps(metrics, indent=2))
         monitor_thread = threading.Thread(target=monitor, daemon=True)
         monitor_thread.start()
-        engines.start(
-            args.mode, args.offered, threads, args.case, args.warmup, args.seconds
-        )
+        engines.start(args.mode, args.offered, args.warmup, args.seconds)
         deadline = time.monotonic() + args.seconds + args.warmup + 210
         while not engines.complete():
             if requested_stop.is_set():
@@ -324,7 +318,6 @@ def main():
     parser.add_argument("--offered", type=int, default=1020)
     parser.add_argument("--seconds", type=int, default=3600)
     parser.add_argument("--warmup", type=int, default=60)
-    parser.add_argument("--threads", type=int)
     parser.add_argument("--case", default="mixed")
     parser.add_argument("--delay-ms", type=int, choices=DELAYS)
     parser.add_argument(

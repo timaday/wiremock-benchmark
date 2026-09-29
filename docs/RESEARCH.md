@@ -38,3 +38,20 @@
   A late client resets `previousTime` to the current time. These two source facts
   avoid the observed shared-timer ceiling and global schedule catch-up:
   https://github.com/apache/jmeter/blob/rel/v5.6.3/src/components/src/main/java/org/apache/jmeter/timers/ConstantThroughputTimer.java
+
+## Gatling migration, 2026-09-29
+
+The JMeter notes above describe historical qualification. The active injector is
+now Gatling 3.15.1, using native constant open arrivals and shared connections.
+Its [scenario control API](https://docs.gatling.io/concepts/scenario/) supports
+`stopLoadGenerator`; the benchmark calls it only after admission has stopped and
+all admitted HTTP requests have been recorded.
+
+The [pinned HTTP client source](https://repo.maven.apache.org/maven2/io/gatling/gatling-http-client/3.15.1/gatling-http-client-3.15.1-sources.jar)
+(`DefaultHttpClient.canRetry`, `HttpAppHandler`, `InputStreamRequestBody`) shows
+that a pooled connection can be retried before a response arrives. The obsolete
+`gatling.http.ahc.maxRetry` property does not configure this client. Consumable
+input-stream bodies prevent replay after the body has been consumed. The
+maintained `tests/perf/verify-failures.py` probe checks actual server request IDs
+and counts, failed client samples and actual response hashes against WireMock
+corrupt-body and empty-response fixtures.

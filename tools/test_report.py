@@ -25,7 +25,8 @@ class ReportTest(unittest.TestCase):
                     offered=12,
                     seconds=60,
                     warmup=60,
-                    threads=32,
+                    generator="gatling-3.15.1",
+                    arrivalModel="open",
                     engines=4,
                     host={"machine": "test"},
                 ),
@@ -140,11 +141,11 @@ class ReportTest(unittest.TestCase):
         self.assertEqual(result["changes"]["delayAdjustedP95Ms"]["percentChange"], 200)
         self.assertTrue((self.b / "comparison-capture-off.md").exists())
 
-    def test_mismatched_threads_and_payloads_are_rejected(self):
-        self.change(self.b, "config.json", "threads", 40)
+    def test_mismatched_generators_and_payloads_are_rejected(self):
+        self.change(self.b, "config.json", "generator", "another")
         with self.assertRaisesRegex(ValueError, "config"):
             validate_pair(self.a, self.b, "capture")
-        self.change(self.b, "config.json", "threads", 32)
+        self.change(self.b, "config.json", "generator", "gatling-3.15.1")
         self.write(self.b, "selected-cases.json", [])
         with self.assertRaisesRegex(ValueError, "cases"):
             validate_pair(self.a, self.b, "capture")

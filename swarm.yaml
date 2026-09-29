@@ -1,17 +1,15 @@
 version: "3.8"
 services:
   injector:
-    image: wiremock-benchmark-jmeter:local
+    image: wiremock-benchmark-gatling:local
     entrypoint: [/bin/sh, /work/tests/start-engine.sh]
     environment:
       ENGINE_SLOT: "{{.Task.Slot}}"
       RUN_ID: ${RUN_NAMESPACE}
       BENCH_HOST: ${BENCH_HOST}
       ENGINE_RATE: ${ENGINE_RATE}
-      ENGINE_THREADS: ${ENGINE_THREADS}
       LOAD_START_MS: ${LOAD_START_MS}
       MEASURE_END_MS: ${MEASURE_END_MS}
-      BENCH_CASE: ${BENCH_CASE}
       HEAP: -Xms128m -Xmx1g
       JVM_ARGS: -Xss256k -XX:MaxMetaspaceSize=160m -XX:+ExitOnOutOfMemoryError
     volumes:

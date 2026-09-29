@@ -22,7 +22,7 @@ class VerdictTest(unittest.TestCase):
             "request_sha256",
             "response_sha256",
         ]
-        with (root / "samples.jtl").open("w") as f:
+        with (root / "samples.csv").open("w") as f:
             writer = csv.DictWriter(f, fieldnames=fields)
             writer.writeheader()
             for i in range(rows):
@@ -104,7 +104,7 @@ class VerdictTest(unittest.TestCase):
     def test_catchup_burst_cannot_pass_as_the_configured_rate(self):
         tmp, root = self.fixture(120)
         with tmp:
-            path = root / "samples.jtl"
+            path = root / "samples.csv"
             with path.open() as source:
                 reader = csv.DictReader(source)
                 fields = reader.fieldnames
@@ -120,10 +120,20 @@ class VerdictTest(unittest.TestCase):
             self.assertFalse(result["checks"]["scheduledRateRespected"])
             self.assertFalse(result["pass"])
 
+    def test_injection_shortfall_fails_even_when_lower_target_passes(self):
+        tmp, root = self.fixture(60)
+        with tmp:
+            (root / "config.json").write_text(
+                json.dumps({"runId": "test", "offered": 2})
+            )
+            result = evaluate(root, None, 1, False, {})
+            self.assertTrue(result["checks"]["averageCompletedTarget"])
+            self.assertFalse(result["checks"]["scheduledRateRespected"])
+
     def test_missing_identity_is_not_silently_dropped(self):
         tmp, root = self.fixture(60)
         with tmp:
-            path = root / "samples.jtl"
+            path = root / "samples.csv"
             with path.open() as source:
                 reader = csv.DictReader(source)
                 fields = reader.fieldnames

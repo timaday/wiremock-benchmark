@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Summarize measured resources or compare two explicitly matched benchmark runs."""
+
 import argparse
 import json
 import re
@@ -99,6 +100,7 @@ def summarize(root):
     mock = next(c for c in containers if role(c, config["mode"]) == "mock")
     return dict(
         runId=config["runId"],
+        generator=config["generator"],
         mode=config["mode"],
         capture=config["capture"],
         verdict=verdict,
@@ -119,6 +121,9 @@ def summarize(root):
             telemetry="telemetry.jsonl",
             jvm="mock-runtime.json",
             engineGc="engine-*-gc.log",
+            clientSamples="samples.csv",
+            engineCompletion="engine-*-completion.json",
+            nativeGatling="engine-*-gatling/",
             mockGc=f"../../state/{config['runId']}/outbox/gc.log",
             verdict="verdict.json",
         ),
@@ -140,7 +145,7 @@ def write_summary(root):
     lines = [
         "# Benchmark run",
         "",
-        f"Runtime: {summary['mode']}; capture: {summary['capture']}; JVM: {summary['java']}.",
+        f"Generator: {summary['generator']}; runtime: {summary['mode']}; capture: {summary['capture']}; JVM: {summary['java']}.",
         "",
         f"Verdict: {'PASS' if verdict['pass'] else 'FAIL'}; measured {verdict['measuredSeconds']:g}s; completed {verdict['completedRps']:.2f}/s; errors {verdict['errors']}.",
         "",
@@ -216,7 +221,8 @@ def signature(root):
                 "offered",
                 "seconds",
                 "warmup",
-                "threads",
+                "generator",
+                "arrivalModel",
                 "engines",
                 "host",
             )

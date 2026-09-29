@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Sequential fixed-delay qualification. Default: print plan; --execute runs it."""
+
 import argparse
 import fcntl
 import json
@@ -12,6 +13,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from injector import GENERATOR
 from fixtures import DELAYS, SIZES, TEMPLATES
 from report import write_summary
 
@@ -39,7 +41,12 @@ def completed(attempt):
         return False
     path = ROOT / "results" / attempt["runId"] / "verdict.json"
     verdict = json.loads(path.read_text())
-    return verdict["pass"] and verdict["measuredSeconds"] == 3600
+    config = json.loads(path.with_name("config.json").read_text())
+    return (
+        config.get("generator") == GENERATOR
+        and verdict["pass"]
+        and verdict["measuredSeconds"] == 3600
+    )
 
 
 def remaining(state):
@@ -69,7 +76,7 @@ def report(directory, state):
     lines = [
         "# Fixed-delay qualification",
         "",
-        f"State: {state['state']}",
+        f"State: {state['state']}; generator: {state['generator']}",
         "",
         f"Workload: {state['workload']}",
         "",
@@ -158,7 +165,7 @@ def run_suite(args, directory, state):
                 stderr=subprocess.STDOUT,
             )
             command(
-                ["docker", "compose", "--profile", "tools", "build", "jmeter"],
+                ["docker", "compose", "--profile", "tools", "build", "gatling"],
                 env=os.environ | {"RUN_NAMESPACE": "build", "CAPTURE_ENABLED": "true"},
                 stdout=output,
                 stderr=subprocess.STDOUT,
@@ -331,6 +338,7 @@ def main():
         if args.resume
         else dict(
             state="planned",
+            generator=GENERATOR,
             attempts=[],
             workload=dict(
                 sizeKiB=(
@@ -343,6 +351,10 @@ def main():
             schedule=schedule(args.delay_ms if args.delay_ms is not None else DELAYS),
         )
     )
+    if state.get("generator") != GENERATOR:
+        parser.error(
+            "Saved suite uses a different generator; retain it and start a new suite"
+        )
     if "workload" not in state:
         parser.error(
             "Saved suite predates explicit workload selection; retain it and start a new suite"

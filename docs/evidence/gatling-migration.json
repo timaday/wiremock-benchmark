@@ -1,0 +1,571 @@
+{
+  "date": "2026-09-29",
+  "validationRoot": "/tmp/wmb-gatling-validation-hjddwj3o",
+  "scope": "Local migration verification; no new one-hour qualification",
+  "unitChecks": {
+    "python": 30,
+    "injectorJava": 5
+  },
+  "runs": [
+    {
+      "runId": "b5417d23f3e64bb2",
+      "config": {
+        "generator": "gatling-3.15.1",
+        "arrivalModel": "Gatling constantUsersPerSec, one request per user",
+        "mode": "official",
+        "capture": "on",
+        "target": 1000,
+        "offered": 1020,
+        "warmup": 20,
+        "seconds": 60,
+        "continuous": false,
+        "engines": 4
+      },
+      "verdict": {
+        "pass": true,
+        "checks": {
+          "httpCorrect": true,
+          "uniqueClientIds": true,
+          "averageOfferedTarget": true,
+          "averageCompletedTarget": true,
+          "everyFullMinuteAtTarget": true,
+          "captureReconciled": true,
+          "scheduledRateRespected": true,
+          "noOomOrRestart": true,
+          "fourEnginesCompleted": true
+        },
+        "measuredSeconds": 60.0,
+        "targetRps": 1000,
+        "measuredRequests": 61200,
+        "errors": 0,
+        "offeredRps": 1020.0,
+        "completedRps": 1019.65,
+        "minutes": [
+          {
+            "minute": 0,
+            "startedRps": 1020.0,
+            "completedRps": 1019.65
+          }
+        ],
+        "latencyMs": {
+          "p50": 6024,
+          "p95": 6046,
+          "p99": 6079,
+          "max": 6151
+        },
+        "delayAdjustedLatencyMs": {
+          "p50": 24,
+          "p95": 46,
+          "p99": 79,
+          "max": 151
+        },
+        "capture": {
+          "enabled": true,
+          "events": 183600,
+          "expectedEvents": 183600,
+          "missingOrCorruptExchanges": 0,
+          "pending": 0,
+          "errors": 0
+        }
+      },
+      "engineCompletion": {
+        "1": {
+          "started": 20377,
+          "completed": 20377
+        },
+        "2": {
+          "completed": 20377,
+          "started": 20377
+        },
+        "3": {
+          "completed": 20374,
+          "started": 20374
+        },
+        "4": {
+          "started": 20377,
+          "completed": 20377
+        }
+      },
+      "engineImages": [
+        "sha256:1a571b68559ff4d3b42e9b18c18e6ac8da194765086e708f0e94a20e7f148ff4"
+      ],
+      "workload": [
+        {
+          "id": "static-1024-6000",
+          "size": 1024,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-1024-6000",
+          "size": 1024,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-1024-6000",
+          "size": 1024,
+          "delay": 6000,
+          "template": "text"
+        },
+        {
+          "id": "static-5120-6000",
+          "size": 5120,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-5120-6000",
+          "size": 5120,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-5120-6000",
+          "size": 5120,
+          "delay": 6000,
+          "template": "text"
+        },
+        {
+          "id": "static-10240-6000",
+          "size": 10240,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-10240-6000",
+          "size": 10240,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-10240-6000",
+          "size": 10240,
+          "delay": 6000,
+          "template": "text"
+        },
+        {
+          "id": "static-51200-6000",
+          "size": 51200,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-51200-6000",
+          "size": 51200,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-51200-6000",
+          "size": 51200,
+          "delay": 6000,
+          "template": "text"
+        }
+      ],
+      "resources": {
+        "mock": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 78.75,
+            "mean": 95.072,
+            "max": 109.63
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 2765958938.624,
+            "mean": 2993162708.5824,
+            "max": 3088081485.824
+          }
+        },
+        "rabbit": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 13.65,
+            "mean": 24.432,
+            "max": 65.22
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 160641843.2,
+            "mean": 162718023.68,
+            "max": 165884723.2
+          }
+        },
+        "archive": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 14.07,
+            "mean": 19.19,
+            "max": 21.3
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 160851558.4,
+            "mean": 163326197.76,
+            "max": 164731289.6
+          }
+        },
+        "engines": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 74.6,
+            "mean": 85.342,
+            "max": 98.28
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1367343104.0,
+            "mean": 1368077107.2,
+            "max": 1369754828.8
+          }
+        },
+        "total": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 182.48999999999998,
+            "mean": 224.036,
+            "max": 260.21999999999997
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 4456997453.824,
+            "mean": 4687284037.2224,
+            "max": 4785935745.023999
+          }
+        }
+      },
+      "mockJava": "17.0.19+10",
+      "sourceSha256": {
+        "Dockerfile": "6d82541a6d639b4744a766c3411194479342cff2bd5349654a96603e644938ed",
+        "compose.swarm.yaml": "23062d1d73d95074d47c53373d15b98f83cfcc5c5e936d02e9545f9d365037e8",
+        "compose.yaml": "13f52039877ec1b4b99915a6aa153fd68df600da728611b2401fb7a604f39ef5",
+        "pom.xml": "6f9cbe74e9e8275cc742ad487de1acbb4dadc5aac4bc9c217a31ab8a8f8050cc",
+        "src/main/java/bench/Archive.java": "6c8d04e5c1df20fff938d9b7435454706406f32c4ae53d926fe6eaa422891fbc",
+        "src/main/java/bench/CaptureCodec.java": "7ff4c8427f913ce6c8a39ec65e0427511c372d833a6eef2ad849a26076ee3b2c",
+        "src/main/java/bench/CaptureEvent.java": "a3eba35aabff7d8aac54e718ebc43dc6bfc75ea358ccd36731c0458ba2713fbe",
+        "src/main/java/bench/CaptureExtension.java": "1004b330b610a5e4247966e678349cd32845284c5062a342534f6071ba327bc3",
+        "src/main/java/bench/DurableOutbox.java": "f66840487f1ae5aa8d19b9811c4dcea803f20797c16e781079e2f6536ad6c8e4",
+        "src/main/java/bench/Headless.java": "12e89054507d6ced567c2ec9d40a353c55afa38b32f63826163fbddface1c1c7",
+        "src/main/java/bench/Json.java": "3036b8da3b769084c63aa40add128baf082b4a890989d4f5d8c7ca92672aa614",
+        "src/main/java/bench/OutboxRow.java": "3d3b392d23d07ed0c48966a007f016eac7738fffa2aa0dfd854a5703fa4afd92",
+        "src/main/java/bench/Phase.java": "175b02a4349a43ddbec4abdcd7b894748cdc572963b6560d6cd66e54a088df4c",
+        "src/main/java/bench/RabbitPublisher.java": "c04c57489fa6ba1afd4e910b0c23bba61a7d23848782b3ef478bcbba38a5ec62",
+        "src/main/java/bench/Settings.java": "4e8e30294d4a10987aa926b526cf0a79bb22b9674dc807f36b12ea71dd434bef",
+        "src/test/java/bench/CaptureCodecTest.java": "dc52e2a5da9b90376db7b99fdda3eb7b7cc267eaa1eb79b239f9292a01057f54",
+        "src/test/java/bench/DurableOutboxTest.java": "971b0fa6a81ddbb47e435060ba1d5a8c8360c1ef3f8b9f65aa8c6f42554fe55b",
+        "swarm.yaml": "267874026b851ced980a3de3dd06dc47dc9479788f91693febe2a4d22d1a487d",
+        "tests/perf/gatling/pom.xml": "e080b74f4c6e6edc08c4a25a0d67ace2a8d6cfd53ea7dbd864e8692833c5d644",
+        "tests/perf/gatling/src/main/java/bench/load/BenchmarkSimulation.java": "95c4c985a8465ddf33493e42ca4a6310e88445b1651cc40c57cd8f54c7d2ddfd",
+        "tests/perf/gatling/src/main/java/bench/load/EngineConfig.java": "67be85f036c148b58ba687bc34189fddbb1e9203fe8cc982e2f4f676bf3d72d7",
+        "tests/perf/gatling/src/main/java/bench/load/ResultJournal.java": "96d7d764b61abc772ba6ef4866bcb2aaa321dba791d2afa5491f168cb60baa52",
+        "tests/perf/gatling/src/main/java/bench/load/Workload.java": "da8fcfff86403905dc2482d2f1758c49d1f6f8c91ca90d10d7a6414d745983b8",
+        "tests/perf/gatling/src/main/resources/logback.xml": "da939d80d0388fb01233a42602c1c7b3226da0380e86b0699322dfadc492543d",
+        "tests/perf/gatling/src/test/java/bench/load/ResultJournalTest.java": "4df5e00f6b2d25448b9dd7aa38f74e61cc520fe201b9e098bd4ad1fe4e3e92d4",
+        "tests/perf/start-engine.sh": "fb11ab770b28ba5482deaaef75344a896184e664b816f04f53c57d9c0904d940",
+        "tests/perf/verify-failures.py": "3399413db2dd1e1be8a4c9834fe42af9ad3cea056dca7459da2dde7c3c71af8e",
+        "tools/bench.py": "99a3e31d9741359a14e8717aa9ec556b617b5f27aa4235a1d31b6ecf3a28f8da",
+        "tools/fault_probe.py": "1f53d76837bd2c9758d0c3bbb175e487df90cbb6fc48eb7e0a512f50504d86d0",
+        "tools/fixtures.py": "98ab477a458e076c35fe07c99be209f46bc0059722b9ee180e2b2bc7f6eaa417",
+        "tools/injector.py": "57a3897704a918937da68d468480e437169868f97c0441d5e62f32531da88a12",
+        "tools/qualify.py": "6263564021e4473cb6858574aa5274fe2c7d6d39bccf0d0ebc6434c85421670a",
+        "tools/read_capture.py": "22e2ff37d01d3b593c4012a65a260d27ec122988fea6df518ffce10ab12a1964",
+        "tools/report.py": "fc46977acd736ab1e7cf0c1c147b3dd659c15355ac33445356afc8f28fbc2add",
+        "tools/swarm.py": "4bc665c19ef39928168e17688f62282c13744af8780b31868afcfcdb4f2a424e",
+        "tools/test_bench.py": "238e1f6d042df02b5e8a782abf7e04e867dc346261ecaf0a48c8a7fcaec8bd79",
+        "tools/test_qualify.py": "ad7330f295b8e1a9756a3f635b2654142598439ac73aa884463b250edcb53054",
+        "tools/test_report.py": "747b9ed770459ce74f2f798d49fecbe4b4d5a173ba012eb8b0bf5e1d6af59525",
+        "tools/test_swarm.py": "0517e61174a882ea0123d521e6a6960226f5b77b9ca7757fb703846a27974ba5",
+        "tools/test_verdict.py": "d9c18740245bec3faff0035c02ccb3231e0c12621be61b765db5ead37dd6a119",
+        "tools/verdict.py": "438e0829ddc7a80feb6a78554bb13d43d22bd3295fde0ecf2b4bb455d0d82949"
+      },
+      "stopRequested": false
+    },
+    {
+      "runId": "96b3489cf6644047",
+      "config": {
+        "generator": "gatling-3.15.1",
+        "arrivalModel": "Gatling constantUsersPerSec, one request per user",
+        "mode": "headless",
+        "capture": "on",
+        "target": 10,
+        "offered": 12,
+        "warmup": 10,
+        "seconds": 31536000,
+        "continuous": true,
+        "engines": 4
+      },
+      "verdict": {
+        "pass": true,
+        "checks": {
+          "httpCorrect": true,
+          "uniqueClientIds": true,
+          "averageOfferedTarget": true,
+          "averageCompletedTarget": true,
+          "everyFullMinuteAtTarget": true,
+          "captureReconciled": true,
+          "scheduledRateRespected": true,
+          "noOomOrRestart": true,
+          "fourEnginesCompleted": true
+        },
+        "measuredSeconds": 66.195,
+        "targetRps": 10,
+        "measuredRequests": 796,
+        "errors": 0,
+        "offeredRps": 12.02507742276607,
+        "completedRps": 12.02507742276607,
+        "minutes": [
+          {
+            "minute": 0,
+            "startedRps": 12.0,
+            "completedRps": 12.0
+          }
+        ],
+        "latencyMs": {
+          "p50": 6012,
+          "p95": 6023,
+          "p99": 6036,
+          "max": 6042
+        },
+        "delayAdjustedLatencyMs": {
+          "p50": 12,
+          "p95": 23,
+          "p99": 36,
+          "max": 42
+        },
+        "capture": {
+          "enabled": true,
+          "events": 2388,
+          "expectedEvents": 2388,
+          "missingOrCorruptExchanges": 0,
+          "pending": 0,
+          "errors": 0
+        }
+      },
+      "engineCompletion": {
+        "1": {
+          "started": 229,
+          "completed": 229
+        },
+        "2": {
+          "started": 229,
+          "completed": 229
+        },
+        "3": {
+          "started": 229,
+          "completed": 229
+        },
+        "4": {
+          "completed": 229,
+          "started": 229
+        }
+      },
+      "engineImages": [
+        "sha256:1a571b68559ff4d3b42e9b18c18e6ac8da194765086e708f0e94a20e7f148ff4"
+      ],
+      "workload": [
+        {
+          "id": "static-1024-6000",
+          "size": 1024,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-1024-6000",
+          "size": 1024,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-1024-6000",
+          "size": 1024,
+          "delay": 6000,
+          "template": "text"
+        },
+        {
+          "id": "static-5120-6000",
+          "size": 5120,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-5120-6000",
+          "size": 5120,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-5120-6000",
+          "size": 5120,
+          "delay": 6000,
+          "template": "text"
+        },
+        {
+          "id": "static-10240-6000",
+          "size": 10240,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-10240-6000",
+          "size": 10240,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-10240-6000",
+          "size": 10240,
+          "delay": 6000,
+          "template": "text"
+        },
+        {
+          "id": "static-51200-6000",
+          "size": 51200,
+          "delay": 6000,
+          "template": "static"
+        },
+        {
+          "id": "json-51200-6000",
+          "size": 51200,
+          "delay": 6000,
+          "template": "json"
+        },
+        {
+          "id": "text-51200-6000",
+          "size": 51200,
+          "delay": 6000,
+          "template": "text"
+        }
+      ],
+      "resources": {
+        "archive": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 1.05,
+            "mean": 1.6880000000000002,
+            "max": 2.24
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 116182220.8,
+            "mean": 138286202.88,
+            "max": 150156083.2
+          }
+        },
+        "rabbit": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 0.97,
+            "mean": 12.304,
+            "max": 56.82
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 146590924.8,
+            "mean": 146905497.6,
+            "max": 147115212.8
+          }
+        },
+        "engines": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 7.27,
+            "mean": 8.872,
+            "max": 10.82
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1048156569.6,
+            "mean": 1053168762.88,
+            "max": 1057803468.8
+          }
+        },
+        "mock": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 9.75,
+            "mean": 11.728,
+            "max": 14.59
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 290036121.6,
+            "mean": 337201070.08000004,
+            "max": 354208972.8
+          }
+        },
+        "total": {
+          "cpuPercent": {
+            "samples": 5,
+            "min": 20.53,
+            "mean": 34.592,
+            "max": 78.77
+          },
+          "memoryBytes": {
+            "samples": 5,
+            "min": 1601490124.8000002,
+            "mean": 1675561533.44,
+            "max": 1709283737.6
+          }
+        }
+      },
+      "mockJava": "27+35-2325",
+      "sourceSha256": {
+        "Dockerfile": "6d82541a6d639b4744a766c3411194479342cff2bd5349654a96603e644938ed",
+        "compose.swarm.yaml": "23062d1d73d95074d47c53373d15b98f83cfcc5c5e936d02e9545f9d365037e8",
+        "compose.yaml": "13f52039877ec1b4b99915a6aa153fd68df600da728611b2401fb7a604f39ef5",
+        "pom.xml": "6f9cbe74e9e8275cc742ad487de1acbb4dadc5aac4bc9c217a31ab8a8f8050cc",
+        "src/main/java/bench/Archive.java": "6c8d04e5c1df20fff938d9b7435454706406f32c4ae53d926fe6eaa422891fbc",
+        "src/main/java/bench/CaptureCodec.java": "7ff4c8427f913ce6c8a39ec65e0427511c372d833a6eef2ad849a26076ee3b2c",
+        "src/main/java/bench/CaptureEvent.java": "a3eba35aabff7d8aac54e718ebc43dc6bfc75ea358ccd36731c0458ba2713fbe",
+        "src/main/java/bench/CaptureExtension.java": "1004b330b610a5e4247966e678349cd32845284c5062a342534f6071ba327bc3",
+        "src/main/java/bench/DurableOutbox.java": "f66840487f1ae5aa8d19b9811c4dcea803f20797c16e781079e2f6536ad6c8e4",
+        "src/main/java/bench/Headless.java": "12e89054507d6ced567c2ec9d40a353c55afa38b32f63826163fbddface1c1c7",
+        "src/main/java/bench/Json.java": "3036b8da3b769084c63aa40add128baf082b4a890989d4f5d8c7ca92672aa614",
+        "src/main/java/bench/OutboxRow.java": "3d3b392d23d07ed0c48966a007f016eac7738fffa2aa0dfd854a5703fa4afd92",
+        "src/main/java/bench/Phase.java": "175b02a4349a43ddbec4abdcd7b894748cdc572963b6560d6cd66e54a088df4c",
+        "src/main/java/bench/RabbitPublisher.java": "c04c57489fa6ba1afd4e910b0c23bba61a7d23848782b3ef478bcbba38a5ec62",
+        "src/main/java/bench/Settings.java": "4e8e30294d4a10987aa926b526cf0a79bb22b9674dc807f36b12ea71dd434bef",
+        "src/test/java/bench/CaptureCodecTest.java": "dc52e2a5da9b90376db7b99fdda3eb7b7cc267eaa1eb79b239f9292a01057f54",
+        "src/test/java/bench/DurableOutboxTest.java": "971b0fa6a81ddbb47e435060ba1d5a8c8360c1ef3f8b9f65aa8c6f42554fe55b",
+        "swarm.yaml": "267874026b851ced980a3de3dd06dc47dc9479788f91693febe2a4d22d1a487d",
+        "tests/perf/gatling/pom.xml": "e080b74f4c6e6edc08c4a25a0d67ace2a8d6cfd53ea7dbd864e8692833c5d644",
+        "tests/perf/gatling/src/main/java/bench/load/BenchmarkSimulation.java": "95c4c985a8465ddf33493e42ca4a6310e88445b1651cc40c57cd8f54c7d2ddfd",
+        "tests/perf/gatling/src/main/java/bench/load/EngineConfig.java": "67be85f036c148b58ba687bc34189fddbb1e9203fe8cc982e2f4f676bf3d72d7",
+        "tests/perf/gatling/src/main/java/bench/load/ResultJournal.java": "96d7d764b61abc772ba6ef4866bcb2aaa321dba791d2afa5491f168cb60baa52",
+        "tests/perf/gatling/src/main/java/bench/load/Workload.java": "da8fcfff86403905dc2482d2f1758c49d1f6f8c91ca90d10d7a6414d745983b8",
+        "tests/perf/gatling/src/main/resources/logback.xml": "da939d80d0388fb01233a42602c1c7b3226da0380e86b0699322dfadc492543d",
+        "tests/perf/gatling/src/test/java/bench/load/ResultJournalTest.java": "4df5e00f6b2d25448b9dd7aa38f74e61cc520fe201b9e098bd4ad1fe4e3e92d4",
+        "tests/perf/start-engine.sh": "fb11ab770b28ba5482deaaef75344a896184e664b816f04f53c57d9c0904d940",
+        "tests/perf/verify-failures.py": "3399413db2dd1e1be8a4c9834fe42af9ad3cea056dca7459da2dde7c3c71af8e",
+        "tools/bench.py": "99a3e31d9741359a14e8717aa9ec556b617b5f27aa4235a1d31b6ecf3a28f8da",
+        "tools/fault_probe.py": "1f53d76837bd2c9758d0c3bbb175e487df90cbb6fc48eb7e0a512f50504d86d0",
+        "tools/fixtures.py": "98ab477a458e076c35fe07c99be209f46bc0059722b9ee180e2b2bc7f6eaa417",
+        "tools/injector.py": "57a3897704a918937da68d468480e437169868f97c0441d5e62f32531da88a12",
+        "tools/qualify.py": "6263564021e4473cb6858574aa5274fe2c7d6d39bccf0d0ebc6434c85421670a",
+        "tools/read_capture.py": "22e2ff37d01d3b593c4012a65a260d27ec122988fea6df518ffce10ab12a1964",
+        "tools/report.py": "fc46977acd736ab1e7cf0c1c147b3dd659c15355ac33445356afc8f28fbc2add",
+        "tools/swarm.py": "4bc665c19ef39928168e17688f62282c13744af8780b31868afcfcdb4f2a424e",
+        "tools/test_bench.py": "238e1f6d042df02b5e8a782abf7e04e867dc346261ecaf0a48c8a7fcaec8bd79",
+        "tools/test_qualify.py": "ad7330f295b8e1a9756a3f635b2654142598439ac73aa884463b250edcb53054",
+        "tools/test_report.py": "747b9ed770459ce74f2f798d49fecbe4b4d5a173ba012eb8b0bf5e1d6af59525",
+        "tools/test_swarm.py": "0517e61174a882ea0123d521e6a6960226f5b77b9ca7757fb703846a27974ba5",
+        "tools/test_verdict.py": "d9c18740245bec3faff0035c02ccb3231e0c12621be61b765db5ead37dd6a119",
+        "tools/verdict.py": "438e0829ddc7a80feb6a78554bb13d43d22bd3295fde0ecf2b4bb455d0d82949"
+      },
+      "stopRequested": true
+    }
+  ],
+  "faultProbe": {
+    "runId": "4af8831e316c4ccf",
+    "exitCode": 2,
+    "requests": 8,
+    "completion": {
+      "started": 8,
+      "completed": 8
+    },
+    "allFailed": true,
+    "actualResponseHashesVerified": true,
+    "noReplayVerified": true
+  }
+}

@@ -65,7 +65,7 @@ services:
     image: wiremock-benchmark-headless:local
     profiles: [headless]
     depends_on: {rabbit: {condition: service_healthy}}
-  jmeter:
-    build: {context: ., target: jmeter}
-    image: wiremock-benchmark-jmeter:local
+  gatling:
+    build: {context: ., target: gatling}
+    image: wiremock-benchmark-gatling:local
     profiles: [tools]
