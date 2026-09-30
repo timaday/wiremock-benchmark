@@ -1,0 +1,84 @@
+{
+  "runId": "f7fa54f53f370020",
+  "scenarioId": "ph-wiremock-official-load-f7fa54f5",
+  "runtime": "official",
+  "mode": "load",
+  "offeredRate": 1020,
+  "expectedRequests": 91800,
+  "warmupSeconds": 20,
+  "measurementSeconds": 60,
+  "cases": [
+    {
+      "id": "static-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "text"
+    }
+  ]
+}
