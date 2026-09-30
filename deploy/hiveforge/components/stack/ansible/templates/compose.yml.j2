@@ -4,7 +4,7 @@ services:
   official:
     image: ghcr.io/timaday/wiremock-lab-official@sha256:2854b2dea03175f2e548d68ebb6443248fc367657ec1356d68d03294685abf88
     deploy:
-      replicas: 1
+      replicas: {{ 1 if active_runtime in ["both", "official"] else 0 }}
       placement:
         constraints:
         - node.hostname == {{ lab_node }}
@@ -79,7 +79,7 @@ services:
   headless:
     image: ghcr.io/timaday/wiremock-lab-headless@sha256:e6de2e9fe26bef4d9afb8a0343c7696d48e45afbb5036c60f46a3ac5e706556c
     deploy:
-      replicas: 1
+      replicas: {{ 1 if active_runtime in ["both", "headless"] else 0 }}
       placement:
         constraints:
         - node.hostname == {{ lab_node }}

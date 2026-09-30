@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-30",
+  "bundleCommit": "802e7e192a5d91311cd920c99f1826f9df6c1751",
+  "deploymentCommit": "2cf5fe493ec1e4cd8bd7cdcb84d4614129d95f17",
+  "recoveryOperation": "uiop-724421e6-17e5-40e4-afc9-d74b6f8e42b7",
+  "guestAvailableMemoryAfterPauseGiB": 6.6,
+  "guestAvailableMemoryAfterOfficialGiB": 3.5,
+  "official": {
+    "runId": "26d949f613d3ef2f",
+    "expected": 91800,
+    "collected": 91472,
+    "missing": 328,
+    "errorCount": 0,
+    "errors": [],
+    "clientIntegrityPassed": false,
+    "collectedRps": 794.3166666666667,
+    "lanesCoverWindow": true,
+    "headerLatencyMs": {
+      "min": 6010,
+      "p99": 10678,
+      "max": 15542
+    },
+    "measurementStart": 1790785032.162077,
+    "measurementEnd": 1790785092.162077,
+    "archiveIntegrity": "not checked remotely",
+    "serverRate": "requires timestamped archive verification",
+    "observedOfferedRpsFromCollectedResults": 1020.0,
+    "qualificationPassed": false
+  },
+  "minimumSampledHostAvailableGiB": 3.351,
+  "headless": {
+    "runId": "da0484c6419f7645",
+    "workloadStarted": false,
+    "reason": "Only 3.5 GiB guest headroom remained with idle official heap retained; prepare single-runtime deployment selection before starting headless."
+  },
+  "enduranceStarted": false,
+  "archiveIntegrity": "not verified remotely",
+  "dataDeleted": false
+}

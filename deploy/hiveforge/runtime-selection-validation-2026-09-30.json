@@ -1,0 +1,58 @@
+{
+  "runnerImage": "ghcr.io/sepa79/hiveforge@sha256:e94cfae4aec86231969a3009007be4dcb6c3629e552a18477ee3247f17b6b593",
+  "checks": [
+    {
+      "selection": "both",
+      "ansiblePassed": true,
+      "dockerStackParserPassed": true,
+      "replicas": {
+        "grafana": 1,
+        "headless": 1,
+        "headless-archive": 1,
+        "official": 1,
+        "official-archive": 1,
+        "prometheus": 1,
+        "rabbit": 1
+      }
+    },
+    {
+      "selection": "official",
+      "ansiblePassed": true,
+      "dockerStackParserPassed": true,
+      "replicas": {
+        "grafana": 1,
+        "headless": 0,
+        "headless-archive": 1,
+        "official": 1,
+        "official-archive": 1,
+        "prometheus": 1,
+        "rabbit": 1
+      }
+    },
+    {
+      "selection": "headless",
+      "ansiblePassed": true,
+      "dockerStackParserPassed": true,
+      "replicas": {
+        "grafana": 1,
+        "headless": 1,
+        "headless-archive": 1,
+        "official": 0,
+        "official-archive": 1,
+        "prometheus": 1,
+        "rabbit": 1
+      }
+    },
+    {
+      "selection": "",
+      "rejected": true
+    },
+    {
+      "selection": "official,headless",
+      "rejected": true
+    }
+  ],
+  "date": "2026-09-30",
+  "projectionUnitTestsPassed": 4,
+  "liveSelectionDeployment": "not yet deployed"
+}

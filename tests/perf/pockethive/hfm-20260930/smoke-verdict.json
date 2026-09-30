@@ -1,0 +1,89 @@
+{
+  "date": "2026-09-30",
+  "bundleCommit": "f9d8a2bd35d19bca9c4fd2825c82ddc24b7c534b",
+  "hfmStackCommit": "2cf5fe493ec1e4cd8bd7cdcb84d4614129d95f17",
+  "clientVerdicts": [
+    {
+      "runtime": "official",
+      "runId": "4cef68bd37193a45",
+      "clientSmokePassed": true,
+      "requests": 48,
+      "offeredRps": 4,
+      "missing": 0,
+      "duplicates": 0,
+      "badStatus": 0,
+      "badHashes": 0,
+      "headerDurationMs": {
+        "min": 6010,
+        "max": 6061
+      },
+      "archiveIntegrity": "not checked remotely"
+    },
+    {
+      "runtime": "headless",
+      "runId": "c2c704e23e0c95b2",
+      "clientSmokePassed": true,
+      "requests": 48,
+      "offeredRps": 4,
+      "missing": 0,
+      "duplicates": 0,
+      "badStatus": 0,
+      "badHashes": 0,
+      "headerDurationMs": {
+        "min": 6012,
+        "max": 6060
+      },
+      "archiveIntegrity": "not checked remotely"
+    }
+  ],
+  "captureMetricTotalsIncludePriorDeploymentSmoke": true,
+  "metrics": {
+    "up{job=\"wiremock\"}": {
+      "official": 1.0,
+      "headless": 1.0
+    },
+    "wiremock_http_completed_total": {
+      "official": 60.0,
+      "headless": 60.0
+    },
+    "wiremock_http_errors_total": {
+      "official": 0.0,
+      "headless": 0.0
+    },
+    "wiremock_capture_pending": {
+      "official": 0.0,
+      "headless": 0.0
+    },
+    "wiremock_capture_confirmed_total": {
+      "official": 180.0,
+      "headless": 180.0
+    }
+  },
+  "captureQueues": [
+    {
+      "name": "wiremock-hiveforge-20260930.headless",
+      "messages": 0,
+      "consumers": 1
+    },
+    {
+      "name": "wiremock-hiveforge-20260930.official",
+      "messages": 0,
+      "consumers": 1
+    }
+  ],
+  "grafanaDashboardHealthy": true,
+  "fullRateRun": "not started: host memory headroom below prior injector peak",
+  "enduranceRun": "not started: host memory gate pending; corrected storage assessment recorded in results/pockethive-hfm-20260930/capacity/preflight.json",
+  "archiveBodyIntegrity": "not verified",
+  "swarmCleanupConfirmed": true,
+  "capacityAssessment": {
+    "guestDockerFreeGiB": 26.6,
+    "hostVmFilesystemFreeGiB": 16.1,
+    "imageVirtualGiB": 40,
+    "imageAllocatedGiB": 25.7,
+    "priorCombinedArchiveGiB": 17.9,
+    "storageConclusion": "Estimated archives fit guest filesystem. Guest free blocks already allocated in the host image are reusable; host free space alone is not the capture budget. Monitor both filesystems during runs.",
+    "memoryStartMinimumGiB": 12,
+    "dataDeleted": false
+  }
+}

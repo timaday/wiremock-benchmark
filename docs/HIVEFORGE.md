@@ -34,6 +34,19 @@ node. The profile needs Docker Swarm and placement capability; it needs no
 shared host bind storage. HiveForge still supplies its normal `/hf` action root.
 The target must be Linux AMD64, matching the published images.
 
+`ACTIVE_RUNTIME` is a required HiveForge input: `both`, `official`, or `headless`.
+Use `official` or `headless` for sequential benchmarks on a memory-constrained
+node. The selected mock has one replica and the other has zero; both archives,
+RabbitMQ, Prometheus and Grafana remain running. Images, heap limits, fixtures,
+volumes and queue names stay identical. This selection belongs to the HiveForge
+adapter; the canonical Portainer stack still starts both mocks.
+
+Before switching targets, stop and drain the workload and require zero pending
+captures and empty capture queues. Set `ACTIVE_RUNTIME` for the same deployment
+profile, run HiveForge `update`, and verify the selected mock is healthy. The
+inactive mock's Prometheus target reports down by design. Use `both` to restore
+the interactive comparison lab. Unknown or omitted selections fail validation.
+
 ## Install HiveForge on HFM
 
 The [HFM installer](../deploy/hiveforge/hfm-install.yml) pins both the service
@@ -104,10 +117,18 @@ configuration issue; the verified deployment used the existing environment.
 
 After that smoke check, Grafana exited with code 137 and the operator confirmed
 `OOMKilled=true`. The original 512 MiB container limit was insufficient. The
-canonical stack now gives Grafana 1 GiB; this correction must be published,
-deployed and checked under dashboard use before an endurance run. The explicit
-`restart_policy: none` remains unchanged so failures remain visible. The earlier
-smoke result does not establish continued health after the OOM event.
+canonical stack now gives Grafana 1 GiB. That correction was deployed at
+`2cf5fe49`; Grafana and both mock health checks passed after recovery. The explicit
+`restart_policy: none` remains unchanged so failures remain visible.
+
+Full-rate HFM attempts subsequently exposed guest memory exhaustion. Pausing the
+separate HFM PocketHive installation increased available guest memory from
+147 MiB to 6.6 GiB. After the official retry, its idle JVM retained heap and only
+3.5 GiB remained available, motivating the explicit single-runtime selection.
+The official retry still failed: 91,472 of 91,800 results, connection-reset logs,
+and 794.3 collected results/s in the measurement window. The cause of the resets
+is not established. No HFM one-hour qualification passed; see the
+[retry evidence](../tests/perf/pockethive/hfm-retry-20260930/verdict.json).
 
 ## Deploy through HiveForge
 
@@ -117,26 +138,27 @@ After these source files are committed and pushed:
    `wiremock-benchmark`, approving the exact ref you intend to deploy.
 2. Allow that project on the selected environment with profile `swarm-lab`
    and actions `deploy`, `update`, `remove`.
-3. Set these two non-secret runtime environment values for that profile:
+3. Set these three non-secret runtime environment values for that profile:
 
    ```text
    LAB_NODE=your-swarm-node-hostname
    CAPTURE_PREFIX=wiremock-hiveforge-01
+   ACTIVE_RUNTIME=official
    ```
 
 4. Validate requirements. Start component `stack`, action `deploy`, profile
    `swarm-lab`, with the approved Git ref and an explicit deployment name, for
    example `wiremock-hiveforge`.
-5. Inspect the operation and recorded deployment diagnostics. Require all seven
-   services running, both mock metrics targets up, capture broker connections
-   established and no capture errors before generating load.
+5. Inspect the operation and recorded deployment diagnostics. Require the selected
+   mock(s) and all five support services running, selected mock metrics targets up,
+   capture broker connections established and no capture errors before load.
 
 Use the selected HiveForge environment's UI or its MCP connection.
 The repo does not register itself, grant policy, take over the existing
 Portainer stack, or deploy automatically. Use `update` for the same recorded
 deployment slot; removal is a separate explicit lifecycle action.
 
-The profile fixes the canonical Portainer defaults: official `19080`, headless
+Apart from the explicit runtime selection, the profile fixes the canonical Portainer defaults: official `19080`, headless
 `19081`, Grafana `13000`, Prometheus `29090`, Rabbit AMQP `5673`, management
 `15673`, with capture enabled. Other Portainer environment overrides are not
 part of this profile. The Grafana dashboard path is `/d/wiremock-comparison`.
@@ -156,6 +178,8 @@ an unknown required input. No second hand-maintained Compose definition exists.
 
 After changing the canonical stack, regenerate in this order:
 
+Local adapter tests require Python with PyYAML and Jinja2, plus the Docker CLI.
+
 ```sh
 python3 deploy/portainer/render.py --registry-lock deploy/portainer/image-lock.json
 python3 deploy/hiveforge/generate.py
@@ -173,3 +197,9 @@ Ansible renderer and Docker Stack parser passed. A second render was unchanged;
 missing node/prefix, unsupported profile and an invalid prefix were rejected.
 Three adapter checks passed, including complete parsed-stack parity with the
 canonical Portainer lab. No target environment was deployed during these checks.
+
+The [runtime-selection validation](../deploy/hiveforge/runtime-selection-validation-2026-09-30.json)
+records the later four adapter checks and real v0.5.9 Ansible renders for all
+three selections. Docker Stack parsed each result; missing and invalid selections
+were rejected. This is local validation of the prepared change, not evidence that
+single-runtime operation fixes the connection resets or passes endurance.

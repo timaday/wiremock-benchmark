@@ -1,0 +1,65 @@
+{
+  "date": "2026-09-30",
+  "sourceCommit": "f9d8a2bd35d19bca9c4fd2825c82ddc24b7c534b",
+  "targetCommit": "2cf5fe493ec1e4cd8bd7cdcb84d4614129d95f17",
+  "workstationMemoryGateClearedGiB": 13.8,
+  "guestMemoryBlocker": {
+    "availableMiB": 147,
+    "totalGiB": 11.68,
+    "swapBytes": 0,
+    "memoryPressureFullAvg10Percent": 62.08,
+    "ioPressureFullAvg10Percent": 72.01,
+    "evidence": "results/pockethive-hfm-20260930/diagnostics/hfm.txt"
+  },
+  "results": {
+    "official": {
+      "runId": "f7fa54f53f370020",
+      "expected": 91800,
+      "collected": 91756,
+      "missing": 44,
+      "errorCount": 0,
+      "errors": [],
+      "clientIntegrityPassed": false,
+      "collectedRps": 898.9833333333333,
+      "lanesCoverWindow": true,
+      "headerLatencyMs": {
+        "min": 6011,
+        "p99": 10736,
+        "max": 15775
+      },
+      "measurementStart": 1790783729.664528,
+      "measurementEnd": 1790783789.664528,
+      "archiveIntegrity": "not checked remotely",
+      "serverRate": "requires timestamped archive verification",
+      "offeredRpsFromCollectedResults": 1020.0,
+      "qualificationPassed": false,
+      "runDisposition": "failed: connection resets, missing results and low measured collection rate"
+    },
+    "headless": {
+      "runId": "c46bb03c10221781",
+      "expected": 91800,
+      "collected": 3725,
+      "missing": 88075,
+      "errorCount": 0,
+      "errors": [],
+      "clientIntegrityPassed": false,
+      "collectedRps": 12.9,
+      "lanesCoverWindow": false,
+      "headerLatencyMs": {
+        "min": 6114,
+        "p99": 49199,
+        "max": 59805
+      },
+      "measurementStart": 1790784082.726921,
+      "measurementEnd": 1790784142.726921,
+      "archiveIntegrity": "not checked remotely",
+      "serverRate": "requires timestamped archive verification",
+      "offeredRpsFromCollectedResults": 0.0,
+      "qualificationPassed": false,
+      "runDisposition": "aborted: VM telemetry and health endpoint repeatedly timed out under severe guest memory pressure"
+    }
+  },
+  "endurance": "not started; short qualification failed",
+  "preparedRemedy": "Temporarily stop the separate HFM PocketHive installation (16 named containers; retain data and restore IDs); user approval requested because it is unrelated running work. Recheck guest memory before redeploy/retry.",
+  "dataDeleted": false
+}

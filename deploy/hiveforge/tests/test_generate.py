@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 import yaml
+from jinja2 import Environment, StrictUndefined
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('hiveforge_generate', ROOT / 'generate.py')
@@ -25,8 +26,9 @@ class HiveForgeLabTest(unittest.TestCase):
                if key not in {match[0] for match in generate.VARIABLE.findall(generate.SOURCE.read_text())}}
         env.update(settings)
         text = generate.template(generate.SOURCE.read_text())
-        text = text.replace('{{ lab_node }}', settings['LAB_NODE'])
-        text = text.replace('{{ capture_prefix }}', settings['CAPTURE_PREFIX'])
+        text = Environment(undefined=StrictUndefined).from_string(text).render(
+            lab_node=settings['LAB_NODE'], capture_prefix=settings['CAPTURE_PREFIX'],
+            active_runtime='both')
         with tempfile.TemporaryDirectory() as directory:
             rendered = Path(directory) / 'compose.yml'
             rendered.write_text(text)
@@ -39,6 +41,21 @@ class HiveForgeLabTest(unittest.TestCase):
         self.assertEqual(len(stack['services']), 7)
         self.assertNotIn('secrets', stack)
         self.assertFalse(any('secrets' in service for service in stack['services'].values()))
+
+    def test_single_runtime_changes_only_mock_replica_counts(self):
+        template = Environment(undefined=StrictUndefined).from_string(
+            generate.template(generate.SOURCE.read_text()))
+        def render(selection):
+            return yaml.safe_load(template.render(lab_node='test-node',
+                                  capture_prefix='test-capture', active_runtime=selection))
+        baseline = render('both')
+        for active, inactive in [('official', 'headless'), ('headless', 'official')]:
+            with self.subTest(active=active):
+                stack = render(active)
+                self.assertEqual(stack['services'][active]['deploy']['replicas'], 1)
+                self.assertEqual(stack['services'][inactive]['deploy']['replicas'], 0)
+                stack['services'][inactive]['deploy']['replicas'] = 1
+                self.assertEqual(stack, baseline)
 
     def test_unknown_required_input_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'UNDECLARED'):
