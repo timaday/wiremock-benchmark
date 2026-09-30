@@ -1,0 +1,48 @@
+{
+  "sourceHashesVerified": 57,
+  "bundles": [
+    {
+      "bundle": "ph-wiremock-headless-endurance-8a9ee9f1",
+      "csvRows": 940950,
+      "expectedRequests": 3763800,
+      "passed": true
+    },
+    {
+      "bundle": "ph-wiremock-headless-load-87275207",
+      "csvRows": 91800,
+      "expectedRequests": 91800,
+      "passed": true
+    },
+    {
+      "bundle": "ph-wiremock-headless-smoke-fbf2f085",
+      "csvRows": 48,
+      "expectedRequests": 48,
+      "passed": true
+    },
+    {
+      "bundle": "ph-wiremock-official-endurance-eaa015f7",
+      "csvRows": 940950,
+      "expectedRequests": 3763800,
+      "passed": true
+    },
+    {
+      "bundle": "ph-wiremock-official-load-b3a7a205",
+      "csvRows": 91800,
+      "expectedRequests": 91800,
+      "passed": true
+    },
+    {
+      "bundle": "ph-wiremock-official-smoke-bd3d6349",
+      "csvRows": 48,
+      "expectedRequests": 48,
+      "passed": true
+    }
+  ],
+  "freshSmokeGenerationVerified": [
+    "official",
+    "headless"
+  ],
+  "existingPythonTestsPassed": 30,
+  "swarmParserTestsPassed": 2,
+  "liveSwarmRun": "not repeated for this source import"
+}

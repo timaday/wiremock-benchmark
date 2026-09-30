@@ -1,0 +1,106 @@
+{
+  "runtime": "headless",
+  "measurementStartEpoch": 1790762512.974837,
+  "measurementSeconds": 3600.0,
+  "samples": 358,
+  "sampleErrors": 0,
+  "meanWiremockCpuCores": 1.0943111731843576,
+  "peakWiremockContainerMemoryGiB": 2.807,
+  "heapMinMiB": 1296.4962158203125,
+  "heapMaxMiB": 2110.538963317871,
+  "settledFirst10MinuteMedianMemoryGiB": 2.452,
+  "last10MinuteMedianMemoryGiB": 2.208,
+  "gcPauseCount": 6453,
+  "gcPauseTotalMs": 70691.617,
+  "gcPauseMaxMs": 54.553,
+  "fullGcCount": 0,
+  "meanPocketHiveCpuCores": 2.9060673184357544,
+  "peakPocketHiveContainerMemoryGiB": 9.7613359375,
+  "meanPocketHiveContainerMemoryGiB": 9.08340211461243,
+  "fiveMinuteMemoryWindows": [
+    {
+      "fromMinute": 0,
+      "toMinute": 5,
+      "minHeapMiB": 1403.31,
+      "maxHeapMiB": 2110.54,
+      "medianMemoryGiB": 2.51
+    },
+    {
+      "fromMinute": 5,
+      "toMinute": 10,
+      "minHeapMiB": 1422.57,
+      "maxHeapMiB": 2041.13,
+      "medianMemoryGiB": 2.4850000000000003
+    },
+    {
+      "fromMinute": 10,
+      "toMinute": 15,
+      "minHeapMiB": 1382.2,
+      "maxHeapMiB": 1943.75,
+      "medianMemoryGiB": 2.3495
+    },
+    {
+      "fromMinute": 15,
+      "toMinute": 20,
+      "minHeapMiB": 1308.64,
+      "maxHeapMiB": 1872.63,
+      "medianMemoryGiB": 2.2045000000000003
+    },
+    {
+      "fromMinute": 20,
+      "toMinute": 25,
+      "minHeapMiB": 1335.34,
+      "maxHeapMiB": 1695.98,
+      "medianMemoryGiB": 2.0895
+    },
+    {
+      "fromMinute": 25,
+      "toMinute": 30,
+      "minHeapMiB": 1320.32,
+      "maxHeapMiB": 1769.14,
+      "medianMemoryGiB": 2.15
+    },
+    {
+      "fromMinute": 30,
+      "toMinute": 35,
+      "minHeapMiB": 1332.61,
+      "maxHeapMiB": 1777.63,
+      "medianMemoryGiB": 2.1975
+    },
+    {
+      "fromMinute": 35,
+      "toMinute": 40,
+      "minHeapMiB": 1296.5,
+      "maxHeapMiB": 1794.48,
+      "medianMemoryGiB": 2.222
+    },
+    {
+      "fromMinute": 40,
+      "toMinute": 45,
+      "minHeapMiB": 1339.53,
+      "maxHeapMiB": 1817.83,
+      "medianMemoryGiB": 2.2184999999999997
+    },
+    {
+      "fromMinute": 45,
+      "toMinute": 50,
+      "minHeapMiB": 1336.0,
+      "maxHeapMiB": 1775.5,
+      "medianMemoryGiB": 2.189
+    },
+    {
+      "fromMinute": 50,
+      "toMinute": 55,
+      "minHeapMiB": 1366.44,
+      "maxHeapMiB": 1806.01,
+      "medianMemoryGiB": 2.206
+    },
+    {
+      "fromMinute": 55,
+      "toMinute": 60,
+      "minHeapMiB": 1358.3,
+      "maxHeapMiB": 1817.82,
+      "medianMemoryGiB": 2.2085
+    }
+  ]
+}

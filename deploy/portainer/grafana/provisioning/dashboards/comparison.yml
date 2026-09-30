@@ -1,0 +1,9 @@
+apiVersion: 1
+providers:
+- name: WireMock comparison
+  folder: WireMock
+  type: file
+  disableDeletion: true
+  editable: false
+  options:
+    path: /etc/grafana/dashboards

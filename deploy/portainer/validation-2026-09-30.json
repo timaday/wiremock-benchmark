@@ -1,0 +1,222 @@
+{
+  "stack": "wmlab-proof-20260930",
+  "brokerMode": "standalone",
+  "archives": [
+    {
+      "runtime": "official",
+      "requests": 12,
+      "events": 36,
+      "integrityPassed": true
+    },
+    {
+      "runtime": "headless",
+      "requests": 12,
+      "events": 36,
+      "integrityPassed": true
+    }
+  ],
+  "dashboardPanels": 17,
+  "queriesReturningData": 19,
+  "metrics": {
+    "up{job=\"wiremock\"}": [
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "official:8081",
+          "job": "wiremock",
+          "runtime": "official"
+        },
+        "value": [
+          1790767864.254,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "headless:8081",
+          "job": "wiremock",
+          "runtime": "headless"
+        },
+        "value": [
+          1790767864.254,
+          "1"
+        ]
+      }
+    ],
+    "wiremock_http_completed_total": [
+      {
+        "metric": {
+          "__name__": "wiremock_http_completed_total",
+          "instance": "official:8081",
+          "job": "wiremock",
+          "runtime": "official"
+        },
+        "value": [
+          1790767864.255,
+          "12"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "wiremock_http_completed_total",
+          "instance": "headless:8081",
+          "job": "wiremock",
+          "runtime": "headless"
+        },
+        "value": [
+          1790767864.255,
+          "12"
+        ]
+      }
+    ],
+    "wiremock_http_timing_missing_total": [
+      {
+        "metric": {
+          "__name__": "wiremock_http_timing_missing_total",
+          "instance": "official:8081",
+          "job": "wiremock",
+          "runtime": "official"
+        },
+        "value": [
+          1790767864.257,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "wiremock_http_timing_missing_total",
+          "instance": "headless:8081",
+          "job": "wiremock",
+          "runtime": "headless"
+        },
+        "value": [
+          1790767864.257,
+          "0"
+        ]
+      }
+    ],
+    "wiremock_http_errors_total": [
+      {
+        "metric": {
+          "__name__": "wiremock_http_errors_total",
+          "instance": "official:8081",
+          "job": "wiremock",
+          "runtime": "official"
+        },
+        "value": [
+          1790767864.258,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "wiremock_http_errors_total",
+          "instance": "headless:8081",
+          "job": "wiremock",
+          "runtime": "headless"
+        },
+        "value": [
+          1790767864.258,
+          "0"
+        ]
+      }
+    ],
+    "wiremock_capture_pending": [
+      {
+        "metric": {
+          "__name__": "wiremock_capture_pending",
+          "instance": "official:8081",
+          "job": "wiremock",
+          "runtime": "official"
+        },
+        "value": [
+          1790767864.259,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "wiremock_capture_pending",
+          "instance": "headless:8081",
+          "job": "wiremock",
+          "runtime": "headless"
+        },
+        "value": [
+          1790767864.259,
+          "0"
+        ]
+      }
+    ],
+    "wiremock_capture_confirmed_total": [
+      {
+        "metric": {
+          "__name__": "wiremock_capture_confirmed_total",
+          "instance": "official:8081",
+          "job": "wiremock",
+          "runtime": "official"
+        },
+        "value": [
+          1790767864.26,
+          "36"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "wiremock_capture_confirmed_total",
+          "instance": "headless:8081",
+          "job": "wiremock",
+          "runtime": "headless"
+        },
+        "value": [
+          1790767864.26,
+          "36"
+        ]
+      }
+    ],
+    "wiremock_http_duration_seconds_count": [
+      {
+        "metric": {
+          "__name__": "wiremock_http_duration_seconds_count",
+          "instance": "official:8081",
+          "job": "wiremock",
+          "runtime": "official"
+        },
+        "value": [
+          1790767864.261,
+          "12"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "wiremock_http_duration_seconds_count",
+          "instance": "headless:8081",
+          "job": "wiremock",
+          "runtime": "headless"
+        },
+        "value": [
+          1790767864.261,
+          "12"
+        ]
+      }
+    ]
+  },
+  "browserVisualCheck": "unverified",
+  "passed": true,
+  "captureOffHttpAndJvmMetricsPassed": true,
+  "javaTestsPassed": 6,
+  "pythonBenchmarkTestsPassed": 30,
+  "swarmParserRegressionTestsPassed": 2,
+  "externalBrokerLiveTest": "not run against shared PocketHive broker; explicit variant validated by Swarm parser",
+  "testStackState": "removed; named evidence volumes retained",
+  "ghcr": {
+    "imagesPublishedAndPulledByDigest": 6,
+    "platform": "linux/amd64",
+    "smokeTestedRuntimeLayersMatch": true,
+    "pinnedSwarmManifestsParsed": 2,
+    "imageLock": "image-lock.json",
+    "allPrivateAtPublication": true,
+    "currentVisibility": "public",
+    "anonymousManifestAndConfigAccessVerified": 6
+  }
+}

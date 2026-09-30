@@ -1,0 +1,98 @@
+{
+  "version": "20260930",
+  "sourceRepository": "https://github.com/timaday/wiremock-benchmark",
+  "sourceState": "Portable stack source committed in this repository; registry runtime layers match the locally smoke-tested build",
+  "images": {
+    "official": {
+      "reference": "ghcr.io/timaday/wiremock-lab-official@sha256:2854b2dea03175f2e548d68ebb6443248fc367657ec1356d68d03294685abf88",
+      "tag": "ghcr.io/timaday/wiremock-lab-official:20260930",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      ],
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-official",
+      "authenticatedDigestPullVerified": true,
+      "smokeTestedRuntimeLayersMatch": true,
+      "anonymousManifestAndConfigVerified": true
+    },
+    "headless": {
+      "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:e6de2e9fe26bef4d9afb8a0343c7696d48e45afbb5036c60f46a3ac5e706556c",
+      "tag": "ghcr.io/timaday/wiremock-lab-headless:20260930",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      ],
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-headless",
+      "authenticatedDigestPullVerified": true,
+      "smokeTestedRuntimeLayersMatch": true,
+      "anonymousManifestAndConfigVerified": true
+    },
+    "archive": {
+      "reference": "ghcr.io/timaday/wiremock-lab-archive@sha256:7de1ee0bb9870be4195058fec0ee3958fd98665c45e2c1f7c8eeb3ce506697ed",
+      "tag": "ghcr.io/timaday/wiremock-lab-archive:20260930",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      ],
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-archive",
+      "authenticatedDigestPullVerified": true,
+      "smokeTestedRuntimeLayersMatch": true,
+      "anonymousManifestAndConfigVerified": true
+    },
+    "rabbit": {
+      "reference": "ghcr.io/timaday/wiremock-lab-rabbit@sha256:809e8845798216d8c484505544628e07d63ba188a07ac3ae24a3e98d2ef52890",
+      "tag": "ghcr.io/timaday/wiremock-lab-rabbit:20260930",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      ],
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-rabbit",
+      "authenticatedDigestPullVerified": true,
+      "smokeTestedRuntimeLayersMatch": true,
+      "anonymousManifestAndConfigVerified": true
+    },
+    "prometheus": {
+      "reference": "ghcr.io/timaday/wiremock-lab-prometheus@sha256:d673d2a0ecffb073bead7951776ab9fc6a8115a85e361981bd2f243ea0b21dff",
+      "tag": "ghcr.io/timaday/wiremock-lab-prometheus:20260930",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      ],
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-prometheus",
+      "authenticatedDigestPullVerified": true,
+      "smokeTestedRuntimeLayersMatch": true,
+      "anonymousManifestAndConfigVerified": true
+    },
+    "grafana": {
+      "reference": "ghcr.io/timaday/wiremock-lab-grafana@sha256:b1ba4ee780745d9e19e53fcbea38ca128da3e8ce5ac28411542dc3b46f13ec35",
+      "tag": "ghcr.io/timaday/wiremock-lab-grafana:20260930",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      ],
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-grafana",
+      "authenticatedDigestPullVerified": true,
+      "smokeTestedRuntimeLayersMatch": true,
+      "anonymousManifestAndConfigVerified": true
+    }
+  },
+  "verifiedAtUtc": "2026-09-30T11:46:44.220727+00:00"
+}

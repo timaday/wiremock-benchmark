@@ -8,6 +8,21 @@ Four Gatling 3.15.1 engines run as Docker Swarm tasks and generate the combined 
 [historical JMeter qualification report](docs/QUALIFICATION.md), per-run `verdict.json` and
 [contract](docs/CONTRACT.md) for measured results, exact gates and scope.
 
+## Portable Portainer / Swarm lab
+
+For a generator-independent deployment of both WireMocks, RabbitMQ, durable archives
+and a provisioned Grafana comparison dashboard, use [the Portainer guide](docs/PORTAINER.md).
+It includes GHCR images pinned by digest and an explicit existing-PocketHive-broker variant.
+
+## PocketHive workload bundles
+
+The [PocketHive benchmark package](tests/perf/pockethive/README.md) contains both
+completed one-hour bundles, smoke/load profiles, fresh-bundle preparation, result
+collection and verification tools, and the measured comparison report. The hour
+profile offers 1,020 requests/s with six-second delay across all sizes/templates.
+It requires a PocketHive deployment with Artemis work transport and a dedicated
+Redis evidence sink; WireMock capture uses RabbitMQ separately.
+
 ## Run
 
 Requires Docker Engine/Compose, a local Swarm manager, and Python 3.10+ on a Linux

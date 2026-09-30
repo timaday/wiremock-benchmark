@@ -1,0 +1,24 @@
+{
+  "official": {
+    "samples": 15,
+    "meanCpuCores": 1.0729866666666668,
+    "peakContainerMemoryGiB": 3.048,
+    "heapMinMiB": 1354.1705474853516,
+    "heapMaxMiB": 2065.299102783203,
+    "gcPauseCount": 96,
+    "gcPauseTotalMs": 1550.242,
+    "gcPauseMaxMs": 54.226,
+    "fullGcCount": 0
+  },
+  "headless": {
+    "samples": 14,
+    "meanCpuCores": 1.0584714285714285,
+    "peakContainerMemoryGiB": 2.477,
+    "heapMinMiB": 1466.0993576049805,
+    "heapMaxMiB": 2003.8606262207031,
+    "gcPauseCount": 84,
+    "gcPauseTotalMs": 1077.392,
+    "gcPauseMaxMs": 32.98,
+    "fullGcCount": 0
+  }
+}

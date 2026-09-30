@@ -43,3 +43,24 @@ COPY --from=gatling-build /src/target/dependency /opt/gatling/dependency
 COPY tests/perf/start-engine.sh /work/tests/start-engine.sh
 ENV HEAP="-Xms128m -Xmx1g" JVM_ARGS="-Xss256k -XX:MaxMetaspaceSize=160m -XX:+ExitOnOutOfMemoryError"
 ENTRYPOINT ["/bin/sh", "/work/tests/start-engine.sh"]
+
+# Portable lab images contain fixtures and monitoring configuration; no bind mounts.
+FROM python:3.12-slim AS portable-fixtures
+COPY tools/fixtures.py /build/fixtures.py
+RUN python /build/fixtures.py
+
+FROM official AS portable-official
+COPY --from=portable-fixtures /fixtures /home/wiremock
+
+FROM headless AS portable-headless
+COPY --from=portable-fixtures /fixtures /home/wiremock
+
+FROM rabbitmq:3.13.7-management-alpine AS portable-rabbit
+RUN rabbitmq-plugins enable --offline rabbitmq_prometheus
+
+FROM prom/prometheus:v3.15.0 AS portable-prometheus
+COPY deploy/portainer/prometheus/ /etc/prometheus/
+
+FROM grafana/grafana:13.2.3 AS portable-grafana
+COPY deploy/portainer/grafana/provisioning/ /etc/grafana/provisioning/
+COPY deploy/portainer/grafana/dashboards/ /etc/grafana/dashboards/

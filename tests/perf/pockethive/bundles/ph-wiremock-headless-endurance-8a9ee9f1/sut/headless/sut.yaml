@@ -1,0 +1,11 @@
+{
+  "id": "headless",
+  "name": "Isolated benchmark WireMock headless",
+  "type": "http",
+  "endpoints": {
+    "default": {
+      "kind": "http",
+      "baseUrl": "http://wmb-ph-headless:8080"
+    }
+  }
+}

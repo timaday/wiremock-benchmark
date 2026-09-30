@@ -1,0 +1,39 @@
+{
+  "runId": "fbf2f0850834f87e",
+  "expected": 48,
+  "collected": 48,
+  "valid": 48,
+  "missing": 0,
+  "unexpectedCaptureIds": 0,
+  "captureEvents": 144,
+  "errors": [],
+  "errorCount": 0,
+  "captureDelivery": {
+    "enabled": true,
+    "errors": 0,
+    "java": "27+35-2325",
+    "pending": 0,
+    "committed": 275544,
+    "confirmed": 275544,
+    "brokerConnected": true,
+    "reconnects": 0,
+    "heapUsed": 1853931704
+  },
+  "integrityPassed": true,
+  "pipelineLatencyMs": {
+    "p50": 7111.55104637146,
+    "p95": 7382.471799850464,
+    "p99": 7401.54504776001
+  },
+  "httpHeaderLatencyMs": {
+    "p50": 6024,
+    "p95": 6100,
+    "p99": 6101
+  },
+  "laneArrivalSpansSeconds": {
+    "02": 10.97635793685913,
+    "03": 10.981683015823364,
+    "01": 10.977565050125122,
+    "00": 10.973203182220459
+  }
+}

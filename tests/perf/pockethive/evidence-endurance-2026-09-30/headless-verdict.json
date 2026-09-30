@@ -1,0 +1,270 @@
+{
+  "runId": "8a9ee9f13a3136c6",
+  "expected": 3763800,
+  "collected": 3763800,
+  "unique": 3763800,
+  "valid": 3763800,
+  "missing": 0,
+  "errors": {
+    "duplicateId": 0
+  },
+  "captureEvents": 11291400,
+  "malformedCaptureIds": 0,
+  "captureMismatchEvents": 0,
+  "captureDelivery": {
+    "enabled": true,
+    "errors": 0,
+    "java": "27+35-2325",
+    "pending": 0,
+    "committed": 11291400,
+    "confirmed": 11291400,
+    "brokerConnected": true,
+    "reconnects": 0,
+    "heapUsed": 1803599568
+  },
+  "measurementStartEpoch": 1790762512.974837,
+  "measurementSeconds": 3600,
+  "laneArrivalSpansSeconds": {
+    "2": 3689.8772180080414,
+    "0": 3689.8775792121887,
+    "3": 3689.8727040290833,
+    "1": 3689.8810489177704
+  },
+  "lanesCoverWindow": true,
+  "httpHeaderLatencyMs": {
+    "p50": 6036,
+    "p95": 6092,
+    "p99": 6184
+  },
+  "pipelineLatencyMs": {
+    "p50": 11172,
+    "p95": 11366,
+    "p99": 11617
+  },
+  "observedOfferedRps": 1020.0,
+  "validCollectedRps": 1020.0033333333333,
+  "serverReceivedRps": 1020.0002777777778,
+  "serverCompletedRps": 1020.0147222222222,
+  "perMinuteServerCompletedRps": [
+    1021.0,
+    1019.8166666666667,
+    1019.1166666666667,
+    1020.9,
+    1019.9333333333333,
+    1019.6833333333333,
+    1020.05,
+    1020.3666666666667,
+    1019.5,
+    1020.2333333333333,
+    1020.2166666666667,
+    1019.3166666666667,
+    1020.65,
+    1020.0333333333333,
+    1020.0833333333334,
+    1019.7666666666667,
+    1020.0833333333334,
+    1019.7,
+    1019.7666666666667,
+    1020.05,
+    1020.6666666666666,
+    1017.85,
+    1021.9,
+    1020.25,
+    1019.7,
+    1019.8166666666667,
+    1020.2166666666667,
+    1019.7666666666667,
+    1020.3833333333333,
+    1019.7166666666667,
+    1020.1666666666666,
+    1020.1666666666666,
+    1019.9833333333333,
+    1019.9166666666666,
+    1020.1166666666667,
+    1019.9833333333333,
+    1019.3333333333334,
+    1019.4166666666666,
+    1020.95,
+    1020.3833333333333,
+    1019.7333333333333,
+    1019.5666666666667,
+    1019.1833333333333,
+    1021.3166666666667,
+    1020.1166666666667,
+    1020.0333333333333,
+    1019.6833333333333,
+    1020.3333333333334,
+    1019.6333333333333,
+    1019.95,
+    1019.3666666666667,
+    1020.7166666666667,
+    1020.3166666666667,
+    1018.9333333333333,
+    1020.9333333333333,
+    1019.9833333333333,
+    1019.55,
+    1019.6666666666666,
+    1020.7333333333333,
+    1020.1833333333333
+  ],
+  "integrityPassed": true,
+  "ratePassed": true,
+  "cases": [
+    {
+      "id": "static-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "static",
+      "requests": 313652,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6036,
+        "p95": 6091,
+        "p99": 6182
+      }
+    },
+    {
+      "id": "json-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "json",
+      "requests": 313652,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6182
+      }
+    },
+    {
+      "id": "text-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "text",
+      "requests": 313652,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6181
+      }
+    },
+    {
+      "id": "static-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "static",
+      "requests": 313652,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6182
+      }
+    },
+    {
+      "id": "json-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "json",
+      "requests": 313652,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6183
+      }
+    },
+    {
+      "id": "text-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "text",
+      "requests": 313652,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6182
+      }
+    },
+    {
+      "id": "static-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "static",
+      "requests": 313648,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6183
+      }
+    },
+    {
+      "id": "json-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "json",
+      "requests": 313648,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6182
+      }
+    },
+    {
+      "id": "text-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "text",
+      "requests": 313648,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6035,
+        "p95": 6091,
+        "p99": 6182
+      }
+    },
+    {
+      "id": "static-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "static",
+      "requests": 313648,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6036,
+        "p95": 6093,
+        "p99": 6186
+      }
+    },
+    {
+      "id": "json-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "json",
+      "requests": 313648,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6036,
+        "p95": 6094,
+        "p99": 6188
+      }
+    },
+    {
+      "id": "text-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "text",
+      "requests": 313648,
+      "errors": 0,
+      "httpHeaderLatencyMs": {
+        "p50": 6036,
+        "p95": 6094,
+        "p99": 6189
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "runId": "b3a7a2057ab3592f",
+  "expected": 91800,
+  "collected": 91800,
+  "valid": 91800,
+  "missing": 0,
+  "unexpectedCaptureIds": 0,
+  "captureEvents": 275400,
+  "errors": [],
+  "errorCount": 0,
+  "captureDelivery": {
+    "enabled": true,
+    "errors": 0,
+    "java": "17.0.19+10",
+    "pending": 0,
+    "committed": 275544,
+    "confirmed": 275544,
+    "brokerConnected": true,
+    "reconnects": 0,
+    "heapUsed": 1968710256
+  },
+  "integrityPassed": true,
+  "pipelineLatencyMs": {
+    "p50": 11395.807027816772,
+    "p95": 14601.912021636963,
+    "p99": 15991.490125656128
+  },
+  "httpHeaderLatencyMs": {
+    "p50": 6045,
+    "p95": 6214,
+    "p99": 6381
+  },
+  "laneArrivalSpansSeconds": {
+    "00": 89.88451480865479,
+    "01": 89.87991690635681,
+    "02": 89.8735761642456,
+    "03": 89.8813750743866
+  },
+  "measurementStartEpoch": 1790756832.699589,
+  "measurementSeconds": 60,
+  "lanesCoverWindow": true,
+  "observedOfferedRps": 1020.0,
+  "validCollectedRps": 1065.65,
+  "serverReceivedRps": 1022.75,
+  "serverCompletedRps": 1023.0833333333334,
+  "ratePassed": true
+}

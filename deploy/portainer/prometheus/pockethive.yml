@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 5s
+  scrape_timeout: 4s
+scrape_configs:
+- job_name: wiremock
+  metrics_path: /prometheus
+  static_configs:
+  - targets:
+    - official:8081
+    labels:
+      runtime: official
+  - targets:
+    - headless:8081
+    labels:
+      runtime: headless

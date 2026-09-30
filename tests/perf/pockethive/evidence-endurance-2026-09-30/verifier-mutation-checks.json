@@ -1,0 +1,27 @@
+[
+  {
+    "mutation": "missing",
+    "exitCode": 2,
+    "rejected": true
+  },
+  {
+    "mutation": "duplicate",
+    "exitCode": 2,
+    "rejected": true
+  },
+  {
+    "mutation": "response_hash",
+    "exitCode": 2,
+    "rejected": true
+  },
+  {
+    "mutation": "http_status",
+    "exitCode": 2,
+    "rejected": true
+  },
+  {
+    "mutation": "undrained_capture",
+    "exitCode": 2,
+    "rejected": true
+  }
+]

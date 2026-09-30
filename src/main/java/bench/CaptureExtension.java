@@ -3,19 +3,20 @@ package bench;
 import com.github.tomakehurst.wiremock.extension.*;
 import com.github.tomakehurst.wiremock.http.HttpHeaders;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
-import com.sun.net.httpserver.HttpServer;
-import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * WireMock lifecycle adapter. Durable intent precedes response emission; broker IO is delegated.
+ * Responsibility: dispatch WireMock lifecycle callbacks to durable capture and HTTP metrics.
+ * Must not: serve metric projections or perform broker IO on callback threads.
+ * Contract: docs/CONTRACT.md and docs/PORTAINER.md.
  */
 public final class CaptureExtension implements ServeEventListener {
   private DurableOutbox outbox;
   private RabbitPublisher publisher;
-  private HttpServer metrics;
+  private MetricsServer metrics;
+  private final HttpMetrics http = new HttpMetrics();
   private final AtomicLong errors = new AtomicLong();
   private boolean enabled;
 
@@ -33,40 +34,14 @@ public final class CaptureExtension implements ServeEventListener {
         outbox = new DurableOutbox(Path.of(Settings.required("OUTBOX_PATH")), 1024);
         publisher = new RabbitPublisher(outbox);
       }
-      metrics = HttpServer.create(new InetSocketAddress("0.0.0.0", 8081), 0);
-      metrics.createContext(
-          "/metrics",
-          exchange -> {
-            try {
-              var values = new LinkedHashMap<String, Object>();
-              values.put("enabled", enabled);
-              values.put("errors", errors.get());
-              values.put("java", System.getProperty("java.runtime.version"));
-              values.put("pending", enabled ? outbox.pending() : 0);
-              values.put("committed", enabled ? outbox.committed.get() : 0);
-              values.put("confirmed", enabled ? publisher.confirmed.get() : 0);
-              values.put("brokerConnected", enabled && publisher.connected);
-              values.put("reconnects", enabled ? publisher.reconnects.get() : 0);
-              values.put(
-                  "heapUsed",
-                  Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
-              byte[] body = Json.bytes(values);
-              exchange.getResponseHeaders().add("Content-Type", "application/json");
-              exchange.sendResponseHeaders(200, body.length);
-              exchange.getResponseBody().write(body);
-            } catch (Exception e) {
-              exchange.sendResponseHeaders(500, -1);
-            } finally {
-              exchange.close();
-            }
-          });
-      metrics.start();
+      metrics = new MetricsServer(enabled, outbox, publisher, errors, http);
     } catch (Exception e) {
       throw new IllegalStateException("Capture startup failed", e);
     }
   }
 
   public void beforeMatch(ServeEvent event, Parameters parameters) {
+    if (isBenchmark(event)) http.received();
     capture(event, Phase.REQUEST);
   }
 
@@ -76,10 +51,16 @@ public final class CaptureExtension implements ServeEventListener {
 
   public void afterComplete(ServeEvent event, Parameters parameters) {
     capture(event, Phase.SEND_COMPLETED);
+    if (isBenchmark(event))
+      http.completed(event.getResponse().getStatus(), event.getTiming().getTotalTime());
+  }
+
+  private static boolean isBenchmark(ServeEvent event) {
+    return event.getRequest().getUrl().startsWith("/bench/");
   }
 
   private void capture(ServeEvent event, Phase phase) {
-    if (!enabled || !event.getRequest().getUrl().startsWith("/bench/")) return;
+    if (!enabled || !isBenchmark(event)) return;
     try {
       var request = event.getRequest();
       String requestId = request.getHeader("X-Bench-Id"), runId = request.getHeader("X-Bench-Run");
@@ -121,7 +102,7 @@ public final class CaptureExtension implements ServeEventListener {
 
   public void stop() {
     try {
-      if (metrics != null) metrics.stop(0);
+      if (metrics != null) metrics.close();
       if (outbox != null) outbox.close();
       if (publisher != null) publisher.close();
     } catch (Exception e) {

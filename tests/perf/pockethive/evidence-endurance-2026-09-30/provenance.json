@@ -1,0 +1,28 @@
+{
+  "official": {
+    "Status": "running",
+    "Running": true,
+    "OOMKilled": false,
+    "StartedAt": "2026-09-30T08:43:35.053653635Z",
+    "health": "healthy",
+    "restartCount": 0
+  },
+  "headless": {
+    "Status": "running",
+    "Running": true,
+    "OOMKilled": false,
+    "StartedAt": "2026-09-30T09:56:25.43913978Z",
+    "health": "healthy",
+    "restartCount": 0
+  },
+  "analysisSourceSha256": {
+    "stream_verify.py": "e4c41504d1d22960f11eb8c5f990dbfd891fd0723fd1eb6f47ee437fa42b0408",
+    "resources.py": "9d92a6ea85f088c1f4e123d86634647bdc8ed595e68bcb1bb8e5125804d48562",
+    "monitor.py": "cdac3281b56f1628170b58340c25b16ac3f21385e1aa0a087507b0ca5b28cbfe",
+    "test_stream_verify.py": "6e784367e57d070d42464fca9eca62681f2687d0898bd6b250ec871384564ee2"
+  },
+  "sourceCommit": "2c509f1b35a9298f36f6c3759a234c4461661aa8",
+  "fixtureSourceCommit": "0b1eb6306c1ab43ec6af85bb6f8d0e3d569de92a",
+  "fixtureSourceClean": true,
+  "runtimeStateRecorded": "After full result/capture drain, before intentional stop"
+}
