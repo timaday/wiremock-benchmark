@@ -14,7 +14,8 @@ TARGET = ROOT / 'components/stack/ansible/templates/compose.yml.j2'
 VARIABLE = re.compile(r'\$\{([A-Z][A-Z0-9_]*)(?::([?-])([^}]*))?\}')
 # Public fixture credentials are intentional for this development lab.
 LAB_CREDENTIAL = 'benchmark'
-INPUTS = {'LAB_NODE': '{{ lab_node }}', 'CAPTURE_PREFIX': '{{ capture_prefix }}'}
+INPUTS = {'LAB_NODE': '{{ lab_node }}', 'CAPTURE_PREFIX': '{{ capture_prefix }}',
+          'CAPTURE_ENABLED': '{{ capture_enabled }}'}
 
 
 def template(source):

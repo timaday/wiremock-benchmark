@@ -18,6 +18,7 @@ final class MetricsServer implements AutoCloseable {
 
   MetricsServer(boolean enabled, DurableOutbox outbox, RabbitPublisher publisher,
       AtomicLong errors, HttpMetrics http) throws IOException {
+    var diagnostics = new CaptureDiagnostics(enabled, outbox, publisher);
     server = HttpServer.create(new InetSocketAddress("0.0.0.0", 8081), 0);
     server.createContext("/metrics", exchange -> {
       try {
@@ -31,6 +32,7 @@ final class MetricsServer implements AutoCloseable {
         values.put("brokerConnected", enabled && publisher.connected);
         values.put("reconnects", enabled ? publisher.reconnects.get() : 0);
         values.put("heapUsed", Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+        values.put("captureDiagnostics", diagnostics.snapshot());
         respond(exchange, "application/json", Json.bytes(values));
       } catch (Exception e) { exchange.sendResponseHeaders(500, -1); }
       finally { exchange.close(); }
@@ -44,6 +46,7 @@ final class MetricsServer implements AutoCloseable {
         HttpMetrics.metric(out, "wiremock_capture_committed_total", "counter", enabled ? outbox.committed.get() : 0);
         HttpMetrics.metric(out, "wiremock_capture_confirmed_total", "counter", enabled ? publisher.confirmed.get() : 0);
         HttpMetrics.metric(out, "wiremock_capture_broker_connected", "gauge", enabled && publisher.connected ? 1 : 0);
+        diagnostics.expose(out);
         respond(exchange, "text/plain; version=0.0.4; charset=utf-8", out.toString().getBytes(StandardCharsets.UTF_8));
       } catch (Exception e) { exchange.sendResponseHeaders(500, -1); }
       finally { exchange.close(); }

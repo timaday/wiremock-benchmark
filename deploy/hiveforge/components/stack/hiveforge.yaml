@@ -16,3 +16,4 @@ requirements:
     - LAB_NODE
     - CAPTURE_PREFIX
     - ACTIVE_RUNTIME
+    - CAPTURE_ENABLED

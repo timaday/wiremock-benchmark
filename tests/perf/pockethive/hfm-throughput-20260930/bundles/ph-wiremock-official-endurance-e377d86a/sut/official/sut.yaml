@@ -1,0 +1,11 @@
+{
+  "id": "official",
+  "name": "Isolated benchmark WireMock official",
+  "type": "http",
+  "endpoints": {
+    "default": {
+      "kind": "http",
+      "baseUrl": "http://192.168.122.67:19080"
+    }
+  }
+}

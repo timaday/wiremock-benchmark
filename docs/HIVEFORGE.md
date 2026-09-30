@@ -47,6 +47,11 @@ profile, run HiveForge `update`, and verify the selected mock is healthy. The
 inactive mock's Prometheus target reports down by design. Use `both` to restore
 the interactive comparison lab. Unknown or omitted selections fail validation.
 
+`CAPTURE_ENABLED` is also required (`true` or `false`). Use `false` only for a
+matched diagnostic baseline; qualification requires `true`. Stop and drain load
+and captures before changing it. HiveForge recreates the selected mock with the
+explicit setting; retained outbox/archive volumes remain unchanged.
+
 ## Install HiveForge on HFM
 
 The [HFM installer](../deploy/hiveforge/hfm-install.yml) pins both the service
@@ -130,6 +135,29 @@ and 794.3 collected results/s in the measurement window. The cause of the resets
 is not established. No HFM one-hour qualification passed; see the
 [retry evidence](../tests/perf/pockethive/hfm-retry-20260930/verdict.json).
 
+Revision `399e3d6` subsequently deployed with `ACTIVE_RUNTIME=headless`: official
+reached `0/0`, while headless and all five support services remained `1/1`.
+The fresh headless short run returned all 91,800 responses with correct client
+hashes and no missing IDs. Its measured client collection rate was 965.4/s,
+below the 1,000/s gate; header latency p99 was 7,752ms. Pending captures peaked
+at 60,711 sampled events, then drained to zero with 275,400 new confirmations
+and empty RabbitMQ queues. Archive body reconciliation remains unverified.
+The resource guard did not trip (minimum sampled workstation available memory
+4.177 GiB), and the services remained running. This does not establish guest
+memory stability or explain the throughput shortfall. The load swarm was
+stopped and removed; headless-only deployment remains active. No HFM one-hour
+hold was started.
+
+The subsequent throughput fix routes inserts and confirmed deletions through
+one outbox writer and reuses the publisher's read connection, retaining FULL/WAL
+durability. It adds capture-stage timing metrics and fresh PocketHive bundles
+that retain worker-hop timings. Updated official/headless GHCR images are pinned
+in the image lock. The local headless Gatling check passed 1,019.8 completions/s
+for a 60-second measured interval, with 6,048ms p99 and all 183,600 measured
+capture events reconciled. Both runtimes passed broker-outage/process-kill
+recovery checks. This is local validation; HFM reruns and one-hour qualification
+remain pending. See the [validation record](../tests/perf/pockethive/hfm-throughput-20260930/validation.json).
+
 ## Deploy through HiveForge
 
 After these source files are committed and pushed:
@@ -138,12 +166,13 @@ After these source files are committed and pushed:
    `wiremock-benchmark`, approving the exact ref you intend to deploy.
 2. Allow that project on the selected environment with profile `swarm-lab`
    and actions `deploy`, `update`, `remove`.
-3. Set these three non-secret runtime environment values for that profile:
+3. Set these four non-secret runtime environment values for that profile:
 
    ```text
    LAB_NODE=your-swarm-node-hostname
    CAPTURE_PREFIX=wiremock-hiveforge-01
    ACTIVE_RUNTIME=official
+   CAPTURE_ENABLED=true
    ```
 
 4. Validate requirements. Start component `stack`, action `deploy`, profile

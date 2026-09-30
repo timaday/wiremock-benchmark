@@ -103,8 +103,8 @@ public final class CaptureExtension implements ServeEventListener {
   public void stop() {
     try {
       if (metrics != null) metrics.close();
-      if (outbox != null) outbox.close();
       if (publisher != null) publisher.close();
+      if (outbox != null) outbox.close();
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

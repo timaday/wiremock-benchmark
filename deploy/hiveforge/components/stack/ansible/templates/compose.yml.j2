@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   official:
-    image: ghcr.io/timaday/wiremock-lab-official@sha256:2854b2dea03175f2e548d68ebb6443248fc367657ec1356d68d03294685abf88
+    image: ghcr.io/timaday/wiremock-lab-official@sha256:ba89ff55533c0747ed98b3f204e96ee8db4a339404e6757ce38bd07d6d45dd8b
     deploy:
       replicas: {{ 1 if active_runtime in ["both", "official"] else 0 }}
       placement:
@@ -15,7 +15,7 @@ services:
       restart_policy:
         condition: none
     environment:
-      CAPTURE_ENABLED: 'true'
+      CAPTURE_ENABLED: '{{ capture_enabled }}'
       OUTBOX_PATH: /state/outbox.db
       RABBIT_URI: amqp://benchmark:benchmark@rabbit:5672/%2f
       RABBIT_QUEUE: '{{ capture_prefix }}.official'
@@ -77,7 +77,7 @@ services:
     - official-archive:/archive
     stop_grace_period: 45s
   headless:
-    image: ghcr.io/timaday/wiremock-lab-headless@sha256:e6de2e9fe26bef4d9afb8a0343c7696d48e45afbb5036c60f46a3ac5e706556c
+    image: ghcr.io/timaday/wiremock-lab-headless@sha256:e8d6a3133b26c2e30e9ee6cecf26f407869f59e55beee4928f478dd16c49f74f
     deploy:
       replicas: {{ 1 if active_runtime in ["both", "headless"] else 0 }}
       placement:
@@ -90,7 +90,7 @@ services:
       restart_policy:
         condition: none
     environment:
-      CAPTURE_ENABLED: 'true'
+      CAPTURE_ENABLED: '{{ capture_enabled }}'
       OUTBOX_PATH: /state/outbox.db
       RABBIT_URI: amqp://benchmark:benchmark@rabbit:5672/%2f
       RABBIT_QUEUE: '{{ capture_prefix }}.headless'

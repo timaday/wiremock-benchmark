@@ -48,6 +48,11 @@ def result_template():
         '"outcome":"{{ result.outcome.type }}",',
         '"path":"{{ result.request.path }}",',
         '"http_header_duration_ms":{{ result.metrics.durationMs }},',
+        '"processor_pacing_ms":{{ result.metrics.connectionLatencyMs }},',
+        '"hops":[{% for hop in workItem.observabilityContext.get.hops %}',
+        '{"service":"{{ hop.service }}","received_at":"{{ hop.receivedAt }}",',
+        '"processed_at":{% if hop.processedAt is null %}null{% else %}"{{ hop.processedAt }}"{% endif %}}',
+        '{% if not loop.last %},{% endif %}{% endfor %}],',
         '"collected_at":"{{ eval("nowIso") }}"}',
     ])
 
@@ -65,6 +70,7 @@ def prepare(canonical_repo, output, runtime, mode):
     rate, rows, warmup, measurement = {
         'smoke': (1, 12, 20, 0),
         'load': (255, 22950, 20, 60),
+        'diagnostic': (255, 255 * 270, 60, 180),
         'endurance': (255, 255 * 3690, 60, 3600),
     }[mode]
     bees, edges = [], []
@@ -174,6 +180,6 @@ if __name__ == '__main__':
     parser.add_argument('--canonical-repo', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--runtime', required=True, choices=['official', 'headless'])
-    parser.add_argument('--mode', required=True, choices=['smoke', 'load', 'endurance'])
+    parser.add_argument('--mode', required=True, choices=['smoke', 'load', 'diagnostic', 'endurance'])
     args = parser.parse_args()
     print(prepare(args.canonical_repo, args.output, args.runtime, args.mode))

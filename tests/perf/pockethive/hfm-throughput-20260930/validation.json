@@ -1,0 +1,171 @@
+{
+  "date": "2026-09-30",
+  "status": "local fix validated; HFM deployment and qualification pending",
+  "outboxProbe": {
+    "scope": "Local filesystem, 32 producers, 512-byte records, synthetic 1ms confirmation delay; not HTTP or RabbitMQ throughput",
+    "before": {
+      "events": 64000,
+      "appendSeconds": 14.946,
+      "drainedSeconds": 14.947,
+      "eventsPerSecond": 4281.7,
+      "maximumSampledPending": 416
+    },
+    "after": {
+      "events": 64000,
+      "appendSeconds": 5.948,
+      "drainedSeconds": 5.951,
+      "eventsPerSecond": 10754.6,
+      "maximumSampledPending": 64
+    },
+    "speedup": 2.512
+  },
+  "javaTests": 11,
+  "pythonTests": {
+    "runner": 30,
+    "portainer": 2,
+    "hiveforge": 5,
+    "stageTiming": 4
+  },
+  "ansibleCases": {
+    "runnerImage": "ghcr.io/sepa79/hiveforge@sha256:e94cfae4aec86231969a3009007be4dcb6c3629e552a18477ee3247f17b6b593",
+    "checks": [
+      {
+        "activeRuntime": "both",
+        "captureEnabled": "true",
+        "valid": true,
+        "exitCode": 0,
+        "dockerStackParserPassed": true
+      },
+      {
+        "activeRuntime": "both",
+        "captureEnabled": "false",
+        "valid": true,
+        "exitCode": 0,
+        "dockerStackParserPassed": true
+      },
+      {
+        "activeRuntime": "official",
+        "captureEnabled": "true",
+        "valid": true,
+        "exitCode": 0,
+        "dockerStackParserPassed": true
+      },
+      {
+        "activeRuntime": "official",
+        "captureEnabled": "false",
+        "valid": true,
+        "exitCode": 0,
+        "dockerStackParserPassed": true
+      },
+      {
+        "activeRuntime": "headless",
+        "captureEnabled": "true",
+        "valid": true,
+        "exitCode": 0,
+        "dockerStackParserPassed": true
+      },
+      {
+        "activeRuntime": "headless",
+        "captureEnabled": "false",
+        "valid": true,
+        "exitCode": 0,
+        "dockerStackParserPassed": true
+      },
+      {
+        "activeRuntime": "",
+        "captureEnabled": "true",
+        "valid": false,
+        "exitCode": 2
+      },
+      {
+        "activeRuntime": "headless",
+        "captureEnabled": "",
+        "valid": false,
+        "exitCode": 2
+      },
+      {
+        "activeRuntime": "headless",
+        "captureEnabled": "invalid",
+        "valid": false,
+        "exitCode": 2
+      }
+    ]
+  },
+  "pockethiveRelease": "0.15.35",
+  "timingTemplateProbePassed": true,
+  "workerDeclarationsValidated": 72,
+  "faultProbes": {
+    "official": {
+      "mode": "official",
+      "runId": "732150b495234004",
+      "checks": {
+        "brokerOutageRetains120Events": true,
+        "mockKillPreserves120CommittedEvents": true,
+        "externalArchiveReconcilesEveryPhase": true
+      },
+      "pass": true
+    },
+    "headless": {
+      "mode": "headless",
+      "runId": "abf775d9bf834d08",
+      "checks": {
+        "brokerOutageRetains120Events": true,
+        "mockKillPreserves120CommittedEvents": true,
+        "externalArchiveReconcilesEveryPhase": true
+      },
+      "pass": true
+    }
+  },
+  "localGatlingCheck": {
+    "runId": "e2b3d10a8c574edd",
+    "scope": "Local host, updated headless, fixed 6s delay, mixed payloads/templates; not HFM/PocketHive qualification",
+    "verdict": {
+      "pass": true,
+      "checks": {
+        "httpCorrect": true,
+        "uniqueClientIds": true,
+        "averageOfferedTarget": true,
+        "averageCompletedTarget": true,
+        "everyFullMinuteAtTarget": true,
+        "captureReconciled": true,
+        "scheduledRateRespected": true,
+        "noOomOrRestart": true,
+        "fourEnginesCompleted": true
+      },
+      "measuredSeconds": 60.0,
+      "targetRps": 1000,
+      "measuredRequests": 61200,
+      "errors": 0,
+      "offeredRps": 1020.0,
+      "completedRps": 1019.8,
+      "minutes": [
+        {
+          "minute": 0,
+          "startedRps": 1020.0,
+          "completedRps": 1019.8
+        }
+      ],
+      "latencyMs": {
+        "p50": 6015,
+        "p95": 6025,
+        "p99": 6048,
+        "max": 6077
+      },
+      "delayAdjustedLatencyMs": {
+        "p50": 15,
+        "p95": 25,
+        "p99": 48,
+        "max": 77
+      },
+      "capture": {
+        "enabled": true,
+        "events": 183600,
+        "expectedEvents": 183600,
+        "missingOrCorruptExchanges": 0,
+        "pending": 0,
+        "errors": 0
+      }
+    }
+  },
+  "hfmEnduranceStarted": false
+}

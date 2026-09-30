@@ -25,6 +25,34 @@ adds its own lane prefix to create unique 29-character IDs. All profiles cycle
 1/5/10/50 KiB bodies and static/JSON/text responses with a fixed 6,000ms delay.
 The pass target is 1,000/s; the offered rate explicitly includes 2% headroom.
 
+New `diagnostic` bundles use 60 seconds warmup, 180 measured seconds and 30 seconds
+of final arrivals at the same 1,020/s rate. Fresh bundles also record the existing
+PocketHive observability hops (service, receivedAt, processedAt) and processor
+pacing milliseconds. No PocketHive service change is needed. Processor hop end
+is measured after the response body and result construction, before output
+publication; it is not a timestamp taken exactly at the socket's final byte.
+The evidence timestamp remains evidence-stage time, not HTTP completion time.
+Use the processor hop to distinguish request-queue waiting, processor work and
+downstream evidence delay. Reject missing/ambiguous processor hops rather than
+substituting evidence time. Cross-host stage differences require synchronized
+clocks; the current injector's workers share one workstation clock.
+
+Run `stage_timing.py --bundle BUNDLE --results RESULTS.jsonl --output NEW_REPORT.json`
+on these fresh records. This diagnostic supports gzip input and reports processor
+completion and evidence rates separately; body/archive checks still belong to
+`analyze.py` / `stream_verify.py`. The prepared HFM sequence and required capture
+flags are in `hfm-throughput-20260930/run-plan.json`. Verify the selected server's
+live `wiremock_capture_enabled` value before starting each run. Capture-off runs
+are baseline diagnostics, never lossless-capture qualification.
+
+The local storage/HTTP validation for the pending HFM fix is recorded in
+`hfm-throughput-20260930/validation.json`. To reproduce the storage-only probe,
+run `mvn package`, compile `tests/perf/OutboxThroughputProbe.java` against
+`target/capture.jar`, then run `bench.OutboxThroughputProbe NEW_DB_PATH 32 2000`.
+Use a fresh database for each probe. `TimingTemplateProbe.java` compiles against
+the deployed PocketHive 0.15.35 worker libraries and takes the generated evidence
+template file as its argument; it checks the actual Pebble/WorkItem/hop contract.
+
 ## Required environment
 
 The original environment was PocketHive 0.15.35. Each bundle explicitly uses

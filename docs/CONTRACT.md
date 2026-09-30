@@ -50,6 +50,20 @@ broker. Outbox/disk exhaustion fails the benchmark, never silently discards data
 In-memory batching is bounded. Process termination on capture storage failure
 prevents continuing to claim a healthy lossless capture service.
 
+The outbox has one transaction writer for both appends and confirmed deletions.
+Both operations enter the same bounded FIFO; successful futures are completed
+only after the FULL/WAL transaction commits. The publisher reuses one read
+connection. Pending-event telemetry is initialized from persisted rows and
+updated only after commits; scrapes do not open SQLite connections or count the
+table. Shutdown rejects new operations, drains accepted operations, then closes
+the read connection. Duplicate append IDs fail the writer and all waiting callers.
+
+Capture diagnostics expose queue depth, append wait count/seconds/max, transaction
+count/seconds/max, maximum committed append batch size, and completed publisher
+cycle stage seconds (read, publish/confirm, delete). Durations use a monotonic clock. These measurements
+do not prove archive reconciliation or HTTP client delivery. JSON/Prometheus
+metrics are projections of the same counters, with zero values when capture is off.
+
 An independent RabbitMQ consumer durably archives the complete compressed event
 before acknowledging delivery. This both proves external receipt and bounds
 broker queue growth for soak. Archive size/disk headroom are monitored. Consuming

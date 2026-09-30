@@ -3,13 +3,20 @@ package bench;
 import com.rabbitmq.client.*;
 import java.util.concurrent.atomic.*;
 
-/** Owns persistent mandatory publishing and confirms. Deletes only confirmed outbox batches. */
+/**
+ * Responsibility: publish durable outbox events and request deletion after broker confirmation.
+ * Must not: mutate SQLite directly or acknowledge events before mandatory routing and confirms.
+ * Contract: docs/CONTRACT.md, durable capture and capture diagnostics.
+ */
 final class RabbitPublisher implements AutoCloseable {
   private final DurableOutbox outbox;
   private final Thread worker;
   private volatile boolean running = true;
   volatile boolean connected;
   final AtomicLong confirmed = new AtomicLong(), reconnects = new AtomicLong();
+  final DurationMetric reads = new DurationMetric();
+  final DurationMetric publishConfirms = new DurationMetric();
+  final DurationMetric deletions = new DurationMetric();
 
   RabbitPublisher(DurableOutbox outbox) {
     this.outbox = outbox;
@@ -40,12 +47,15 @@ final class RabbitPublisher implements AutoCloseable {
         channel.addReturnListener(message -> returned.set(true));
         connected = true;
         while (running && connection.isOpen()) {
+          long started = System.nanoTime();
           var batch = outbox.read(256);
+          reads.record(System.nanoTime() - started);
           if (batch.isEmpty()) {
             Thread.sleep(10);
             continue;
           }
           returned.set(false);
+          started = System.nanoTime();
           for (var row : batch)
             channel.basicPublish(
                 "",
@@ -60,7 +70,10 @@ final class RabbitPublisher implements AutoCloseable {
                 row.payload());
           channel.waitForConfirmsOrDie(10000);
           if (returned.get()) throw new IllegalStateException("Capture returned unroutable");
+          publishConfirms.record(System.nanoTime() - started);
+          started = System.nanoTime();
           outbox.confirmed(batch);
+          deletions.record(System.nanoTime() - started);
           confirmed.addAndGet(batch.size());
         }
       } catch (Exception e) {

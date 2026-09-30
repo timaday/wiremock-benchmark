@@ -1,0 +1,69 @@
+{
+  "status": "prepared, not committed or published",
+  "runs": [
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-headless-smoke-c1bdd36e",
+      "runtime": "headless",
+      "mode": "smoke",
+      "captureEnabled": true,
+      "runId": "c1bdd36e78975ec0",
+      "expectedRequests": 48
+    },
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-headless-diagnostic-5a80369e",
+      "runtime": "headless",
+      "mode": "diagnostic",
+      "captureEnabled": false,
+      "runId": "5a80369e9f8722d0",
+      "expectedRequests": 275400
+    },
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-headless-diagnostic-6bd2d648",
+      "runtime": "headless",
+      "mode": "diagnostic",
+      "captureEnabled": true,
+      "runId": "6bd2d648cf7b55ee",
+      "expectedRequests": 275400
+    },
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-headless-endurance-99f789cc",
+      "runtime": "headless",
+      "mode": "endurance",
+      "captureEnabled": true,
+      "runId": "99f789cc6db19e0c",
+      "expectedRequests": 3763800
+    },
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-official-smoke-6e022a9a",
+      "runtime": "official",
+      "mode": "smoke",
+      "captureEnabled": true,
+      "runId": "6e022a9a25c8817a",
+      "expectedRequests": 48
+    },
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-official-diagnostic-71e4bbff",
+      "runtime": "official",
+      "mode": "diagnostic",
+      "captureEnabled": false,
+      "runId": "71e4bbffa10b2686",
+      "expectedRequests": 275400
+    },
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-official-diagnostic-0e7ae930",
+      "runtime": "official",
+      "mode": "diagnostic",
+      "captureEnabled": true,
+      "runId": "0e7ae93074685220",
+      "expectedRequests": 275400
+    },
+    {
+      "path": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-official-endurance-e377d86a",
+      "runtime": "official",
+      "mode": "endurance",
+      "captureEnabled": true,
+      "runId": "e377d86acde363ee",
+      "expectedRequests": 3763800
+    }
+  ]
+}

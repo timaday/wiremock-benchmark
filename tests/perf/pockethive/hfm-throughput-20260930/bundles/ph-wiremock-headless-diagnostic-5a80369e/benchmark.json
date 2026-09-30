@@ -1,0 +1,85 @@
+{
+  "runId": "5a80369e9f8722d0",
+  "scenarioId": "ph-wiremock-headless-diagnostic-5a80369e",
+  "runtime": "headless",
+  "mode": "diagnostic",
+  "offeredRate": 1020,
+  "expectedRequests": 275400,
+  "warmupSeconds": 60,
+  "measurementSeconds": 180,
+  "cases": [
+    {
+      "id": "static-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "text"
+    }
+  ],
+  "requiredCaptureEnabled": false
+}

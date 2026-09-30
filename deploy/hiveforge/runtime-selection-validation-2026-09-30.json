@@ -54,5 +54,12 @@
   ],
   "date": "2026-09-30",
   "projectionUnitTestsPassed": 4,
-  "liveSelectionDeployment": "not yet deployed"
+  "liveSelectionDeployment": {
+    "selection": "headless",
+    "commit": "399e3d6cef2806334ed647d5f4784adc1a2aa528",
+    "operationId": "uiop-4262c44d-c339-40ac-ae3b-53037a507943",
+    "officialReplicas": "0/0",
+    "otherServiceReplicas": "1/1",
+    "headlessHealth": "healthy"
+  }
 }

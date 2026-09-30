@@ -28,7 +28,7 @@ class HiveForgeLabTest(unittest.TestCase):
         text = generate.template(generate.SOURCE.read_text())
         text = Environment(undefined=StrictUndefined).from_string(text).render(
             lab_node=settings['LAB_NODE'], capture_prefix=settings['CAPTURE_PREFIX'],
-            active_runtime='both')
+            active_runtime='both', capture_enabled='true')
         with tempfile.TemporaryDirectory() as directory:
             rendered = Path(directory) / 'compose.yml'
             rendered.write_text(text)
@@ -47,7 +47,8 @@ class HiveForgeLabTest(unittest.TestCase):
             generate.template(generate.SOURCE.read_text()))
         def render(selection):
             return yaml.safe_load(template.render(lab_node='test-node',
-                                  capture_prefix='test-capture', active_runtime=selection))
+                                  capture_prefix='test-capture', active_runtime=selection,
+                                  capture_enabled='true'))
         baseline = render('both')
         for active, inactive in [('official', 'headless'), ('headless', 'official')]:
             with self.subTest(active=active):
@@ -60,6 +61,18 @@ class HiveForgeLabTest(unittest.TestCase):
     def test_unknown_required_input_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'UNDECLARED'):
             generate.template('services: {example: {image: "${UNDECLARED:?required}"}}')
+
+    def test_capture_diagnostic_changes_only_capture_flags(self):
+        template = Environment(undefined=StrictUndefined).from_string(
+            generate.template(generate.SOURCE.read_text()))
+        def render(enabled):
+            return yaml.safe_load(template.render(lab_node='test-node',
+                capture_prefix='test-capture', active_runtime='headless', capture_enabled=enabled))
+        enabled, disabled = render('true'), render('false')
+        for runtime in ('official', 'headless'):
+            self.assertEqual(disabled['services'][runtime]['environment']['CAPTURE_ENABLED'], 'false')
+            disabled['services'][runtime]['environment']['CAPTURE_ENABLED'] = 'true'
+        self.assertEqual(enabled, disabled)
 
     def test_checked_in_template_matches_generator(self):
         self.assertEqual(generate.TARGET.read_text(), generate.template(generate.SOURCE.read_text()))

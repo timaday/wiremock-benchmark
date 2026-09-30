@@ -1,11 +1,11 @@
 {
-  "version": "20260930",
+  "version": "20260930-throughput-1",
   "sourceRepository": "https://github.com/timaday/wiremock-benchmark",
-  "sourceState": "Portable stack source committed in this repository; registry runtime layers match the locally smoke-tested build",
+  "sourceState": "Official/headless throughput fix source accompanies this image lock; fault-tested runtime layers match. HFM qualification pending.",
   "images": {
     "official": {
-      "reference": "ghcr.io/timaday/wiremock-lab-official@sha256:2854b2dea03175f2e548d68ebb6443248fc367657ec1356d68d03294685abf88",
-      "tag": "ghcr.io/timaday/wiremock-lab-official:20260930",
+      "reference": "ghcr.io/timaday/wiremock-lab-official@sha256:ba89ff55533c0747ed98b3f204e96ee8db4a339404e6757ce38bd07d6d45dd8b",
+      "tag": "ghcr.io/timaday/wiremock-lab-official:20260930-throughput-1",
       "platforms": [
         {
           "architecture": "amd64",
@@ -19,8 +19,8 @@
       "anonymousManifestAndConfigVerified": true
     },
     "headless": {
-      "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:e6de2e9fe26bef4d9afb8a0343c7696d48e45afbb5036c60f46a3ac5e706556c",
-      "tag": "ghcr.io/timaday/wiremock-lab-headless:20260930",
+      "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:e8d6a3133b26c2e30e9ee6cecf26f407869f59e55beee4928f478dd16c49f74f",
+      "tag": "ghcr.io/timaday/wiremock-lab-headless:20260930-throughput-1",
       "platforms": [
         {
           "architecture": "amd64",

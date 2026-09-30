@@ -6,6 +6,7 @@
     lab_node: "{{ lookup('ansible.builtin.env', 'LAB_NODE') }}"
     capture_prefix: "{{ lookup('ansible.builtin.env', 'CAPTURE_PREFIX') }}"
     active_runtime: "{{ lookup('ansible.builtin.env', 'ACTIVE_RUNTIME') }}"
+    capture_enabled: "{{ lookup('ansible.builtin.env', 'CAPTURE_ENABLED') }}"
   tasks:
     - name: Require the explicit benchmark profile
       ansible.builtin.assert:
@@ -25,6 +26,12 @@
         that:
           - active_runtime in ['both', 'official', 'headless']
         fail_msg: "ACTIVE_RUNTIME must be both, official, or headless."
+
+    - name: Require an explicit capture setting
+      ansible.builtin.assert:
+        that:
+          - capture_enabled in ['true', 'false']
+        fail_msg: "CAPTURE_ENABLED must be true or false; qualification requires true."
 
     - name: Write the stack artifact for HiveForge
       ansible.builtin.template:
