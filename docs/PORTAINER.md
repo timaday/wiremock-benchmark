@@ -167,7 +167,9 @@ stack leaves those volumes intact. No evidence deletion is automated.
 
 Mocks are each capped at 4 CPU/4 GiB with a 3 GiB heap. Each archive is capped at
 2 CPU/768 MiB; Rabbit at 2 CPU/1.5 GiB; Prometheus at 1 CPU/768 MiB; Grafana at
-1 CPU/512 MiB. Prometheus retains up to seven days/2 GiB. Full captures accumulate
+1 CPU/1 GiB. The earlier 512 MiB Grafana limit caused a confirmed OOM kill on HFM;
+the new limit requires a stack update and live verification. Prometheus retains
+up to seven days/2 GiB. Full captures accumulate
 until explicitly archived/removed by the operator; plan disk capacity for the hold.
 
 ## Verification and scope

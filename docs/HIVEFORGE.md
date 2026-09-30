@@ -71,6 +71,44 @@ proves control-plane process health, not benchmark deployment or MCP access.
 The existing local-image `hiveforge-mcp` service has not been qualified against
 v0.5.9. Use the release-matched stdio client described above.
 
+Existing runtime directories also need
+`capabilities.managedRoot.bindSourceRoot: /opt/hiveforge` in the current
+environment's `environments.yaml`, matching the host directory mounted at `/hf`.
+Without it the action runner mounts incorrect host paths and fails before Ansible
+starts. Back up the file before modifying it, validate it with HiveForge's
+environment loader, and restart the HiveForge service after saving.
+
+## HFM deployment verification
+
+On September 30, 2026, HiveForge MCP deployed revision
+`6fb4d5a6cfe95b1d5e00415da25522f8a86563e6` as `wiremock-hiveforge` on
+`swarm-manager`. All seven services reached `1/1`. The public HTTP smoke test
+passed all 24 combinations (four sizes, three templates, two runtimes), with
+six-second responses and exact response bodies. Monitoring reported zero HTTP
+errors, 72 confirmed capture events, no pending captures, and two drained queues
+with one archive consumer each. All 19 queries in the 17-panel Grafana dashboard
+returned data. See the [HFM validation record](../deploy/hiveforge/hfm-validation-2026-09-30.json).
+
+During startup, the host `/home` filesystem filled and libvirt paused HFM.
+The VM's Docker disk was copied through libvirt to the dedicated VM filesystem;
+both live and persistent disk references were verified before resuming. The
+original disk was retained and no caches were deleted. The destination had about
+17 GiB free after recovery. Libvirt still reported the earlier `vdb: no space`
+error, although the VM remained running and the subsequent HTTP/capture checks
+passed. This verification is a deployment smoke test; no HFM endurance run or
+remote archive-body integrity check was performed.
+
+The legacy environment id `hiveforge-swarm-lab` also prevents
+`refresh_environment`, whose detector returns `swarm`. This remains an explicit
+configuration issue; the verified deployment used the existing environment.
+
+After that smoke check, Grafana exited with code 137 and the operator confirmed
+`OOMKilled=true`. The original 512 MiB container limit was insufficient. The
+canonical stack now gives Grafana 1 GiB; this correction must be published,
+deployed and checked under dashboard use before an endurance run. The explicit
+`restart_policy: none` remains unchanged so failures remain visible. The earlier
+smoke result does not establish continued health after the OOM event.
+
 ## Deploy through HiveForge
 
 After these source files are committed and pushed:

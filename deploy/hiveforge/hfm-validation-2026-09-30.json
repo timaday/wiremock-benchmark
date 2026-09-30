@@ -1,0 +1,45 @@
+{
+  "date": "2026-09-30",
+  "gitRef": "6fb4d5a6cfe95b1d5e00415da25522f8a86563e6",
+  "hiveforgeVersion": "0.5.9",
+  "operationId": "uiop-e632cde8-3613-41c0-bf1f-8fec81cfaac5",
+  "deploymentId": "deployment-16039cdf-fd7e-4a81-8088-8cc7f700ac2e",
+  "stack": "wiremock-hiveforge",
+  "node": "swarm-manager",
+  "servicesRunning": 7,
+  "smokeCasesPassed": 24,
+  "delayMs": 6000,
+  "elapsedSeconds": {
+    "min": 6.168921502016019,
+    "max": 6.395676563028246
+  },
+  "httpErrors": 0,
+  "captureConfirmed": 72,
+  "capturePending": 0,
+  "captureConsumersPerQueue": 1,
+  "queuedMessages": 0,
+  "grafanaPanels": 17,
+  "dashboardQueriesWithData": 19,
+  "enduranceTest": "not run on HFM",
+  "archiveBodyIntegrity": "not checked remotely",
+  "storageRecovery": {
+    "reason": "VM paused after /home filled",
+    "method": "libvirt blockcopy then pivot; live and persistent source verified",
+    "currentDisk": "/var/lib/libvirt/images/swarm-lab/swarm-manager-docker.qcow2",
+    "retainedOriginal": "/home/hiveforge-vm-data/swarm-lab/swarm-manager/docker.qcow2",
+    "destinationFreeGiBApprox": 17,
+    "vmFinalState": "running (unpaused)",
+    "libvirtRetainedDiskError": "domblkerror still reports vdb: no space; no further pause observed and post-resume smoke/capture delivery passed",
+    "deletedFiles": false
+  },
+  "remainingEnvironmentIssue": "refresh_environment rejects legacy environment id hiveforge-swarm-lab because detection returns swarm; deployment used the existing environment successfully",
+  "subsequentFailure": {
+    "service": "grafana",
+    "exitCode": 137,
+    "oomKilled": true,
+    "confirmation": "operator docker inspect output",
+    "oldLimitMiB": 512,
+    "preparedLimitMiB": 1024,
+    "fixDeployed": false
+  }
+}
