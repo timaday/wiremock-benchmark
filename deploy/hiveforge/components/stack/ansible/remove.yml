@@ -1,0 +1,8 @@
+---
+- name: Require HiveForge-owned removal
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Reject direct playbook removal
+      ansible.builtin.fail:
+        msg: "Use HiveForge's remove lifecycle action and recorded deployment state. This project playbook does not remove services or volumes."

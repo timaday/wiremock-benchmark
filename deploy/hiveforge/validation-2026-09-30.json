@@ -1,0 +1,32 @@
+{
+  "hiveforgeRelease": "v0.5.9",
+  "hiveforgeReleaseCommit": "44820b7f10f7b05d7206e8909421ede4847b6b1d",
+  "hiveforgeCurrentMainChecked": "c2f9ad568763a027eeee7629c16b9279367aa7c1",
+  "hiveforgeRunnerImage": "ghcr.io/sepa79/hiveforge@sha256:e94cfae4aec86231969a3009007be4dcb6c3629e552a18477ee3247f17b6b593",
+  "manifestValidationPassed": true,
+  "actualAnsibleRenderPassed": true,
+  "repeatRenderUnchanged": true,
+  "runnerDockerStackConfigPassed": true,
+  "services": 7,
+  "dockerSecrets": false,
+  "negativeCases": [
+    {
+      "case": "missing-node",
+      "rejected": true
+    },
+    {
+      "case": "missing-prefix",
+      "rejected": true
+    },
+    {
+      "case": "unsupported-profile",
+      "rejected": true
+    },
+    {
+      "case": "invalid-prefix",
+      "rejected": true
+    }
+  ],
+  "projectionUnitTestsPassed": 3,
+  "liveDeployment": "not run; governed HiveForge connection unavailable"
+}

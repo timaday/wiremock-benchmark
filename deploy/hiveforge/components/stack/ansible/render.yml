@@ -1,0 +1,26 @@
+---
+- name: Render WireMock benchmark lab for HiveForge-owned deployment
+  hosts: localhost
+  gather_facts: false
+  vars:
+    lab_node: "{{ lookup('ansible.builtin.env', 'LAB_NODE') }}"
+    capture_prefix: "{{ lookup('ansible.builtin.env', 'CAPTURE_PREFIX') }}"
+  tasks:
+    - name: Require the explicit benchmark profile
+      ansible.builtin.assert:
+        that:
+          - lookup('ansible.builtin.env', 'HIVEFORGE_PROFILE') == 'swarm-lab'
+        fail_msg: "HIVEFORGE_PROFILE must be swarm-lab."
+
+    - name: Require safe explicit node and queue identifiers
+      ansible.builtin.assert:
+        that:
+          - lab_node is match('^[A-Za-z0-9][A-Za-z0-9_.-]*$')
+          - capture_prefix is match('^[A-Za-z0-9][A-Za-z0-9_.-]*$')
+        fail_msg: "LAB_NODE and CAPTURE_PREFIX must be nonempty identifiers containing only letters, digits, dots, underscores or hyphens."
+
+    - name: Write the stack artifact for HiveForge
+      ansible.builtin.template:
+        src: templates/compose.yml.j2
+        dest: /hf/stacks/compose.yml
+        mode: "0644"

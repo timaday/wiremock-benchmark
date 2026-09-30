@@ -1,0 +1,15 @@
+kind: project
+version: "0.5"
+project:
+  name: wiremock-benchmark
+  repository: https://github.com/timaday/wiremock-benchmark.git
+  actions: [deploy, update, remove]
+  profiles:
+    - id: swarm-lab
+      runtime: docker-swarm
+      serviceSet: comparison
+      requires:
+        capabilities: [placement]
+components:
+  - name: stack
+    manifest: deploy/hiveforge/components/stack/hiveforge.yaml

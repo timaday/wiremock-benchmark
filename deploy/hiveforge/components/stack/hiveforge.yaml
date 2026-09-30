@@ -1,0 +1,17 @@
+kind: component
+component:
+  name: stack
+  project: wiremock-benchmark
+deployment:
+  adapter: ansible
+  actions:
+    deploy:
+      playbook: ansible/render.yml
+    update:
+      playbook: ansible/render.yml
+    remove:
+      playbook: ansible/remove.yml
+requirements:
+  environment:
+    - LAB_NODE
+    - CAPTURE_PREFIX

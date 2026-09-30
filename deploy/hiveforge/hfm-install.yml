@@ -1,0 +1,45 @@
+# HiveForge Lite v0.5.9 bootstrap, adapted from the upstream install file at
+# 44820b7f10f7b05d7206e8909421ede4847b6b1d/deploy/docker-compose.hiveforge.yml.
+# Run on the selected HFM Swarm manager; create /opt/hiveforge there first.
+version: "3.8"
+
+services:
+  hiveforge:
+    image: ghcr.io/sepa79/hiveforge@sha256:e94cfae4aec86231969a3009007be4dcb6c3629e552a18477ee3247f17b6b593
+    environment:
+      HIVEFORGE_ENVIRONMENT_NAME: HFM benchmark lab
+      HIVEFORGE_ENVIRONMENT_DESCRIPTION: WireMock comparison lab on HFM
+      HIVEFORGE_MANAGED_ROOT_BIND_SOURCE_ROOT: /opt/hiveforge
+      HIVEFORGE_ACTION_RUNNER_IMAGE: ghcr.io/sepa79/hiveforge@sha256:e94cfae4aec86231969a3009007be4dcb6c3629e552a18477ee3247f17b6b593
+      HIVEFORGE_BIND_HOST: 0.0.0.0
+      HIVEFORGE_PORT: "3000"
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - type: bind
+        source: /opt/hiveforge
+        target: /hf
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://127.0.0.1:3000/health', r => {r.resume(); process.exit(r.statusCode === 200 ? 0 : 1)}).on('error', () => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.role == manager
+          - node.hostname == ${HIVEFORGE_NODE:?Set the HFM Swarm manager hostname}

@@ -14,6 +14,9 @@ For a generator-independent deployment of both WireMocks, RabbitMQ, durable arch
 and a provisioned Grafana comparison dashboard, use [the Portainer guide](docs/PORTAINER.md).
 It includes GHCR images pinned by digest and an explicit existing-PocketHive-broker variant.
 
+For HiveForge v0.5.9, use the [HiveForge lab deployment](docs/HIVEFORGE.md):
+the same seven services, public lab credentials and no Docker secrets.
+
 ## PocketHive workload bundles
 
 The [PocketHive benchmark package](tests/perf/pockethive/README.md) contains both
