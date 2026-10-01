@@ -42,7 +42,7 @@ services['prometheus'] = service('prometheus', 1, '768M',
     command=['--config.file=/etc/prometheus/standalone.yml', '--storage.tsdb.path=/prometheus', '--storage.tsdb.retention.time=7d', '--storage.tsdb.retention.size=2GB'],
     ports=['${PROMETHEUS_PORT:-29090}:9090'], volumes=['prometheus:/prometheus'])
 services['grafana'] = service('grafana', 1, '1G',
-    environment={'GF_SECURITY_ADMIN_USER': '${GRAFANA_USER:-admin}', 'GF_SECURITY_ADMIN_PASSWORD': '${GRAFANA_PASSWORD:?set Grafana password}', 'GF_USERS_ALLOW_SIGN_UP': 'false'},
+    environment={'GF_SECURITY_ADMIN_USER': '${GRAFANA_USER:-admin}', 'GF_SECURITY_ADMIN_PASSWORD': '${GRAFANA_PASSWORD:?set Grafana password}', 'GF_USERS_ALLOW_SIGN_UP': 'false', 'GOMEMLIMIT': '512MiB'},
     ports=['${GRAFANA_PORT:-13000}:3000'], volumes=['grafana:/var/lib/grafana'])
 volumes.update({x: {} for x in ['rabbit', 'prometheus', 'grafana']})
 stack = {'version': '3.8', 'services': services, 'volumes': volumes}

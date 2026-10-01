@@ -126,6 +126,14 @@ canonical stack now gives Grafana 1 GiB. That correction was deployed at
 `2cf5fe49`; Grafana and both mock health checks passed after recovery. The explicit
 `restart_policy: none` remains unchanged so failures remain visible.
 
+During the subsequent headless endurance run, the 1 GiB Grafana task also exited
+with code 137. HiveForge confirmed its missing replica; it did not expose the
+stopped container's OOM flag. WireMock, Prometheus, RabbitMQ and both archives
+continued running. The canonical stack now sets `GOMEMLIMIT=512MiB` for Grafana
+to make Go collect below its container ceiling. This mitigation needs deployment
+and observation on HFM before it can be called a verified fix; no mock settings
+or capture settings change.
+
 Full-rate HFM attempts subsequently exposed guest memory exhaustion. Pausing the
 separate HFM PocketHive installation increased available guest memory from
 147 MiB to 6.6 GiB. After the official retry, its idle JVM retained heap and only

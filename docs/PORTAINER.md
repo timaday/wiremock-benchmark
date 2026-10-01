@@ -167,8 +167,13 @@ stack leaves those volumes intact. No evidence deletion is automated.
 
 Mocks are each capped at 4 CPU/4 GiB with a 3 GiB heap. Each archive is capped at
 2 CPU/768 MiB; Rabbit at 2 CPU/1.5 GiB; Prometheus at 1 CPU/768 MiB; Grafana at
-1 CPU/1 GiB. The earlier 512 MiB Grafana limit caused a confirmed OOM kill on HFM;
-the new limit requires a stack update and live verification. Prometheus retains
+1 CPU/1 GiB. Grafana sets `GOMEMLIMIT=512MiB` so Go starts reclaiming memory
+below the container ceiling, leaving room for non-Go allocations. This is a
+[soft Go runtime limit](https://go.dev/doc/gc-guide#Memory_limit), not an RSS cap
+or a guarantee against OOM. The earlier 512 MiB container limit caused a confirmed
+OOM kill; a later 1 GiB task exited with code 137 during the HFM endurance run.
+The new environment setting requires a stack update and live verification.
+Failures remain visible with `restart_policy: none`. Prometheus retains
 up to seven days/2 GiB. Full captures accumulate
 until explicitly archived/removed by the operator; plan disk capacity for the hold.
 

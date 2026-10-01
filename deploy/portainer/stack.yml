@@ -204,6 +204,7 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:?set Grafana password}
       GF_USERS_ALLOW_SIGN_UP: 'false'
+      GOMEMLIMIT: 512MiB
     ports:
     - ${GRAFANA_PORT:-13000}:3000
     volumes:

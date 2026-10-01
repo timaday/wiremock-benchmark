@@ -1,0 +1,43 @@
+{
+  "status": "prepared, HFM deployment and endurance observation pending",
+  "incident": {
+    "deployment": "wiremock-hiveforge",
+    "service": "grafana",
+    "replicas": "0/1",
+    "exitCode": 137,
+    "oomConfirmed": false,
+    "benchmarkServicesStillRunning": true
+  },
+  "change": {
+    "GOMEMLIMIT": "512MiB",
+    "containerMemoryLimit": "1GiB",
+    "restartPolicy": "none",
+    "scope": "Grafana environment only; all other service definitions compared equal"
+  },
+  "checks": {
+    "portainerTests": 2,
+    "hiveforgeTests": 5,
+    "generatedStackParity": true,
+    "gitDiffCheck": true,
+    "localGrafanaVersion": "13.2.3",
+    "localHealth": "ok",
+    "dashboardQueriesPerIteration": 19,
+    "iterations": 6,
+    "queryErrors": 0,
+    "containerOomKilled": false,
+    "memorySamples": [
+      "616.4MiB / 1GiB",
+      "617.8MiB / 1GiB",
+      "619.4MiB / 1GiB",
+      "619.6MiB / 1GiB",
+      "621.9MiB / 1GiB",
+      "622.7MiB / 1GiB"
+    ]
+  },
+  "limitations": [
+    "A short local check does not verify the cause of HFM exit 137 or prove the memory mitigation on HFM.",
+    "GOMEMLIMIT is a soft Go runtime limit, not an RSS limit."
+  ],
+  "evidence": "results/pockethive-hfm-hours-20260930/grafana-memory-probe.jsonl",
+  "reference": "https://go.dev/doc/gc-guide#Memory_limit"
+}

@@ -204,6 +204,7 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: benchmark
       GF_USERS_ALLOW_SIGN_UP: 'false'
+      GOMEMLIMIT: 512MiB
     ports:
     - 13000:3000
     volumes:
