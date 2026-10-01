@@ -174,14 +174,21 @@ After these source files are committed and pushed:
    `wiremock-benchmark`, approving the exact ref you intend to deploy.
 2. Allow that project on the selected environment with profile `swarm-lab`
    and actions `deploy`, `update`, `remove`.
-3. Set these four non-secret runtime environment values for that profile:
+3. Set these five non-secret runtime environment values for that profile:
 
    ```text
    LAB_NODE=your-swarm-node-hostname
    CAPTURE_PREFIX=wiremock-hiveforge-01
    ACTIVE_RUNTIME=official
    CAPTURE_ENABLED=true
+   WIREMOCK_ACCEPT_BACKLOG=4096
    ```
+
+   `WIREMOCK_ACCEPT_BACKLOG` is required and must be a positive integer. It sets
+   both mocks' accept queues; Linux caps the effective value at `net.core.somaxconn`.
+   Stop and drain load/capture before changing it. The pinned headless image
+   implements the setting; old headless images ignore it. Local component checks
+   passed, but this setting has not been deployed or load-tested on HFM.
 
 4. Validate requirements. Start component `stack`, action `deploy`, profile
    `swarm-lab`, with the approved Git ref and an explicit deployment name, for

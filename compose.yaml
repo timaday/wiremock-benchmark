@@ -13,6 +13,7 @@ x-mock: &mock
     nofile: {soft: 65536, hard: 65536}
   environment:
     <<: *capture
+    WIREMOCK_ACCEPT_BACKLOG: ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
     JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
   volumes:
     - ./fixtures:/home/wiremock:ro
@@ -57,7 +58,7 @@ services:
     build: {context: ., target: official}
     image: wiremock-benchmark-official:local
     profiles: [official]
-    command: [--port, '8080', --no-request-journal, --disable-request-logging, --container-threads, '128', --async-response-enabled, 'true', --async-response-threads, '64', --disable-gzip, --disable-http2-plain, --disable-http2-tls, --max-template-cache-entries, '1000', --extensions, bench.CaptureExtension]
+    command: [--port, '8080', --no-request-journal, --disable-request-logging, --container-threads, '128', --jetty-accept-queue-size, '${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}', --async-response-enabled, 'true', --async-response-threads, '64', --disable-gzip, --disable-http2-plain, --disable-http2-tls, --max-template-cache-entries, '1000', --extensions, bench.CaptureExtension]
     depends_on: {rabbit: {condition: service_healthy}}
   headless:
     <<: *mock

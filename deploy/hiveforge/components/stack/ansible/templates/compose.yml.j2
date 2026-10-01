@@ -21,6 +21,7 @@ services:
       RABBIT_QUEUE: '{{ capture_prefix }}.official'
       FIXTURES: /home/wiremock
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
+      WIREMOCK_ACCEPT_BACKLOG: '{{ accept_backlog }}'
     ports:
     - target: 8080
       published: 19080
@@ -45,6 +46,8 @@ services:
     - --disable-request-logging
     - --container-threads
     - '128'
+    - --jetty-accept-queue-size
+    - '{{ accept_backlog }}'
     - --async-response-enabled
     - 'true'
     - --async-response-threads
@@ -77,7 +80,7 @@ services:
     - official-archive:/archive
     stop_grace_period: 45s
   headless:
-    image: ghcr.io/timaday/wiremock-lab-headless@sha256:e8d6a3133b26c2e30e9ee6cecf26f407869f59e55beee4928f478dd16c49f74f
+    image: ghcr.io/timaday/wiremock-lab-headless@sha256:7531f0d83570c21a3e6ff119f37b554d5d7cea98a55fe56703ea1abce9ffd059
     deploy:
       replicas: {{ 1 if active_runtime in ["both", "headless"] else 0 }}
       placement:
@@ -96,6 +99,7 @@ services:
       RABBIT_QUEUE: '{{ capture_prefix }}.headless'
       FIXTURES: /home/wiremock
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
+      WIREMOCK_ACCEPT_BACKLOG: '{{ accept_backlog }}'
     ports:
     - target: 8080
       published: 19081

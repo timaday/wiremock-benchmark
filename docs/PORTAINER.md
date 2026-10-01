@@ -13,6 +13,14 @@ PocketHive RabbitMQ URI and creates no broker. Each runtime has its own durable
 capture queue, outbox and archive. The user must supply a distinct queue prefix.
 The existing archive remains the capture consumer in both variants.
 
+Set the required stack variable `WIREMOCK_ACCEPT_BACKLOG=4096` to configure the
+same pending-connection backlog in both mocks. Linux may cap it at
+`net.core.somaxconn`. Stop and drain load/capture before changing this value.
+The pinned headless image (`20261001-backlog-1`) implements this setting; older
+headless images do not. Local listener checks confirmed effective queues of 128
+and 4096 in both runtimes. HFM startup-load validation remains pending. See the
+[listener contract](CONTRACT.md#listener-backlog).
+
 Images contain all configuration and fixtures. Stack deployment requires images
 already available on the selected node or in a reachable registry; Portainer/Swarm
 does not build them. All services are pinned to the required `LAB_NODE` hostname

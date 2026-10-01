@@ -20,6 +20,7 @@ class HiveForgeLabTest(unittest.TestCase):
         settings = {
             'LAB_NODE': 'test-node', 'CAPTURE_PREFIX': 'test-capture',
             'RABBIT_PASSWORD': 'benchmark', 'GRAFANA_PASSWORD': 'benchmark',
+            'WIREMOCK_ACCEPT_BACKLOG': '4096',
         }
         # Ambient Portainer overrides must not change this fixed profile test.
         env = {key: value for key, value in os.environ.items()
@@ -28,7 +29,7 @@ class HiveForgeLabTest(unittest.TestCase):
         text = generate.template(generate.SOURCE.read_text())
         text = Environment(undefined=StrictUndefined).from_string(text).render(
             lab_node=settings['LAB_NODE'], capture_prefix=settings['CAPTURE_PREFIX'],
-            active_runtime='both', capture_enabled='true')
+            active_runtime='both', capture_enabled='true', accept_backlog='4096')
         with tempfile.TemporaryDirectory() as directory:
             rendered = Path(directory) / 'compose.yml'
             rendered.write_text(text)
@@ -48,7 +49,7 @@ class HiveForgeLabTest(unittest.TestCase):
         def render(selection):
             return yaml.safe_load(template.render(lab_node='test-node',
                                   capture_prefix='test-capture', active_runtime=selection,
-                                  capture_enabled='true'))
+                                  capture_enabled='true', accept_backlog='4096'))
         baseline = render('both')
         for active, inactive in [('official', 'headless'), ('headless', 'official')]:
             with self.subTest(active=active):
@@ -67,7 +68,7 @@ class HiveForgeLabTest(unittest.TestCase):
             generate.template(generate.SOURCE.read_text()))
         def render(enabled):
             return yaml.safe_load(template.render(lab_node='test-node',
-                capture_prefix='test-capture', active_runtime='headless', capture_enabled=enabled))
+                capture_prefix='test-capture', active_runtime='headless', capture_enabled=enabled, accept_backlog='4096'))
         enabled, disabled = render('true'), render('false')
         for runtime in ('official', 'headless'):
             self.assertEqual(disabled['services'][runtime]['environment']['CAPTURE_ENABLED'], 'false')
@@ -76,6 +77,23 @@ class HiveForgeLabTest(unittest.TestCase):
 
     def test_checked_in_template_matches_generator(self):
         self.assertEqual(generate.TARGET.read_text(), generate.template(generate.SOURCE.read_text()))
+
+    def test_backlog_changes_both_runtimes_without_changing_resources(self):
+        template = Environment(undefined=StrictUndefined).from_string(
+            generate.template(generate.SOURCE.read_text()))
+        def render(backlog):
+            return yaml.safe_load(template.render(lab_node='test-node',
+                capture_prefix='test-capture', active_runtime='headless',
+                capture_enabled='true', accept_backlog=backlog))
+        baseline, changed = render('4096'), render('2048')
+        for runtime in ('official', 'headless'):
+            self.assertEqual(changed['services'][runtime]['environment']['WIREMOCK_ACCEPT_BACKLOG'], '2048')
+            changed['services'][runtime]['environment']['WIREMOCK_ACCEPT_BACKLOG'] = '4096'
+        command = changed['services']['official']['command']
+        index = command.index('--jetty-accept-queue-size') + 1
+        self.assertEqual(command[index], '2048')
+        command[index] = '4096'
+        self.assertEqual(baseline, changed)
 
 
 if __name__ == '__main__':

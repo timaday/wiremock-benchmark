@@ -4,7 +4,11 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 
-/** Embedded launcher with the same explicit HTTP/delay/journal settings as the official image. */
+/**
+ * Responsibility: launch embedded WireMock with the benchmark's explicit settings.
+ * Must not: own request handling or capture persistence.
+ * Contract: docs/CONTRACT.md, including the required listener backlog.
+ */
 public final class Headless {
   public static void main(String[] args) {
     var server =
@@ -14,6 +18,7 @@ public final class Headless {
                 .usingFilesUnderDirectory(Settings.required("FIXTURES"))
                 .disableRequestJournal()
                 .containerThreads(128)
+                .jettyAcceptQueueSize(Settings.positiveNumber("WIREMOCK_ACCEPT_BACKLOG"))
                 .asynchronousResponseEnabled(true)
                 .asynchronousResponseThreads(64)
                 .gzipDisabled(true)

@@ -36,6 +36,9 @@ been qualified here. Native Windows Python is unsupported by the POSIX suite loc
 Docker VM resources and file sharing affect results.
 
 ```sh
+# Explicit listener setting, used by both runtimes and retained in Compose evidence.
+export WIREMOCK_ACCEPT_BACKLOG=4096
+
 # Once, if this machine is not already a Swarm manager (local-only qualification):
 docker swarm init --listen-addr 127.0.0.1:2377 --advertise-addr 127.0.0.1
 
@@ -149,7 +152,7 @@ WireMock standalone3.13.2 jar beside `target/capture.jar`, and run on JDK27:
 ```sh
 CAPTURE_ENABLED=true OUTBOX_PATH=/absolute/outbox.db \
 RABBIT_URI=amqp://benchmark:benchmark@localhost:5672/%2f RABBIT_QUEUE=captures \
-FIXTURES=/absolute/fixtures \
+FIXTURES=/absolute/fixtures WIREMOCK_ACCEPT_BACKLOG=4096 \
 java --enable-native-access=ALL-UNNAMED -Xmx3g \
   -cp 'target/capture.jar:wiremock-standalone-3.13.2.jar' bench.Headless
 ```

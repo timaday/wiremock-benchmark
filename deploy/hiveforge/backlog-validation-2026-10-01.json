@@ -1,0 +1,170 @@
+{
+  "setting": "WIREMOCK_ACCEPT_BACKLOG",
+  "testValue": 4096,
+  "status": "LOCAL_CONFIGURATION_VERIFIED_HFM_PENDING",
+  "registry": {
+    "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:7531f0d83570c21a3e6ff119f37b554d5d7cea98a55fe56703ea1abce9ffd059",
+    "anonymousManifestAndConfigVerified": true,
+    "platforms": [
+      {
+        "architecture": "amd64",
+        "os": "linux"
+      }
+    ],
+    "verifiedAtUtc": "2026-10-01T10:06:28.705000+00:00"
+  },
+  "javaTests": {
+    "count": 11,
+    "failures": 0
+  },
+  "pythonToolTests": {
+    "count": 30,
+    "failures": 0
+  },
+  "hiveforgeAdapterTests": {
+    "count": 6,
+    "failures": 0
+  },
+  "portainerRenderTests": {
+    "count": 3,
+    "failures": 0
+  },
+  "ansibleInputChecks": [
+    {
+      "backlog": "4096",
+      "accepted": true,
+      "exitCode": 0
+    },
+    {
+      "backlog": "1",
+      "accepted": true,
+      "exitCode": 0
+    },
+    {
+      "backlog": "",
+      "accepted": false,
+      "exitCode": 2
+    },
+    {
+      "backlog": "0",
+      "accepted": false,
+      "exitCode": 2
+    },
+    {
+      "backlog": "-1",
+      "accepted": false,
+      "exitCode": 2
+    },
+    {
+      "backlog": "abc",
+      "accepted": false,
+      "exitCode": 2
+    },
+    {
+      "backlog": "2147483648",
+      "accepted": false,
+      "exitCode": 2
+    }
+  ],
+  "runtimeListenerChecks": {
+    "scope": "Local isolated component checks; newly built headless image and unchanged pinned official image; no HFM deployment or load qualification",
+    "checks": [
+      {
+        "runtime": "headless",
+        "requested": 128,
+        "effectiveLinuxBacklog": 128,
+        "health": {
+          "status": "healthy",
+          "message": "Wiremock is ok",
+          "uptimeInSeconds": 0,
+          "timestamp": "2026-10-01T10:04:37.998843063Z"
+        }
+      },
+      {
+        "runtime": "headless",
+        "requested": 4096,
+        "effectiveLinuxBacklog": 4096,
+        "health": {
+          "status": "healthy",
+          "message": "Wiremock is ok",
+          "uptimeInSeconds": 0,
+          "timestamp": "2026-10-01T10:04:39.189269057Z"
+        }
+      },
+      {
+        "runtime": "official",
+        "requested": 128,
+        "effectiveLinuxBacklog": 128,
+        "health": {
+          "status": "healthy",
+          "message": "Wiremock is ok",
+          "version": "3.13.2",
+          "uptimeInSeconds": 1,
+          "timestamp": "2026-10-01T10:04:40.920885959Z"
+        }
+      },
+      {
+        "runtime": "official",
+        "requested": 4096,
+        "effectiveLinuxBacklog": 4096,
+        "health": {
+          "status": "healthy",
+          "message": "Wiremock is ok",
+          "version": "3.13.2",
+          "uptimeInSeconds": 0,
+          "timestamp": "2026-10-01T10:04:42.104896659Z"
+        }
+      },
+      {
+        "runtime": "headless",
+        "invalidValue": null,
+        "rejected": true
+      },
+      {
+        "runtime": "headless",
+        "invalidValue": "0",
+        "rejected": true
+      },
+      {
+        "runtime": "headless",
+        "invalidValue": "-1",
+        "rejected": true
+      },
+      {
+        "runtime": "headless",
+        "invalidValue": "not-a-number",
+        "rejected": true
+      },
+      {
+        "runtime": "headless",
+        "invalidValue": "2147483648",
+        "rejected": true
+      }
+    ]
+  },
+  "previousImageDefault": {
+    "scope": "Previous unmodified headless image; local Linux effective default, not an HFM measurement",
+    "checks": [
+      {
+        "runtime": "headless",
+        "requested": null,
+        "effectiveLinuxBacklog": 50,
+        "health": {
+          "status": "healthy",
+          "message": "Wiremock is ok",
+          "uptimeInSeconds": 1,
+          "timestamp": "2026-10-01T10:05:52.578719211Z"
+        }
+      }
+    ]
+  },
+  "headlessSourceSha256": "b4a21f2a619ac401fe0177a300b25c7643b86162c493f82decc11e78a58f4ff3",
+  "scope": [
+    "Official CLI and headless environment resolve the explicit accept backlog.",
+    "Exact new headless image and unchanged official image tested locally, using isolated network namespaces.",
+    "Capture disabled for listener-only checks; no load qualification or fault-recovery claim.",
+    "HFM deployment, effective backlog measurement and controlled startup comparison remain outstanding.",
+    "No acceptor count, request-thread count, asynchronous delay-thread count or kernel sysctl changed."
+  ],
+  "evidenceRoot": "results/accept-backlog-20261001"
+}

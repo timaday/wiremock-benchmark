@@ -21,6 +21,7 @@ services:
       RABBIT_QUEUE: ${CAPTURE_PREFIX:?set unique capture queue prefix}.official
       FIXTURES: /home/wiremock
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
+      WIREMOCK_ACCEPT_BACKLOG: ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
     ports:
     - target: 8080
       published: ${OFFICIAL_PORT:-19080}
@@ -45,6 +46,8 @@ services:
     - --disable-request-logging
     - --container-threads
     - '128'
+    - --jetty-accept-queue-size
+    - ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
     - --async-response-enabled
     - 'true'
     - --async-response-threads
@@ -96,6 +99,7 @@ services:
       RABBIT_QUEUE: ${CAPTURE_PREFIX:?set unique capture queue prefix}.headless
       FIXTURES: /home/wiremock
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
+      WIREMOCK_ACCEPT_BACKLOG: ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
     ports:
     - target: 8080
       published: ${HEADLESS_PORT:-19081}

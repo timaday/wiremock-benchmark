@@ -9,6 +9,7 @@ PREFIX = '${LAB_IMAGE_PREFIX:-wiremock-lab}'
 TAG = '${LAB_TAG:-20260930}'
 URI = 'amqp://benchmark:${RABBIT_PASSWORD:?required}@rabbit:5672/%2f'
 JAVA = '-Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags'
+BACKLOG = '${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}'
 
 def deploy(cpu, memory, restart='none'):
     return {'replicas': 1, 'placement': {'constraints': ['node.hostname == ${LAB_NODE:?set Swarm node hostname}']},
@@ -25,7 +26,8 @@ for runtime, port in [('official', 19080), ('headless', 19081)]:
     volumes[outbox] = {}; volumes[archive] = {}
     env = {'CAPTURE_ENABLED': '${CAPTURE_ENABLED:-true}', 'OUTBOX_PATH': '/state/outbox.db',
            'RABBIT_URI': URI, 'RABBIT_QUEUE': '${CAPTURE_PREFIX:?set unique capture queue prefix}.' + runtime,
-           'FIXTURES': '/home/wiremock', 'JAVA_TOOL_OPTIONS': JAVA}
+           'FIXTURES': '/home/wiremock', 'JAVA_TOOL_OPTIONS': JAVA,
+           'WIREMOCK_ACCEPT_BACKLOG': BACKLOG}
     services[runtime] = service(runtime, 4, '4G', environment=env,
         ports=[{'target': 8080, 'published': '${' + runtime.upper() + '_PORT:-' + str(port) + '}', 'protocol': 'tcp', 'mode': 'ingress'}],
         volumes=[outbox + ':/state'], stop_grace_period='45s',
@@ -33,7 +35,7 @@ for runtime, port in [('official', 19080), ('headless', 19081)]:
     services[archive] = service('archive', 2, '768M',
         environment={'RABBIT_URI': URI, 'RABBIT_QUEUE': env['RABBIT_QUEUE'], 'ARCHIVE_PATH': '/archive/events.db'},
         volumes=[archive + ':/archive'], stop_grace_period='45s')
-services['official']['command'] = ['--port', '8080', '--no-request-journal', '--disable-request-logging', '--container-threads', '128', '--async-response-enabled', 'true', '--async-response-threads', '64', '--disable-gzip', '--disable-http2-plain', '--disable-http2-tls', '--max-template-cache-entries', '1000', '--extensions', 'bench.CaptureExtension']
+services['official']['command'] = ['--port', '8080', '--no-request-journal', '--disable-request-logging', '--container-threads', '128', '--jetty-accept-queue-size', BACKLOG, '--async-response-enabled', 'true', '--async-response-threads', '64', '--disable-gzip', '--disable-http2-plain', '--disable-http2-tls', '--max-template-cache-entries', '1000', '--extensions', 'bench.CaptureExtension']
 services['rabbit'] = service('rabbit', 2, '1536M', hostname='rabbit',
     environment={'RABBITMQ_DEFAULT_USER': 'benchmark', 'RABBITMQ_DEFAULT_PASS': '${RABBIT_PASSWORD:?required}', 'RABBITMQ_NODENAME': 'rabbit@rabbit'},
     ports=['${RABBIT_AMQP_PORT:-5673}:5672', '${RABBIT_UI_PORT:-15673}:15672'], volumes=['rabbit:/var/lib/rabbitmq'],

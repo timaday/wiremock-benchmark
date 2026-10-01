@@ -1,0 +1,270 @@
+{
+  "status": "PREPARED_NOT_RUN",
+  "comparison": "Explicit accept backlog 50 versus 4096; same new headless image for both",
+  "image": "ghcr.io/timaday/wiremock-lab-headless@sha256:7531f0d83570c21a3e6ff119f37b554d5d7cea98a55fe56703ea1abce9ffd059",
+  "offeredRps": 1020,
+  "arrivalSeconds": 90,
+  "delayMs": 6000,
+  "payloadKiB": [
+    1,
+    5,
+    10,
+    50
+  ],
+  "templates": [
+    "static",
+    "json",
+    "text"
+  ],
+  "captureEnabled": true,
+  "serverStart": "fresh JVM per trial",
+  "injectorStart": "fresh swarm per trial",
+  "invariants": [
+    "No ramp, retry, processor-thread, connection-reuse, capture, or broker-setting changes between trials",
+    "Measure failures from first offered request, including warmup",
+    "Keep overload, client result omission and server capture delivery as separate outcomes"
+  ],
+  "runs": [
+    {
+      "order": 1,
+      "backlog": 50,
+      "replicate": 1,
+      "runId": "e767c0fe056eacdc",
+      "scenarioId": "ph-wiremock-headless-load-e767c0fe",
+      "swarmId": "ph-hfm-backlog-e767c0fe",
+      "bundlePath": "tests/perf/pockethive/hfm-backlog-20261001/bundles/ph-wiremock-headless-load-e767c0fe",
+      "expectedRequests": 91800,
+      "files": [
+        {
+          "path": "benchmark.json",
+          "sha256": "02a7f0b83ff15b5647a2e02337b0c5d8bc2c2b35b0af0a4839b681eb465180ab"
+        },
+        {
+          "path": "datasets/lane-0.csv",
+          "sha256": "6cc151081f4c4e3a66d4038d31287d1c03381975aefbaaff1abd7e60bd4cc859"
+        },
+        {
+          "path": "datasets/lane-1.csv",
+          "sha256": "3f6388b54b054eb3b92b043f9779d15f1988630adc7981861e1db5a83e687e82"
+        },
+        {
+          "path": "datasets/lane-2.csv",
+          "sha256": "215687adfca672b351af176229cb47b00ed4fe1a60cf396426526d928c8fa0f2"
+        },
+        {
+          "path": "datasets/lane-3.csv",
+          "sha256": "875b6b86042312dff045e3b9b214092c1ed9465eaef9b1bb6e6af4272815380f"
+        },
+        {
+          "path": "scenario.yaml",
+          "sha256": "45be57a87802f5edb2ab880fa2c4f4980b0ee79e01b152dbc164185886e6c637"
+        },
+        {
+          "path": "sut/headless/sut.yaml",
+          "sha256": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "backlog": 4096,
+      "replicate": 1,
+      "runId": "b1102cfd49ebe8ec",
+      "scenarioId": "ph-wiremock-headless-load-b1102cfd",
+      "swarmId": "ph-hfm-backlog-b1102cfd",
+      "bundlePath": "tests/perf/pockethive/hfm-backlog-20261001/bundles/ph-wiremock-headless-load-b1102cfd",
+      "expectedRequests": 91800,
+      "files": [
+        {
+          "path": "benchmark.json",
+          "sha256": "e4a436ef7ea5bb8450d293d14d145a88a7fa80ec52e72c6f84a10239ac7c4b19"
+        },
+        {
+          "path": "datasets/lane-0.csv",
+          "sha256": "01a5d8c4b8ed2d3f592d9624c45d7f4e36c7243a3a71829c915e7ad505f4c424"
+        },
+        {
+          "path": "datasets/lane-1.csv",
+          "sha256": "672ce929240a0a462790bb7b18355ee079bd073beb25d2adaa7791586e70f3b3"
+        },
+        {
+          "path": "datasets/lane-2.csv",
+          "sha256": "3b06b0769e7f1b2dd7598a6aa801eafe4aae510e10dc2ea1d02b25c744c55aa6"
+        },
+        {
+          "path": "datasets/lane-3.csv",
+          "sha256": "f71e44c3d48835f65875d71b30b30f029ab7e7e8f041b62d14f33d778d743754"
+        },
+        {
+          "path": "scenario.yaml",
+          "sha256": "2aaa77c4c601ffd111c45c54cc4db1822282c798cdea641866732a2b72b5d47d"
+        },
+        {
+          "path": "sut/headless/sut.yaml",
+          "sha256": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "backlog": 50,
+      "replicate": 2,
+      "runId": "2b8d288c8f514921",
+      "scenarioId": "ph-wiremock-headless-load-2b8d288c",
+      "swarmId": "ph-hfm-backlog-2b8d288c",
+      "bundlePath": "tests/perf/pockethive/hfm-backlog-20261001/bundles/ph-wiremock-headless-load-2b8d288c",
+      "expectedRequests": 91800,
+      "files": [
+        {
+          "path": "benchmark.json",
+          "sha256": "0307c6604f0f20d02032b1b23783db720525e04f2e553ebdf7961dd5361dba01"
+        },
+        {
+          "path": "datasets/lane-0.csv",
+          "sha256": "0ec3f2e74d3752d8469b7ea8d5dbde5ae06285e02acb57cff485081a37d93768"
+        },
+        {
+          "path": "datasets/lane-1.csv",
+          "sha256": "ff12d1cd8b0a9e129d12c06b1a16d3adbd0abd67ecf351be2ffc20299d0e25d6"
+        },
+        {
+          "path": "datasets/lane-2.csv",
+          "sha256": "e98dbdadbeca96e189dbf4fa771a730490c83a0cc485dee81f88345b467de893"
+        },
+        {
+          "path": "datasets/lane-3.csv",
+          "sha256": "dd5574cfff6c3b6797ff493a4e9ab2b41947bdc19b671eaf14a9fa75faad8c4e"
+        },
+        {
+          "path": "scenario.yaml",
+          "sha256": "1f406eebd0fffa4b93c4153093e408c3a3bfc5dfd97800be90e616f6abe96525"
+        },
+        {
+          "path": "sut/headless/sut.yaml",
+          "sha256": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "backlog": 4096,
+      "replicate": 2,
+      "runId": "ea84f3513068a286",
+      "scenarioId": "ph-wiremock-headless-load-ea84f351",
+      "swarmId": "ph-hfm-backlog-ea84f351",
+      "bundlePath": "tests/perf/pockethive/hfm-backlog-20261001/bundles/ph-wiremock-headless-load-ea84f351",
+      "expectedRequests": 91800,
+      "files": [
+        {
+          "path": "benchmark.json",
+          "sha256": "ed9bd05a103d22e21f34040aae7938a6e8924e9b13038783d8d7a89040259e3f"
+        },
+        {
+          "path": "datasets/lane-0.csv",
+          "sha256": "50e15a1fc519e5407f9ad2b7725aaafae1475e524af8eee9f3b480776492c853"
+        },
+        {
+          "path": "datasets/lane-1.csv",
+          "sha256": "e5179a4c896d77563d795036c488fd5c4db820d9c2f28c9e1d74f8d67e0f2586"
+        },
+        {
+          "path": "datasets/lane-2.csv",
+          "sha256": "a0874de249f8b441f263938c214f79ffac4ad8a67573cabac6e2feffed29e757"
+        },
+        {
+          "path": "datasets/lane-3.csv",
+          "sha256": "293b8df43c1d4a6272d2d4534753eb328c5ec50ef3d067ae8a281878d756f4f2"
+        },
+        {
+          "path": "scenario.yaml",
+          "sha256": "66c46c1861a57a401439a36b27c958af7276c84d13d6cbcff0892cd9b9cafcad"
+        },
+        {
+          "path": "sut/headless/sut.yaml",
+          "sha256": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "backlog": 50,
+      "replicate": 3,
+      "runId": "0fbc042c2f708bf9",
+      "scenarioId": "ph-wiremock-headless-load-0fbc042c",
+      "swarmId": "ph-hfm-backlog-0fbc042c",
+      "bundlePath": "tests/perf/pockethive/hfm-backlog-20261001/bundles/ph-wiremock-headless-load-0fbc042c",
+      "expectedRequests": 91800,
+      "files": [
+        {
+          "path": "benchmark.json",
+          "sha256": "4789519bf9deb63c7c03077a443a818ab5cdde9d4a0a541ec6562927d2b86ca7"
+        },
+        {
+          "path": "datasets/lane-0.csv",
+          "sha256": "a79d45864f96dc6ea21c4b3eddcd25c3ff794c51f31bc210ca1c2aea3cd76770"
+        },
+        {
+          "path": "datasets/lane-1.csv",
+          "sha256": "71b46ceb6f1c803eea033fc67469107bcd61405276687c9b7992b15b8fc9fcc0"
+        },
+        {
+          "path": "datasets/lane-2.csv",
+          "sha256": "c9a1d8e18da264f5b8010aa24ae1a20c331beaf988861e61d25e097af853812e"
+        },
+        {
+          "path": "datasets/lane-3.csv",
+          "sha256": "7b45f10231358c94f6e1ccb80d7b9a5a5100f2766703dde8d6a998a0a6f5587e"
+        },
+        {
+          "path": "scenario.yaml",
+          "sha256": "d991da53e0d7af42e4bdf7be7786d33764d89c5d6946a841acfacbf718993fd2"
+        },
+        {
+          "path": "sut/headless/sut.yaml",
+          "sha256": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "backlog": 4096,
+      "replicate": 3,
+      "runId": "6c59e2b13fcf8540",
+      "scenarioId": "ph-wiremock-headless-load-6c59e2b1",
+      "swarmId": "ph-hfm-backlog-6c59e2b1",
+      "bundlePath": "tests/perf/pockethive/hfm-backlog-20261001/bundles/ph-wiremock-headless-load-6c59e2b1",
+      "expectedRequests": 91800,
+      "files": [
+        {
+          "path": "benchmark.json",
+          "sha256": "bbff3d25365120288530a6d7d489e225de4624870e547bdf8268339dada1357a"
+        },
+        {
+          "path": "datasets/lane-0.csv",
+          "sha256": "1e7dae37cdc27120f2a14a1df689b94af5915ba052c925999f480a59343d147f"
+        },
+        {
+          "path": "datasets/lane-1.csv",
+          "sha256": "08831112471188d3f5a18d9b1548b985908d5509af41c285a34d80bb7d710f24"
+        },
+        {
+          "path": "datasets/lane-2.csv",
+          "sha256": "2fd896b58f55d80cdd758924db922af9d32b5f9cd35bfb020b2a58176e6ef8fc"
+        },
+        {
+          "path": "datasets/lane-3.csv",
+          "sha256": "b2d0bb71c30707e7c1ec60871f848f90db778209740a3fbfe64ec063770b15d1"
+        },
+        {
+          "path": "scenario.yaml",
+          "sha256": "1656b0dadd744eb3eeace727725459dadf074e8feb5991bc608b30195532a3a0"
+        },
+        {
+          "path": "sut/headless/sut.yaml",
+          "sha256": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+        }
+      ]
+    }
+  ],
+  "bundleComparison": "All six bundles match byte-for-byte after normalizing scenario/run IDs; each contains 91800 unique requests."
+}

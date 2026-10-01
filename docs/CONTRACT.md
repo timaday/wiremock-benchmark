@@ -70,6 +70,19 @@ broker queue growth for soak. Archive size/disk headroom are monitored. Consumin
 is explicit test processing, not an assertion RabbitMQ retains acknowledged data.
 The archive remains a portable SQLite file containing full replayable events.
 
+## Listener backlog
+
+`WIREMOCK_ACCEPT_BACKLOG` is a required positive integer (1–2147483647) for
+both runtimes. Set `WIREMOCK_ACCEPT_BACKLOG=4096` for the next startup comparison.
+The official runtime receives `--jetty-accept-queue-size`; headless passes the
+same value to `jettyAcceptQueueSize`. Missing settings fail explicitly.
+This is the pending connection accept queue, not the number of active requests
+or Jetty request threads. Linux caps the effective backlog at the container's
+`net.core.somaxconn`; this change does not modify that kernel setting.
+Changing the backlog requires recreating the mock. Stop and drain load/capture
+first, and record the value with the run. A larger backlog is a startup mitigation
+to test, not a throughput qualification or a fix for PocketHive failure records.
+
 ## Verdict
 
 Warmup (60s by default), measured hold and final response/capture drain are distinct.

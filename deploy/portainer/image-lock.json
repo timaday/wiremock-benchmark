@@ -1,7 +1,7 @@
 {
-  "version": "20260930-throughput-1",
+  "version": "20261001-backlog-1",
   "sourceRepository": "https://github.com/timaday/wiremock-benchmark",
-  "sourceState": "Official/headless throughput fix source accompanies this image lock; fault-tested runtime layers match. HFM qualification pending.",
+  "sourceState": "Headless accepts required WIREMOCK_ACCEPT_BACKLOG; both runtime listener settings verified locally. HFM deployment and startup-load comparison pending.",
   "images": {
     "official": {
       "reference": "ghcr.io/timaday/wiremock-lab-official@sha256:ba89ff55533c0747ed98b3f204e96ee8db4a339404e6757ce38bd07d6d45dd8b",
@@ -19,8 +19,8 @@
       "anonymousManifestAndConfigVerified": true
     },
     "headless": {
-      "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:e8d6a3133b26c2e30e9ee6cecf26f407869f59e55beee4928f478dd16c49f74f",
-      "tag": "ghcr.io/timaday/wiremock-lab-headless:20260930-throughput-1",
+      "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:7531f0d83570c21a3e6ff119f37b554d5d7cea98a55fe56703ea1abce9ffd059",
+      "tag": "ghcr.io/timaday/wiremock-lab-headless:20261001-backlog-1",
       "platforms": [
         {
           "architecture": "amd64",
@@ -94,5 +94,5 @@
       "anonymousManifestAndConfigVerified": true
     }
   },
-  "verifiedAtUtc": "2026-09-30T11:46:44.220727+00:00"
+  "verifiedAtUtc": "2026-10-01T10:06:28.705000+00:00"
 }

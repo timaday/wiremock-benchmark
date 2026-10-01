@@ -7,6 +7,7 @@
     capture_prefix: "{{ lookup('ansible.builtin.env', 'CAPTURE_PREFIX') }}"
     active_runtime: "{{ lookup('ansible.builtin.env', 'ACTIVE_RUNTIME') }}"
     capture_enabled: "{{ lookup('ansible.builtin.env', 'CAPTURE_ENABLED') }}"
+    accept_backlog: "{{ lookup('ansible.builtin.env', 'WIREMOCK_ACCEPT_BACKLOG') }}"
   tasks:
     - name: Require the explicit benchmark profile
       ansible.builtin.assert:
@@ -32,6 +33,14 @@
         that:
           - capture_enabled in ['true', 'false']
         fail_msg: "CAPTURE_ENABLED must be true or false; qualification requires true."
+
+    - name: Require an explicit positive listener backlog
+      ansible.builtin.assert:
+        that:
+          - accept_backlog is match('^[0-9]+$')
+          - accept_backlog | int > 0
+          - accept_backlog | int <= 2147483647
+        fail_msg: "WIREMOCK_ACCEPT_BACKLOG must be an integer from 1 to 2147483647."
 
     - name: Write the stack artifact for HiveForge
       ansible.builtin.template:
