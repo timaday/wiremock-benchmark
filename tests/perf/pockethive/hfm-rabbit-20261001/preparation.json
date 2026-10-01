@@ -1,0 +1,111 @@
+{
+  "transport": "RABBITMQ",
+  "deploymentSetting": "POCKETHIVE_WORK_TYPE=RABBITMQ",
+  "referenceRunId": "63a628ffd1d177e1",
+  "hourWorkloadEquivalence": "Only run/scenario identity and 13 Work adapter declarations differ from the Artemis reference scenario; dataset bytes identical.",
+  "rabbitInput": {
+    "prefetch": 50,
+    "concurrentConsumers": 1,
+    "exclusive": false
+  },
+  "rabbitOutput": {
+    "persistent": true,
+    "publisherConfirms": false
+  },
+  "brokerBoundaries": "PocketHive local RabbitMQ Work; HFM RabbitMQ retains independent WireMock capture; Redis evidence unchanged.",
+  "runs": [
+    {
+      "mode": "smoke",
+      "runId": "84277a3cdd2f06eb",
+      "scenarioId": "ph-wiremock-headless-smoke-84277a3c",
+      "swarmId": "ph-hfm-rabbit-smoke-84277a3c",
+      "bundlePath": "tests/perf/pockethive/hfm-rabbit-20261001/bundles/ph-wiremock-headless-smoke-84277a3c",
+      "expectedRequests": 48,
+      "changedAdapterPaths": [
+        "generator-0.outputs",
+        "processor-0.inputs",
+        "processor-0.outputs",
+        "generator-1.outputs",
+        "processor-1.inputs",
+        "processor-1.outputs",
+        "generator-2.outputs",
+        "processor-2.inputs",
+        "processor-2.outputs",
+        "generator-3.outputs",
+        "processor-3.inputs",
+        "processor-3.outputs",
+        "evidence.inputs"
+      ],
+      "hashes": {
+        "scenario.yaml": "f386c2015137b6683cf1728e8e1059f511eb669bef36ad91e00f37a4ac0a853e",
+        "benchmark.json": "b52b1d99ba04749e41ac27243680f5475d5e9ecb5ba603cbcfd984cd94af3ca2",
+        "datasets/lane-2.csv": "c6017001c0715b114a3cb2f8ca69120f8fcd1bdeec8906e74b8530d8901e0f4d",
+        "datasets/lane-3.csv": "9586e3a825958e9b601bfc907c879cf24a7482f4e11a534125df114b8594f938",
+        "datasets/lane-0.csv": "f10101aed9c43f462bd535959dcb65d37d041a2ffbe6624127458f0a44e0efb6",
+        "datasets/lane-1.csv": "c29f2f793ecbfc4db10ce39104dc053f6772bf5826621bd3fa83cbe5878708dd",
+        "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+      }
+    },
+    {
+      "mode": "load",
+      "runId": "26fe5fcff5af2701",
+      "scenarioId": "ph-wiremock-headless-load-26fe5fcf",
+      "swarmId": "ph-hfm-rabbit-load-26fe5fcf",
+      "bundlePath": "tests/perf/pockethive/hfm-rabbit-20261001/bundles/ph-wiremock-headless-load-26fe5fcf",
+      "expectedRequests": 91800,
+      "changedAdapterPaths": [
+        "generator-0.outputs",
+        "processor-0.inputs",
+        "processor-0.outputs",
+        "generator-1.outputs",
+        "processor-1.inputs",
+        "processor-1.outputs",
+        "generator-2.outputs",
+        "processor-2.inputs",
+        "processor-2.outputs",
+        "generator-3.outputs",
+        "processor-3.inputs",
+        "processor-3.outputs",
+        "evidence.inputs"
+      ],
+      "hashes": {
+        "scenario.yaml": "ba5115218a5486f9c285551118c2df6517814d754c9633d6e6986387cc6d26dc",
+        "benchmark.json": "615d1bd8a449c39ec12f34e9d52c488b3a238e5beee59e933edd33d37dbde335",
+        "datasets/lane-2.csv": "5df4643d74e0456cf2375f0d7b6ee41e21081f97b77d9069fc3db05c7a32163f",
+        "datasets/lane-3.csv": "dec281e8b8abd938aa26e24b264946767b930490ab1d82c3e9e7c4c27127219e",
+        "datasets/lane-0.csv": "27f8b99abc53c4fb40f28507a571c1fc1c5e5b4a3f266568f8ae106f9bda5cae",
+        "datasets/lane-1.csv": "d1cbf53b4aa2380deeba1463d1a2ffa398d12310572573e17f0aeee2fd978148",
+        "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+      }
+    },
+    {
+      "mode": "endurance",
+      "runId": "44fa92b944a8a799",
+      "scenarioId": "ph-wiremock-headless-endurance-44fa92b9",
+      "swarmId": "ph-hfm-rabbit-endurance-44fa92b9",
+      "bundlePath": "tests/perf/pockethive/hfm-rabbit-20261001/bundles/ph-wiremock-headless-endurance-44fa92b9",
+      "expectedRequests": 3763800,
+      "changedAdapterPaths": [
+        "generator-0.outputs",
+        "processor-0.inputs",
+        "processor-0.outputs",
+        "generator-1.outputs",
+        "processor-1.inputs",
+        "processor-1.outputs",
+        "generator-2.outputs",
+        "processor-2.inputs",
+        "processor-2.outputs",
+        "generator-3.outputs",
+        "processor-3.inputs",
+        "processor-3.outputs",
+        "evidence.inputs"
+      ],
+      "hashes": {
+        "scenario.yaml": "2901db7da58e4f16271c5bbfd3c6777fe7feec78efbd7628c4ec5325b449606a",
+        "benchmark.json": "0db237abf96305c9dc03e06efe95ba4609b7149a323808a2e1a6ed935f540758",
+        "datasets/shared.csv": "6e5faa96d60396db0ebc9f55413bc4e18c690a9b5fd6382d2c614d36dd03e7f9",
+        "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+      }
+    }
+  ]
+}
