@@ -1,0 +1,34 @@
+{
+  "runId": "d0169f4aa18e31a5",
+  "scenarioId": "ph-wiremock-headless-endurance-d0169f4a",
+  "swarmId": "ph-hfm-headless-watch-d0169f4a",
+  "bundlePath": "tests/perf/pockethive/hfm-watch-20261001/bundles/ph-wiremock-headless-endurance-d0169f4a",
+  "sourceBundle": "tests/perf/pockethive/hfm-throughput-20260930/bundles/ph-wiremock-headless-endurance-99f789cc",
+  "scope": "Same headless endurance settings and endpoints; only scenario/run IDs changed",
+  "files": [
+    {
+      "path": "benchmark.json",
+      "unchanged": false,
+      "bytes": 1635,
+      "sha256": "e1a2fdba50ae1967375fb4d17882f848f57e06c2bf67b0d0c9aac65f064095d6"
+    },
+    {
+      "path": "datasets/shared.csv",
+      "unchanged": true,
+      "bytes": 30737715,
+      "sha256": "6e5faa96d60396db0ebc9f55413bc4e18c690a9b5fd6382d2c614d36dd03e7f9"
+    },
+    {
+      "path": "scenario.yaml",
+      "unchanged": false,
+      "bytes": 285164,
+      "sha256": "aa33bab97b8f534e9ab9399d3dc8342a425e5fe44285eff5a4a786973028055a"
+    },
+    {
+      "path": "sut/headless/sut.yaml",
+      "unchanged": true,
+      "bytes": 205,
+      "sha256": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+    }
+  ]
+}
