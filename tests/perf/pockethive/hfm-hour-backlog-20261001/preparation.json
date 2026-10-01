@@ -1,0 +1,23 @@
+{
+  "runId": "63a628ffd1d177e1",
+  "scenarioId": "ph-wiremock-headless-endurance-63a628ff",
+  "swarmId": "ph-hfm-headless-hour-63a628ff",
+  "bundlePath": "tests/perf/pockethive/hfm-hour-backlog-20261001/bundles/ph-wiremock-headless-endurance-63a628ff",
+  "expectedRequests": 3763800,
+  "measurementSeconds": 3600,
+  "warmupSeconds": 60,
+  "offeredRps": 1020,
+  "delayMs": 6000,
+  "acceptBacklog": 4096,
+  "artemisPolicy": "BLOCK",
+  "requestQueueMaxBytes": 134217728,
+  "resultsQueueMaxBytes": 268435456,
+  "evidenceContainer": "wmb-hfm-hour-63a628ff-evidence",
+  "evidenceVolume": "wmb-hfm-hour-63a628ff-evidence",
+  "fileHashes": {
+    "benchmark.json": "f83eff3695adb7dedd77968d0e235b06023f4c7a0290e960181d0deb7110e3ee",
+    "datasets/shared.csv": "6e5faa96d60396db0ebc9f55413bc4e18c690a9b5fd6382d2c614d36dd03e7f9",
+    "scenario.yaml": "9f434c3d67247162945c3f45e8099f10cb859c83777d85eca8d3bcb5edadc156",
+    "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+  }
+}
