@@ -1,0 +1,72 @@
+{
+  "status": "PREPARED_NOT_RUN",
+  "workConfigurationValidation": "Deployed release parser accepted 36 worker declarations.",
+  "datasetAndSettingsChecks": [
+    {
+      "variant": "smoke",
+      "runId": "af50ed00f3b8c7cf",
+      "uniqueDatasetRows": 48,
+      "artemisInputs": 5,
+      "artemisOutputs": 8,
+      "sha256": {
+        "scenario.yaml": "5d80b1cfad8bc5901f7360a4edfc050a2607aa1066dcbe7900344e743ca598da",
+        "benchmark.json": "078d62df4c88dfbfa88ed5ceee021b03599b27e70770a5b5c044fdad467924a0",
+        "datasets/lane-2.csv": "86334f5ed8901ab0b631850e71575a8f901492e65157d976d02bdffe935a5278",
+        "datasets/lane-3.csv": "a0d343e1e4a6292b193c8852d05a3e54a1c9ef70f0a96848aa3d3692325e80e2",
+        "datasets/lane-0.csv": "187b06cbe3b81ce7fa6efb4d15cadd3bdfc0ae837719741e9f4c436eb3dcaeb1",
+        "datasets/lane-1.csv": "984d6a52c8bd762b883f84592070e15fd7cb0a378064d2c15603c14d1749b477",
+        "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+      }
+    },
+    {
+      "variant": "baseline",
+      "runId": "07190e53360d4bfc",
+      "uniqueDatasetRows": 275400,
+      "artemisInputs": 5,
+      "artemisOutputs": 8,
+      "sha256": {
+        "scenario.yaml": "81222019ba114b654d5b77481fa3d0ed3569cd97198213cff05d8f646c08fae9",
+        "benchmark.json": "da39e0816bc6df9242ee99dd93a30733c11e93eed26c922b3cfb2b5de684bcf2",
+        "datasets/lane-2.csv": "54e4d9cf99b44d3513f9e6a90721565e0dc4d1ed044b67b03462635b02fc35c5",
+        "datasets/lane-3.csv": "4c763bc1fba3ff2240fd20ef6bd058f0411e74471456120fe4a115c31640f78b",
+        "datasets/lane-0.csv": "067b8b0d378af27214f2ccbc33105d8a7bdcb5076ed61584f5bdf365d14af916",
+        "datasets/lane-1.csv": "e0a0a61bce3525ddd4b0c313b39db2fa3e5821c27c2280feeb5d98b9e2848467",
+        "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+      }
+    },
+    {
+      "variant": "window-256k",
+      "runId": "3d16c24b033e2ca3",
+      "uniqueDatasetRows": 275400,
+      "artemisInputs": 5,
+      "artemisOutputs": 8,
+      "sha256": {
+        "scenario.yaml": "b1420752a85426c31cc4bffa77cc258812cca4fd27c71df574d0837aa19ae281",
+        "benchmark.json": "ef39c63e319dc0318569dd796c2fceab7ae0710aedc0827ca7cc70aa7d93e6d5",
+        "datasets/lane-2.csv": "6e90dcf2a9e65b781ef844a75448bc22b74bce4efa87a9ee9f78301c00bd16fe",
+        "datasets/lane-3.csv": "a4afaa61ff7439eeedc6b0da061e881c492a3910f2c4cf5b3735f290bf781c80",
+        "datasets/lane-0.csv": "598975818dea2b8668c66519e81626e08cbeb2405eef1588d4e7d4246607e483",
+        "datasets/lane-1.csv": "61e5fb16aaea1ab79fb8a662d400d84f99273111d999128e9009c29039fa81e1",
+        "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+      }
+    },
+    {
+      "variant": "window-4m",
+      "runId": "b704fdef0de01ee6",
+      "uniqueDatasetRows": 275400,
+      "artemisInputs": 5,
+      "artemisOutputs": 8,
+      "sha256": {
+        "scenario.yaml": "a0e426a743d901d7d22a83142b6ba8b18f47c4ca4c62d3d72ea9a9492c1f010f",
+        "benchmark.json": "1f8507b09557766e94e27ad2c1e4d111567b3657b17901dab3bbfd6042714425",
+        "datasets/lane-2.csv": "eba7a3b6513c33419d695c1a315165bc79a036ad368290c56b3922fd3450dfcc",
+        "datasets/lane-3.csv": "4ff0ecffd8bf0702697868f23239dddf3c698347d65b6b4033c1dd7ee847d19d",
+        "datasets/lane-0.csv": "b5074c4d3c5fa867b82797296cd657db68afb8199af9002e66226b9e81ce3df9",
+        "datasets/lane-1.csv": "b4d983f841bcc0bb604e1da64755cd8632d902505e3f70550df4bef1b8c0fa9c",
+        "sut/headless/sut.yaml": "b27f3c910bfc6330c0b99dfdc34e7663b6051d135e86c08e6fe167c36a18eabf"
+      }
+    }
+  ],
+  "connectionContract": "tcp://artemis:61616 only; URI query overrides rejected by deployed contract.",
+  "runtimeMutations": "Approved old Rabbit swarm removal and age-filtered build-cache prune only; no transport switch or tuning load started."
+}

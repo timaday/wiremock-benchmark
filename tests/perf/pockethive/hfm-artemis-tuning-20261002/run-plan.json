@@ -1,0 +1,72 @@
+{
+  "captureEnabled": true,
+  "backlog": 4096,
+  "requestAddressLimitBytes": 134217728,
+  "resultsAddressLimitBytes": 268435456,
+  "globalLimitBytes": 1073741824,
+  "addressFullPolicy": "BLOCK",
+  "trials": [
+    {
+      "variant": "smoke",
+      "mode": "smoke",
+      "runId": "af50ed00f3b8c7cf",
+      "scenarioId": "ph-wiremock-headless-smoke-af50ed00",
+      "swarmId": "ph-art-smoke-af50ed00",
+      "bundlePath": "tests/perf/pockethive/hfm-artemis-tuning-20261002/bundles/ph-wiremock-headless-smoke-af50ed00",
+      "expectedRequests": 48,
+      "consumerWindowBytes": 1048576,
+      "minLargeMessageSize": 102400,
+      "brokerUrl": "tcp://artemis:61616",
+      "maxSeconds": 600,
+      "order": 1,
+      "backlog": 4096
+    },
+    {
+      "variant": "baseline",
+      "mode": "diagnostic",
+      "runId": "07190e53360d4bfc",
+      "scenarioId": "ph-wiremock-headless-diagnostic-07190e53",
+      "swarmId": "ph-art-baseline-07190e53",
+      "bundlePath": "tests/perf/pockethive/hfm-artemis-tuning-20261002/bundles/ph-wiremock-headless-diagnostic-07190e53",
+      "expectedRequests": 275400,
+      "consumerWindowBytes": 1048576,
+      "minLargeMessageSize": 102400,
+      "brokerUrl": "tcp://artemis:61616",
+      "maxSeconds": 900,
+      "order": 2,
+      "backlog": 4096
+    },
+    {
+      "variant": "window-256k",
+      "mode": "diagnostic",
+      "runId": "3d16c24b033e2ca3",
+      "scenarioId": "ph-wiremock-headless-diagnostic-3d16c24b",
+      "swarmId": "ph-art-window-256k-3d16c24b",
+      "bundlePath": "tests/perf/pockethive/hfm-artemis-tuning-20261002/bundles/ph-wiremock-headless-diagnostic-3d16c24b",
+      "expectedRequests": 275400,
+      "consumerWindowBytes": 262144,
+      "minLargeMessageSize": 102400,
+      "brokerUrl": "tcp://artemis:61616",
+      "maxSeconds": 900,
+      "order": 3,
+      "backlog": 4096
+    },
+    {
+      "variant": "window-4m",
+      "mode": "diagnostic",
+      "runId": "b704fdef0de01ee6",
+      "scenarioId": "ph-wiremock-headless-diagnostic-b704fdef",
+      "swarmId": "ph-art-window-4m-b704fdef",
+      "bundlePath": "tests/perf/pockethive/hfm-artemis-tuning-20261002/bundles/ph-wiremock-headless-diagnostic-b704fdef",
+      "expectedRequests": 275400,
+      "consumerWindowBytes": 4194304,
+      "minLargeMessageSize": 102400,
+      "brokerUrl": "tcp://artemis:61616",
+      "maxSeconds": 900,
+      "order": 4,
+      "backlog": 4096
+    }
+  ],
+  "hourSelection": "After short-run integrity and measured-rate review; no hour bundle prepared yet.",
+  "largeMessageThreshold": "Unchanged: deployed typed connection contract rejects all URI query overrides. Measure envelope sizes; extending threshold configuration is a separate change if needed."
+}
