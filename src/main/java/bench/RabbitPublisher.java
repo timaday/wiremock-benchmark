@@ -42,9 +42,7 @@ final class RabbitPublisher implements AutoCloseable {
       try (var connection = factory().newConnection("wiremock-capture");
           var channel = connection.createChannel()) {
         declare(channel);
-        channel.confirmSelect();
-        var returned = new AtomicBoolean();
-        channel.addReturnListener(message -> returned.set(true));
+        var batchPublisher = new RabbitCaptureBatch(connection, channel, Settings.required("RABBIT_QUEUE"));
         connected = true;
         while (running && connection.isOpen()) {
           long started = System.nanoTime();
@@ -54,22 +52,8 @@ final class RabbitPublisher implements AutoCloseable {
             Thread.sleep(10);
             continue;
           }
-          returned.set(false);
           started = System.nanoTime();
-          for (var row : batch)
-            channel.basicPublish(
-                "",
-                Settings.required("RABBIT_QUEUE"),
-                true,
-                new AMQP.BasicProperties.Builder()
-                    .deliveryMode(2)
-                    .contentType(CaptureCodec.CONTENT_TYPE)
-                    .contentEncoding(CaptureCodec.CONTENT_ENCODING)
-                    .messageId(row.id())
-                    .build(),
-                row.payload());
-          channel.waitForConfirmsOrDie(10000);
-          if (returned.get()) throw new IllegalStateException("Capture returned unroutable");
+          batchPublisher.publish(batch, 10000);
           publishConfirms.record(System.nanoTime() - started);
           started = System.nanoTime();
           outbox.confirmed(batch);

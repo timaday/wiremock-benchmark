@@ -12,10 +12,26 @@ PLACEMENTS = {
     'MONITORING_NODE': 'monitoring-node',
 }
 DISTRIBUTED = dict(PLACEMENTS, OFFICIAL_REPLICAS='0', HEADLESS_REPLICAS='1')
+DIRECT = {
+    'OFFICIAL_DIRECT_IMAGE': 'example.invalid/direct-official:test',
+    'HEADLESS_DIRECT_IMAGE': 'example.invalid/direct-headless:test',
+    'POCKETHIVE_RABBIT_URI': 'amqp://test:test@pockethive-rabbit:5672/bench',
+    'POCKETHIVE_NETWORK': 'pockethive-overlay', 'RABBIT_QUEUE_TYPE': 'classic',
+    'CAPTURE_CONFIRM_TIMEOUT_MS': '10000',
+}
 
 class SwarmConfigurationTest(unittest.TestCase):
+    def test_stack_lists_are_indented_beneath_their_keys(self):
+        for path in ROOT.glob('stack*.yml'):
+            lines = path.read_text().splitlines()
+            for index, line in enumerate(lines[:-1]):
+                if line.rstrip().endswith(':') and lines[index + 1].lstrip().startswith('- '):
+                    with self.subTest(file=path.name, key=line.strip()):
+                        self.assertGreater(len(lines[index + 1]) - len(lines[index + 1].lstrip()),
+                                           len(line) - len(line.lstrip()))
+
     def render(self, file, **settings):
-        excluded = {'RABBIT_PASSWORD', 'POCKETHIVE_RABBIT_URI', *DISTRIBUTED}
+        excluded = {'RABBIT_PASSWORD', 'POCKETHIVE_RABBIT_URI', *DISTRIBUTED, *DIRECT}
         env = {k:v for k,v in os.environ.items() if k not in excluded}
         env.update(LAB_NODE='test-node', CAPTURE_PREFIX='test-capture', GRAFANA_PASSWORD='test-only-grafana', WIREMOCK_ACCEPT_BACKLOG='4096')
         env.update(settings)
@@ -102,6 +118,50 @@ class SwarmConfigurationTest(unittest.TestCase):
         services = yaml.safe_load(result.stdout)['services']
         actual = {port['published'] for service in services.values() for port in service.get('ports', [])}
         self.assertEqual(actual, {19180, 19181, 13100, 29190, 5674, 15674})
+
+    def test_direct_stacks_have_only_one_read_only_mock_and_external_broker(self):
+        for runtime in ('official', 'headless'):
+            with self.subTest(runtime=runtime):
+                result = self.render(f'stack-direct-{runtime}.yml', **DIRECT)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                config = yaml.safe_load(result.stdout)
+                self.assertEqual(set(config['services']), {runtime})
+                self.assertNotIn('volumes', config)
+                mock = config['services'][runtime]
+                self.assertTrue(mock['read_only'])
+                self.assertEqual(mock['image'], DIRECT[runtime.upper() + '_DIRECT_IMAGE'])
+                self.assertEqual(mock['environment']['CAPTURE_MODE'], 'DIRECT_RABBIT')
+                self.assertEqual(mock['environment']['CAPTURE_ENABLED'], 'true')
+                self.assertNotIn('OUTBOX_PATH', mock['environment'])
+                self.assertNotIn('/state', mock['environment']['JAVA_TOOL_OPTIONS'])
+                self.assertEqual(mock['environment']['RABBIT_URI'], DIRECT['POCKETHIVE_RABBIT_URI'])
+                self.assertEqual(mock['environment']['RABBIT_QUEUE'], 'test-capture.' + runtime)
+                self.assertEqual(mock['environment']['WIREMOCK_ACCEPT_BACKLOG'], '4096')
+                self.assertEqual(mock['volumes'][0]['type'], 'tmpfs')
+                self.assertEqual(mock['volumes'][0]['target'], '/tmp')
+                self.assertEqual(mock['volumes'][0]['tmpfs']['size'], 67108864)
+                self.assertEqual(mock['deploy']['restart_policy'], {'condition': 'on-failure', 'delay': '5s'})
+                self.assertTrue(config['networks']['pockethive']['external'])
+                self.assertEqual(config['networks']['pockethive']['name'], DIRECT['POCKETHIVE_NETWORK'])
+
+    def test_direct_stacks_require_new_image_and_explicit_broker_configuration(self):
+        for runtime in ('official', 'headless'):
+            for missing in ('POCKETHIVE_RABBIT_URI', 'POCKETHIVE_NETWORK', 'RABBIT_QUEUE_TYPE',
+                            'CAPTURE_CONFIRM_TIMEOUT_MS', runtime.upper() + '_DIRECT_IMAGE'):
+                with self.subTest(runtime=runtime, missing=missing):
+                    settings = dict(DIRECT)
+                    del settings[missing]
+                    result = self.render(f'stack-direct-{runtime}.yml', **settings)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(missing, result.stderr)
+
+    def test_direct_example_is_accepted_and_keeps_separate_ports(self):
+        example = dict(line.split('=', 1) for line in (ROOT/'example-direct.env').read_text().splitlines()
+                       if line and not line.startswith('#'))
+        for runtime, port in [('official', 19280), ('headless', 19281)]:
+            result = self.render(f'stack-direct-{runtime}.yml', **example)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(yaml.safe_load(result.stdout)['services'][runtime]['ports'][0]['published'], port)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,35 @@
+{
+  "version": "20261005-direct-2",
+  "verifiedAtUTC": "2026-10-05T17:12:22.505450+00:00",
+  "sourceRepository": "https://github.com/timaday/wiremock-benchmark",
+  "sourceParentRevision": "8fe85392821eaf1b36cda35dde2b6c1e2606177b",
+  "captureJarSha256": "df18d8ff3ef2f624c2d553fc7cf8cba53b9c287ecf3ea73bd9b1e81d4d309bd0",
+  "images": {
+    "official": {
+      "tag": "ghcr.io/timaday/wiremock-lab-official:20261005-direct-2",
+      "reference": "ghcr.io/timaday/wiremock-lab-official@sha256:c7c0aa65662e6bc05093a2ee45df710e115e54cdee3d58f58894ec608f688b68",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "runtimeManifestDigest": "sha256:ee238deb06f988619e5c3958164022815abda8d9e40014dd3c6fd0eec42a53cf",
+      "matchesTestedImage": true,
+      "anonymousManifestConfigAndAllLayersVerified": true,
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-official"
+    },
+    "headless": {
+      "tag": "ghcr.io/timaday/wiremock-lab-headless:20261005-direct-2",
+      "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:91f333c4c78750e33b51188f7f1b569aef0348a3e1f40508ad3d0d0cd9c29737",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "runtimeManifestDigest": "sha256:45d59e0c16ce0bb31981cd5cfdc8de931a4a82f71a984fd646044d956a66bed6",
+      "matchesTestedImage": true,
+      "anonymousManifestConfigAndAllLayersVerified": true,
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-headless"
+    }
+  }
+}

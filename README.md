@@ -14,6 +14,11 @@ For a generator-independent deployment of both WireMocks, RabbitMQ, durable arch
 and a provisioned Grafana comparison dashboard, use [the Portainer guide](docs/PORTAINER.md).
 It includes GHCR images pinned by digest and an explicit existing-PocketHive-broker variant.
 
+For a mock with no writable persistent volume, use the separate
+[direct RabbitMQ headless/official stacks](deploy/portainer/DIRECT-RABBIT.md).
+They require new images and make RabbitMQ confirmation the capture durability
+boundary; there is no local broker-outage buffer.
+
 For HiveForge v0.5.9, use the [HiveForge lab deployment](docs/HIVEFORGE.md):
 the same seven services, public lab credentials and no Docker secrets.
 
@@ -152,7 +157,7 @@ To run the embedded launcher directly, build with `mvn package`, place the pinne
 WireMock standalone3.13.2 jar beside `target/capture.jar`, and run on JDK27:
 
 ```sh
-CAPTURE_ENABLED=true OUTBOX_PATH=/absolute/outbox.db \
+CAPTURE_MODE=OUTBOX CAPTURE_ENABLED=true OUTBOX_PATH=/absolute/outbox.db \
 RABBIT_URI=amqp://benchmark:benchmark@localhost:5672/%2f RABBIT_QUEUE=captures \
 FIXTURES=/absolute/fixtures WIREMOCK_ACCEPT_BACKLOG=4096 \
 java --enable-native-access=ALL-UNNAMED -Xmx3g \

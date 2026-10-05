@@ -15,6 +15,7 @@ services:
       restart_policy:
         condition: none
     environment:
+      CAPTURE_MODE: OUTBOX
       CAPTURE_ENABLED: '{{ capture_enabled }}'
       OUTBOX_PATH: /state/outbox.db
       RABBIT_URI: amqp://benchmark:benchmark@rabbit:5672/%2f
@@ -93,6 +94,7 @@ services:
       restart_policy:
         condition: none
     environment:
+      CAPTURE_MODE: OUTBOX
       CAPTURE_ENABLED: '{{ capture_enabled }}'
       OUTBOX_PATH: /state/outbox.db
       RABBIT_URI: amqp://benchmark:benchmark@rabbit:5672/%2f

@@ -16,37 +16,42 @@ import java.util.concurrent.atomic.AtomicLong;
 final class MetricsServer implements AutoCloseable {
   private final HttpServer server;
 
-  MetricsServer(boolean enabled, DurableOutbox outbox, RabbitPublisher publisher,
-      AtomicLong errors, HttpMetrics http) throws IOException {
-    var diagnostics = new CaptureDiagnostics(enabled, outbox, publisher);
+  MetricsServer(CaptureSink sink, AtomicLong errors, AtomicLong rejected, HttpMetrics http) throws IOException {
+    boolean enabled = sink != null;
+    var disabledDiagnostics = new CaptureDiagnostics(false, null, null);
     server = HttpServer.create(new InetSocketAddress("0.0.0.0", 8081), 0);
     server.createContext("/metrics", exchange -> {
       try {
+        var state = enabled ? sink.snapshot() : null;
         var values = new LinkedHashMap<String, Object>();
+        values.put("mode", enabled ? state.mode().name() : "DISABLED");
         values.put("enabled", enabled);
         values.put("errors", errors.get());
+        values.put("rejectedRequests", rejected.get());
         values.put("java", System.getProperty("java.runtime.version"));
-        values.put("pending", enabled ? outbox.pending() : 0);
-        values.put("committed", enabled ? outbox.committed.get() : 0);
-        values.put("confirmed", enabled ? publisher.confirmed.get() : 0);
-        values.put("brokerConnected", enabled && publisher.connected);
-        values.put("reconnects", enabled ? publisher.reconnects.get() : 0);
+        values.put("pending", enabled ? state.pending() : 0);
+        values.put("committed", enabled ? state.committed() : 0);
+        values.put("confirmed", enabled ? state.confirmed() : 0);
+        values.put("brokerConnected", enabled && state.brokerConnected());
+        values.put("reconnects", enabled ? state.reconnects() : 0);
         values.put("heapUsed", Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
-        values.put("captureDiagnostics", diagnostics.snapshot());
+        values.put("captureDiagnostics", enabled ? state.diagnostics() : disabledDiagnostics.snapshot());
         respond(exchange, "application/json", Json.bytes(values));
       } catch (Exception e) { exchange.sendResponseHeaders(500, -1); }
       finally { exchange.close(); }
     });
     server.createContext("/prometheus", exchange -> {
       try {
+        var state = enabled ? sink.snapshot() : null;
         var out = new StringBuilder(http.exposition()).append(JvmMetrics.exposition());
         HttpMetrics.metric(out, "wiremock_capture_enabled", "gauge", enabled ? 1 : 0);
         HttpMetrics.metric(out, "wiremock_capture_errors_total", "counter", errors.get());
-        HttpMetrics.metric(out, "wiremock_capture_pending", "gauge", enabled ? outbox.pending() : 0);
-        HttpMetrics.metric(out, "wiremock_capture_committed_total", "counter", enabled ? outbox.committed.get() : 0);
-        HttpMetrics.metric(out, "wiremock_capture_confirmed_total", "counter", enabled ? publisher.confirmed.get() : 0);
-        HttpMetrics.metric(out, "wiremock_capture_broker_connected", "gauge", enabled && publisher.connected ? 1 : 0);
-        diagnostics.expose(out);
+        HttpMetrics.metric(out, "wiremock_capture_rejected_requests_total", "counter", rejected.get());
+        HttpMetrics.metric(out, "wiremock_capture_pending", "gauge", enabled ? state.pending() : 0);
+        HttpMetrics.metric(out, "wiremock_capture_committed_total", "counter", enabled ? state.committed() : 0);
+        HttpMetrics.metric(out, "wiremock_capture_confirmed_total", "counter", enabled ? state.confirmed() : 0);
+        HttpMetrics.metric(out, "wiremock_capture_broker_connected", "gauge", enabled && state.brokerConnected() ? 1 : 0);
+        if (enabled) sink.exposeDiagnostics(out); else disabledDiagnostics.expose(out);
         respond(exchange, "text/plain; version=0.0.4; charset=utf-8", out.toString().getBytes(StandardCharsets.UTF_8));
       } catch (Exception e) { exchange.sendResponseHeaders(500, -1); }
       finally { exchange.close(); }

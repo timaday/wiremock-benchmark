@@ -1,4 +1,5 @@
 x-capture: &capture
+  CAPTURE_MODE: OUTBOX
   CAPTURE_ENABLED: ${CAPTURE_ENABLED:?set capture mode}
   OUTBOX_PATH: /state/outbox.db
   RABBIT_URI: amqp://benchmark:benchmark@rabbit:5672/%2f

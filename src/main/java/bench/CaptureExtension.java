@@ -1,7 +1,10 @@
 package bench;
 
 import com.github.tomakehurst.wiremock.extension.*;
+import com.github.tomakehurst.wiremock.extension.requestfilter.*;
 import com.github.tomakehurst.wiremock.http.HttpHeaders;
+import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import java.nio.file.Path;
 import java.util.*;
@@ -12,12 +15,12 @@ import java.util.concurrent.atomic.AtomicLong;
  * Must not: serve metric projections or perform broker IO on callback threads.
  * Contract: docs/CONTRACT.md and docs/PORTAINER.md.
  */
-public final class CaptureExtension implements ServeEventListener {
-  private DurableOutbox outbox;
-  private RabbitPublisher publisher;
+public final class CaptureExtension implements ServeEventListener, StubRequestFilterV2 {
+  private CaptureSink sink;
   private MetricsServer metrics;
   private final HttpMetrics http = new HttpMetrics();
   private final AtomicLong errors = new AtomicLong();
+  private final AtomicLong rejected = new AtomicLong();
   private boolean enabled;
 
   public String getName() {
@@ -31,13 +34,27 @@ public final class CaptureExtension implements ServeEventListener {
         throw new IllegalArgumentException("CAPTURE_ENABLED must be true or false");
       enabled = Boolean.parseBoolean(setting);
       if (enabled) {
-        outbox = new DurableOutbox(Path.of(Settings.required("OUTBOX_PATH")), 1024);
-        publisher = new RabbitPublisher(outbox);
+        sink = switch (CaptureMode.valueOf(Settings.required("CAPTURE_MODE"))) {
+          case OUTBOX -> new OutboxCaptureSink(Path.of(Settings.required("OUTBOX_PATH")));
+          case DIRECT_RABBIT -> DirectRabbitCaptureSink.configured();
+        };
       }
-      metrics = new MetricsServer(enabled, outbox, publisher, errors, http);
+      metrics = new MetricsServer(sink, errors, rejected, http);
     } catch (Exception e) {
+      if (sink != null) {
+        try { sink.close(); } catch (Exception closeFailure) { e.addSuppressed(closeFailure); }
+      }
       throw new IllegalStateException("Capture startup failed", e);
     }
+  }
+
+  public RequestFilterAction filter(Request request, ServeEvent event) {
+    var admission = enabled ? CaptureRequestPolicy.evaluate(request) : CaptureAdmission.ACCEPTED;
+    if (admission == CaptureAdmission.ACCEPTED) return RequestFilterAction.continueWith(request);
+    rejected.incrementAndGet();
+    return RequestFilterAction.stopWith(ResponseDefinitionBuilder.responseDefinition()
+        .withStatus(admission.status).withHeader("Content-Type", "text/plain; charset=utf-8")
+        .withBody(admission.message).build());
   }
 
   public void beforeMatch(ServeEvent event, Parameters parameters) {
@@ -55,17 +72,17 @@ public final class CaptureExtension implements ServeEventListener {
       http.completed(event.getResponse().getStatus(), event.getTiming().getTotalTime());
   }
 
-  private static boolean isBenchmark(ServeEvent event) {
-    return event.getRequest().getUrl().startsWith("/bench/");
+  private boolean isBenchmark(ServeEvent event) {
+    return CaptureRequestPolicy.isBenchmark(event.getRequest())
+        && (!enabled || CaptureRequestPolicy.evaluate(event.getRequest()) == CaptureAdmission.ACCEPTED);
   }
 
   private void capture(ServeEvent event, Phase phase) {
     if (!enabled || !isBenchmark(event)) return;
     try {
       var request = event.getRequest();
-      String requestId = request.getHeader("X-Bench-Id"), runId = request.getHeader("X-Bench-Run");
-      if (requestId == null || runId == null)
-        throw new IllegalArgumentException("Benchmark correlation headers required");
+      String requestId = request.getHeader(CaptureRequestPolicy.REQUEST_ID);
+      String runId = request.getHeader(CaptureRequestPolicy.RUN_ID);
       String id = event.getId() + ":" + phase;
       byte[] body =
           phase == Phase.REQUEST
@@ -91,11 +108,12 @@ public final class CaptureExtension implements ServeEventListener {
               phase == Phase.REQUEST ? 0 : event.getResponse().getStatus(),
               values,
               Base64.getEncoder().encodeToString(body));
-      outbox.append(id, CaptureCodec.encode(record));
+      sink.append(id, CaptureCodec.encode(record));
     } catch (Throwable failure) {
       errors.incrementAndGet();
       System.err.println(
-          "FATAL: durable capture unavailable; terminating rather than silently losing records");
+          "FATAL: durable capture unavailable (" + failure.getClass().getSimpleName()
+              + "); terminating rather than silently losing records");
       Runtime.getRuntime().halt(70);
     }
   }
@@ -103,8 +121,7 @@ public final class CaptureExtension implements ServeEventListener {
   public void stop() {
     try {
       if (metrics != null) metrics.close();
-      if (publisher != null) publisher.close();
-      if (outbox != null) outbox.close();
+      if (sink != null) sink.close();
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

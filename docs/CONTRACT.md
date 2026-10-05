@@ -28,8 +28,9 @@ IDs, phase, timestamp, method/URL, headers and complete body bytes. Completion
 means server callback observed, **not proof the client received the response**.
 Headers are the WireMock lifecycle view, before any transport headers added by
 the HTTP container; this is application capture, not a raw packet recording.
-If a process dies after response preparation, delivery remains unknown unless the
-completion event exists. Requests not yet durably accepted at hook entry cannot
+With asynchronous delay, WireMock 3.13.2 can invoke the completion callback before
+the delayed socket write. Even a completion event does not establish delivery;
+only the client can verify it. Requests not yet durably accepted at hook entry cannot
 be promised to survive a process/OS failure. No replay of HTTP requests occurs.
 
 The full JSON capture envelope is zlib-compressed (level 1) before disk commit
@@ -69,6 +70,68 @@ before acknowledging delivery. This both proves external receipt and bounds
 broker queue growth for soak. Archive size/disk headroom are monitored. Consuming
 is explicit test processing, not an assertion RabbitMQ retains acknowledged data.
 The archive remains a portable SQLite file containing full replayable events.
+
+## Direct RabbitMQ capture (filesystem-free mocks)
+
+`CAPTURE_MODE` explicitly selects `OUTBOX` (the SQLite contract above) or
+`DIRECT_RABBIT` when capture is enabled. Container images for the original path
+set `OUTBOX`; the two direct Portainer deployments set `DIRECT_RABBIT`. There is
+no automatic switch between modes. Capture disabled opens neither sink.
+
+Direct capture preserves the same three phases, IDs, complete bodies and zlib
+encoding. It requires `RABBIT_URI`, `RABBIT_QUEUE`, `RABBIT_QUEUE_TYPE` (`classic`
+or `quorum`) and `CAPTURE_CONFIRM_TIMEOUT_MS` (positive milliseconds). The queue
+is durable, non-exclusive and not auto-deleted, and its declared type must match
+an existing queue. Use dedicated capture queues, never PocketHive work queues.
+No TTL, overflow/drop policy or premature consumer acknowledgement is compatible
+with retained evidence; the broker/consumer operator owns those policies.
+
+A single publisher batches up to 256 events with at most 2 ms collection time.
+At most 1,024 operations may be admitted, including the batch awaiting confirmation.
+Each callback waits for mandatory, persistent publication and a positive broker
+confirmation; a return, nack, connection failure, deadline or full admission
+window fails explicitly. No retry/replay from memory is claimed. A confirm lost
+on the network leaves delivery uncertain; consumers must deduplicate event IDs.
+Unconfirmed process memory is not durable. Startup requires a usable broker.
+Shutdown rejects new work and fails unconfirmed operations. Capture failure stops
+the mock with exit 70 rather than continuing a misleading successful run.
+
+Client validation is not a capture-storage failure. With capture enabled,
+`/bench/` requests require exactly one nonblank `X-Bench-Run` and `X-Bench-Id`,
+each at most 256 characters. Invalid correlation returns HTTP 400. Request bodies
+over 64 KiB return HTTP 413 (the workload maximum remains 50 KiB). Rejection occurs
+before capture/matching and does not terminate the process. Rejected requests do
+not produce correlated captures or enter the valid-request lifecycle counters;
+`rejectedRequests` / `wiremock_capture_rejected_requests_total` count them separately.
+Non-benchmark/admin paths retain normal WireMock handling. Configured fixtures
+retain their existing matching behavior; this is not a general JSON schema validator.
+
+Unlike OUTBOX, broker outages cannot be buffered locally. The confirmation
+wait is part of request processing and must be measured. `pending` means admitted
+but unconfirmed memory operations; `committed` and `confirmed` both count positively
+confirmed events in DIRECT_RABBIT. JSON metrics include `mode`; direct diagnostics
+include callback wait and publish/confirm durations and do not pretend to measure
+SQLite transactions. Broker connection telemetry also checks the live connection.
+
+The direct stacks contain one mock each and reuse an explicitly addressed
+PocketHive RabbitMQ. Images contain immutable fixtures, GC/application logs go to
+stdout, the root filesystem is read-only and `/tmp` is bounded tmpfs scratch.
+There are no persistent volumes, EFS mounts, archive services or bundled broker.
+RabbitMQ and the downstream consumer still own durable storage. A confirmed
+publish is not a reconciliation verdict. Consumers must decode the capture
+contract and acknowledge only after their required durable processing succeeds.
+These files do not configure a PocketHive postprocessor or prove its compatibility.
+
+The existing SQLite archive/recovery runner remains the OUTBOX qualification
+path. Direct capture needs its own client/body/ID reconciliation and fault proofs;
+previous hour results do not qualify these images. Existing server callback
+completion/in-flight metrics are not actual client delivery counters with async
+responses; use client results for throughput and latency verdicts.
+
+The direct Swarm stacks restart on operational failure after 5 seconds, with no
+finite retry ceiling. Each restart repeats strict broker startup checks. This is
+service recovery, not request/capture replay: a restart or capture failure still
+fails the benchmark run. Incorrect configuration must be corrected explicitly.
 
 ## Listener backlog
 

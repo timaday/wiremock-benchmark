@@ -7,6 +7,12 @@ into both mock images. Select delay, size and template through the request URL.
 
 ## Deployment contract
 
+For one mock with no EFS/local persistence, use the
+[direct RabbitMQ headless/official guide](../deploy/portainer/DIRECT-RABBIT.md).
+Those new images publish directly to PocketHive RabbitMQ and require a compatible
+capture consumer. They have a different broker-outage contract from the outbox
+stacks described here.
+
 For nodes with 4 CPUs and 16 GiB RAM each, use the separate
 [distributed stack guide](../deploy/portainer/DISTRIBUTED.md). It assigns mocks,
 capture RabbitMQ, archives and monitoring to explicit nodes and selects one mock

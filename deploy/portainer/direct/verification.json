@@ -1,0 +1,162 @@
+{
+  "passed": true,
+  "oneHourQualification": false,
+  "remoteSwarmDeployment": false,
+  "supervisor": "local Docker on-failure; Swarm restart policy separately parser-tested",
+  "brokerStorage": "tmpfs: protocol/recovery proof, not power-loss durability proof",
+  "images": {
+    "official": "sha256:c7c0aa65662e6bc05093a2ee45df710e115e54cdee3d58f58894ec608f688b68",
+    "headless": "sha256:91f333c4c78750e33b51188f7f1b569aef0348a3e1f40508ad3d0d0cd9c29737"
+  },
+  "clientRejections": {
+    "official": {
+      "badRequests": 8,
+      "sameProcess": true,
+      "restartCount": 0
+    },
+    "headless": {
+      "badRequests": 8,
+      "sameProcess": true,
+      "restartCount": 0
+    }
+  },
+  "recoveryRestartCounts": {
+    "official": 5,
+    "headless": 5
+  },
+  "before-outage": {
+    "requests": 24,
+    "exactCaptures": 72,
+    "minimumDelaySeconds": 6,
+    "metrics": {
+      "official": {
+        "mode": "DIRECT_RABBIT",
+        "enabled": true,
+        "errors": 0,
+        "rejectedRequests": 8,
+        "java": "17.0.19+10",
+        "pending": 0,
+        "committed": 36,
+        "confirmed": 36,
+        "brokerConnected": true,
+        "reconnects": 0,
+        "heapUsed": 70317872,
+        "captureDiagnostics": {
+          "publish_confirm": {
+            "seconds": 0.036868136,
+            "maxSeconds": 0.029473561,
+            "count": 9
+          },
+          "queuedOperations": 0,
+          "append_wait": {
+            "seconds": 0.245946334,
+            "maxSeconds": 0.03176946,
+            "count": 36
+          }
+        }
+      },
+      "headless": {
+        "mode": "DIRECT_RABBIT",
+        "enabled": true,
+        "errors": 0,
+        "rejectedRequests": 8,
+        "java": "27+35-2325",
+        "pending": 0,
+        "committed": 36,
+        "confirmed": 36,
+        "brokerConnected": true,
+        "reconnects": 0,
+        "heapUsed": 58794984,
+        "captureDiagnostics": {
+          "publish_confirm": {
+            "count": 8,
+            "seconds": 0.008448675,
+            "maxSeconds": 0.00351686
+          },
+          "queuedOperations": 0,
+          "append_wait": {
+            "count": 36,
+            "seconds": 0.172198005,
+            "maxSeconds": 0.010304477
+          }
+        }
+      }
+    }
+  },
+  "after-recovery": {
+    "requests": 24,
+    "exactCaptures": 72,
+    "minimumDelaySeconds": 6,
+    "metrics": {
+      "official": {
+        "mode": "DIRECT_RABBIT",
+        "enabled": true,
+        "errors": 0,
+        "rejectedRequests": 0,
+        "java": "17.0.19+10",
+        "pending": 0,
+        "committed": 36,
+        "confirmed": 36,
+        "brokerConnected": true,
+        "reconnects": 0,
+        "heapUsed": 60919200,
+        "captureDiagnostics": {
+          "publish_confirm": {
+            "count": 8,
+            "seconds": 0.009565438,
+            "maxSeconds": 0.00321242
+          },
+          "queuedOperations": 0,
+          "append_wait": {
+            "count": 36,
+            "seconds": 0.134426846,
+            "maxSeconds": 0.011462134
+          }
+        }
+      },
+      "headless": {
+        "mode": "DIRECT_RABBIT",
+        "enabled": true,
+        "errors": 0,
+        "rejectedRequests": 0,
+        "java": "27+35-2325",
+        "pending": 0,
+        "committed": 36,
+        "confirmed": 36,
+        "brokerConnected": true,
+        "reconnects": 0,
+        "heapUsed": 57919136,
+        "captureDiagnostics": {
+          "append_wait": {
+            "maxSeconds": 0.039482502,
+            "seconds": 0.24726531,
+            "count": 36
+          },
+          "queuedOperations": 0,
+          "publish_confirm": {
+            "maxSeconds": 0.003145353,
+            "seconds": 0.011277035,
+            "count": 9
+          }
+        }
+      }
+    }
+  },
+  "sourceEvidence": "results/direct-rabbit-resilience-20261005-final/verification.json",
+  "sourceEvidenceSha256": "ef12f984450c6b2c6c648e5234e111d14fa645378c563f6334f74530ab9c58b9",
+  "evidenceSha256": {
+    "before-outage-clients.json": "c151f274995cd674ad7cbd209d9e700149195bdde2ab4da9c4439b8b2829d224",
+    "before-outage-captures.json": "e8f6b4f73b0711b92cc72a716bb8ec091322aa9269095878dbac14cbcc1a5fb4",
+    "after-recovery-clients.json": "9167ae506c6e562494c660b405f3e0a69423fc29ff914f06819b18646c497313",
+    "after-recovery-captures.json": "c0f707e8e24a81b31512a1dfd6e62c7e71a8ea096bdf8985965e1bed919d809a"
+  },
+  "mavenTests": {
+    "passed": 24,
+    "failures": 0,
+    "skipped": 0,
+    "log": "results/direct-rabbit-20261005/maven-resilient-test.log",
+    "sha256": "ff811067ba10e902acb8d228778bf7a3d5a8562aa706ac03bd42754a94df881e"
+  },
+  "portainerManifestTestsPassed": 10,
+  "hiveforgeGenerationTestsPassed": 6
+}

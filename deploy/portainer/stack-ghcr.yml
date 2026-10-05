@@ -7,7 +7,7 @@ services:
       replicas: 1
       placement:
         constraints:
-        - node.hostname == ${LAB_NODE:?set Swarm node hostname}
+          - node.hostname == ${LAB_NODE:?set Swarm node hostname}
       resources:
         limits:
           cpus: '4'
@@ -15,6 +15,7 @@ services:
       restart_policy:
         condition: none
     environment:
+      CAPTURE_MODE: OUTBOX
       CAPTURE_ENABLED: ${CAPTURE_ENABLED:-true}
       OUTBOX_PATH: /state/outbox.db
       RABBIT_URI: amqp://benchmark:${RABBIT_PASSWORD:?required}@rabbit:5672/%2f
@@ -23,49 +24,49 @@ services:
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
       WIREMOCK_ACCEPT_BACKLOG: ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
     ports:
-    - target: 8080
-      published: ${OFFICIAL_PORT:-19080}
-      protocol: tcp
-      mode: ingress
+      - target: 8080
+        published: ${OFFICIAL_PORT:-19080}
+        protocol: tcp
+        mode: ingress
     volumes:
-    - official-outbox:/state
+      - official-outbox:/state
     stop_grace_period: 45s
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -fsS
-      - http://localhost:8080/__admin/health
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8080/__admin/health
       interval: 10s
       timeout: 5s
       retries: 12
     command:
-    - --port
-    - '8080'
-    - --no-request-journal
-    - --disable-request-logging
-    - --container-threads
-    - '128'
-    - --jetty-accept-queue-size
-    - ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
-    - --async-response-enabled
-    - 'true'
-    - --async-response-threads
-    - '64'
-    - --disable-gzip
-    - --disable-http2-plain
-    - --disable-http2-tls
-    - --max-template-cache-entries
-    - '1000'
-    - --extensions
-    - bench.CaptureExtension
+      - --port
+      - '8080'
+      - --no-request-journal
+      - --disable-request-logging
+      - --container-threads
+      - '128'
+      - --jetty-accept-queue-size
+      - ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
+      - --async-response-enabled
+      - 'true'
+      - --async-response-threads
+      - '64'
+      - --disable-gzip
+      - --disable-http2-plain
+      - --disable-http2-tls
+      - --max-template-cache-entries
+      - '1000'
+      - --extensions
+      - bench.CaptureExtension
   official-archive:
     image: ghcr.io/timaday/wiremock-lab-archive@sha256:7de1ee0bb9870be4195058fec0ee3958fd98665c45e2c1f7c8eeb3ce506697ed
     deploy:
       replicas: 1
       placement:
         constraints:
-        - node.hostname == ${LAB_NODE:?set Swarm node hostname}
+          - node.hostname == ${LAB_NODE:?set Swarm node hostname}
       resources:
         limits:
           cpus: '2'
@@ -77,7 +78,7 @@ services:
       RABBIT_QUEUE: ${CAPTURE_PREFIX:?set unique capture queue prefix}.official
       ARCHIVE_PATH: /archive/events.db
     volumes:
-    - official-archive:/archive
+      - official-archive:/archive
     stop_grace_period: 45s
   headless:
     image: ghcr.io/timaday/wiremock-lab-headless@sha256:7531f0d83570c21a3e6ff119f37b554d5d7cea98a55fe56703ea1abce9ffd059
@@ -85,7 +86,7 @@ services:
       replicas: 1
       placement:
         constraints:
-        - node.hostname == ${LAB_NODE:?set Swarm node hostname}
+          - node.hostname == ${LAB_NODE:?set Swarm node hostname}
       resources:
         limits:
           cpus: '4'
@@ -93,6 +94,7 @@ services:
       restart_policy:
         condition: none
     environment:
+      CAPTURE_MODE: OUTBOX
       CAPTURE_ENABLED: ${CAPTURE_ENABLED:-true}
       OUTBOX_PATH: /state/outbox.db
       RABBIT_URI: amqp://benchmark:${RABBIT_PASSWORD:?required}@rabbit:5672/%2f
@@ -101,19 +103,19 @@ services:
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:file=/state/gc.log:time,level,tags
       WIREMOCK_ACCEPT_BACKLOG: ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
     ports:
-    - target: 8080
-      published: ${HEADLESS_PORT:-19081}
-      protocol: tcp
-      mode: ingress
+      - target: 8080
+        published: ${HEADLESS_PORT:-19081}
+        protocol: tcp
+        mode: ingress
     volumes:
-    - headless-outbox:/state
+      - headless-outbox:/state
     stop_grace_period: 45s
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -fsS
-      - http://localhost:8080/__admin/health
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8080/__admin/health
       interval: 10s
       timeout: 5s
       retries: 12
@@ -123,7 +125,7 @@ services:
       replicas: 1
       placement:
         constraints:
-        - node.hostname == ${LAB_NODE:?set Swarm node hostname}
+          - node.hostname == ${LAB_NODE:?set Swarm node hostname}
       resources:
         limits:
           cpus: '2'
@@ -135,7 +137,7 @@ services:
       RABBIT_QUEUE: ${CAPTURE_PREFIX:?set unique capture queue prefix}.headless
       ARCHIVE_PATH: /archive/events.db
     volumes:
-    - headless-archive:/archive
+      - headless-archive:/archive
     stop_grace_period: 45s
   rabbit:
     image: ghcr.io/timaday/wiremock-lab-rabbit@sha256:809e8845798216d8c484505544628e07d63ba188a07ac3ae24a3e98d2ef52890
@@ -143,7 +145,7 @@ services:
       replicas: 1
       placement:
         constraints:
-        - node.hostname == ${LAB_NODE:?set Swarm node hostname}
+          - node.hostname == ${LAB_NODE:?set Swarm node hostname}
       resources:
         limits:
           cpus: '2'
@@ -156,16 +158,16 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD:?required}
       RABBITMQ_NODENAME: rabbit@rabbit
     ports:
-    - ${RABBIT_AMQP_PORT:-5673}:5672
-    - ${RABBIT_UI_PORT:-15673}:15672
+      - ${RABBIT_AMQP_PORT:-5673}:5672
+      - ${RABBIT_UI_PORT:-15673}:15672
     volumes:
-    - rabbit:/var/lib/rabbitmq
+      - rabbit:/var/lib/rabbitmq
     healthcheck:
       test:
-      - CMD
-      - rabbitmq-diagnostics
-      - -q
-      - ping
+        - CMD
+        - rabbitmq-diagnostics
+        - -q
+        - ping
       interval: 10s
       timeout: 5s
       retries: 12
@@ -175,7 +177,7 @@ services:
       replicas: 1
       placement:
         constraints:
-        - node.hostname == ${LAB_NODE:?set Swarm node hostname}
+          - node.hostname == ${LAB_NODE:?set Swarm node hostname}
       resources:
         limits:
           cpus: '1'
@@ -183,21 +185,21 @@ services:
       restart_policy:
         condition: none
     command:
-    - --config.file=/etc/prometheus/standalone.yml
-    - --storage.tsdb.path=/prometheus
-    - --storage.tsdb.retention.time=7d
-    - --storage.tsdb.retention.size=2GB
+      - --config.file=/etc/prometheus/standalone.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=2GB
     ports:
-    - ${PROMETHEUS_PORT:-29090}:9090
+      - ${PROMETHEUS_PORT:-29090}:9090
     volumes:
-    - prometheus:/prometheus
+      - prometheus:/prometheus
   grafana:
     image: ghcr.io/timaday/wiremock-lab-grafana@sha256:b1ba4ee780745d9e19e53fcbea38ca128da3e8ce5ac28411542dc3b46f13ec35
     deploy:
       replicas: 1
       placement:
         constraints:
-        - node.hostname == ${LAB_NODE:?set Swarm node hostname}
+          - node.hostname == ${LAB_NODE:?set Swarm node hostname}
       resources:
         limits:
           cpus: '1'
@@ -210,9 +212,9 @@ services:
       GF_USERS_ALLOW_SIGN_UP: 'false'
       GOMEMLIMIT: 512MiB
     ports:
-    - ${GRAFANA_PORT:-13000}:3000
+      - ${GRAFANA_PORT:-13000}:3000
     volumes:
-    - grafana:/var/lib/grafana
+      - grafana:/var/lib/grafana
 volumes:
   official-outbox: {}
   official-archive: {}
