@@ -116,7 +116,27 @@ if __name__ == '__main__':
     args=parser.parse_args()
     if args.registry_lock is not None:
         lock=json.loads(args.registry_lock.read_text())
-        for filename,template in [('stack-ghcr.yml',stack),('stack-ghcr-pockethive.yml',external)]:
+        distributed = copy.deepcopy(stack)
+        placements = {
+            'official': 'OFFICIAL_NODE', 'headless': 'HEADLESS_NODE',
+            'rabbit': 'RABBIT_NODE', 'official-archive': 'ARCHIVE_NODE',
+            'headless-archive': 'ARCHIVE_NODE', 'prometheus': 'MONITORING_NODE',
+            'grafana': 'MONITORING_NODE',
+        }
+        for name, variable in placements.items():
+            deployment = distributed['services'][name]['deploy']
+            deployment['placement']['constraints'] = [
+                'node.hostname == ${' + variable + ':?set Swarm node hostname}'
+            ]
+            deployment['update_config'] = {'parallelism': 1, 'order': 'stop-first'}
+            deployment['rollback_config'] = {'parallelism': 1, 'order': 'stop-first'}
+        for runtime in ['official', 'headless']:
+            distributed['services'][runtime]['deploy']['replicas'] = (
+                '${' + runtime.upper() + '_REPLICAS:?set 0 or 1}'
+            )
+        distributed['networks'] = {'default': {'driver': 'overlay'}}
+        for filename,template in [('stack-ghcr.yml',stack),('stack-ghcr-pockethive.yml',external),
+                                  ('stack-ghcr-distributed.yml',distributed)]:
             pinned=copy.deepcopy(template)
             for name,spec in pinned['services'].items():
                 component='archive' if name.endswith('-archive') else name

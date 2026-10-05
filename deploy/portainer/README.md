@@ -3,6 +3,8 @@
 Use [the deployment guide](../../docs/PORTAINER.md) for Docker Swarm / Portainer.
 
 - `stack-ghcr.yml`: ready-to-upload stack with GHCR image digests and its own RabbitMQ.
+- `stack-ghcr-distributed.yml`: separate node placement and explicit mock replica counts;
+  see [the distributed guide](DISTRIBUTED.md) and `example-distributed.env`.
 - `stack-ghcr-pockethive.yml`: GHCR stack using the existing PocketHive RabbitMQ.
 - `image-lock.json`: published image references and verification evidence.
 - `stack.yml`: both mocks, two capture archives, RabbitMQ, Prometheus and Grafana.
@@ -15,4 +17,5 @@ Use [the deployment guide](../../docs/PORTAINER.md) for Docker Swarm / Portainer
 From the repository root, regenerate the pinned stacks using
 `python3 deploy/portainer/render.py --registry-lock deploy/portainer/image-lock.json`.
 All six GHCR packages are public; Portainer needs no registry token. Published images are
-Linux AMD64; both variants require an explicit Swarm node hostname.
+Linux AMD64; single-node variants require `LAB_NODE`, and the distributed variant
+requires explicit per-service hostnames.

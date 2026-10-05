@@ -7,6 +7,11 @@ into both mock images. Select delay, size and template through the request URL.
 
 ## Deployment contract
 
+For nodes with 4 CPUs and 16 GiB RAM each, use the separate
+[distributed stack guide](../deploy/portainer/DISTRIBUTED.md). It assigns mocks,
+capture RabbitMQ, archives and monitoring to explicit nodes and selects one mock
+at a time. The single-node files described below retain their existing placement.
+
 `deploy/portainer/render.py` owns the generated stack files. `stack.yml` includes
 a dedicated RabbitMQ. `stack-pockethive.yml` uses the explicitly configured existing
 PocketHive RabbitMQ URI and creates no broker. Each runtime has its own durable
