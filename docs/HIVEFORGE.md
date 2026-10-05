@@ -208,7 +208,7 @@ Apart from the explicit runtime selection, the profile fixes the canonical Porta
 part of this profile. The Grafana dashboard path is `/d/wiremock-comparison`.
 
 For PocketHive load generation, use [the bundle guide](../tests/perf/pockethive/README.md).
-Those bundles separately require Artemis work transport and a Redis evidence
+New bundles require PocketHive's `POCKETHIVE_WORK_TYPE=RABBITMQ` and a Redis evidence
 sink. The HiveForge lab includes its own capture RabbitMQ and does not implement
 the proposed postprocessor reconciliation integration.
 

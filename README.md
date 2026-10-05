@@ -23,8 +23,10 @@ The [PocketHive benchmark package](tests/perf/pockethive/README.md) contains bot
 completed one-hour bundles, smoke/load profiles, fresh-bundle preparation, result
 collection and verification tools, and the measured comparison report. The hour
 profile offers 1,020 requests/s with six-second delay across all sizes/templates.
-It requires a PocketHive deployment with Artemis work transport and a dedicated
-Redis evidence sink; WireMock capture uses RabbitMQ separately.
+New bundles use PocketHive's RabbitMQ work transport and require
+`POCKETHIVE_WORK_TYPE=RABBITMQ` plus a dedicated Redis evidence sink. WireMock
+capture uses its separately configured RabbitMQ connection. Historical Artemis
+bundles and their measured results remain available in the package.
 
 ## Run
 

@@ -1,0 +1,48 @@
+{
+  "pythonUnitTests": {
+    "passed": 8,
+    "command": "python3 -m unittest discover -s tests/perf/pockethive -p 'test_*.py' -v"
+  },
+  "releaseConfigurationProbes": {
+    "pockethiveVersion": "0.15.35",
+    "authoringAccepted": 54,
+    "rabbitResolvedAccepted": 54,
+    "artemisResolvedRejected": 54,
+    "openedBrokerConnections": false
+  },
+  "workloadEquivalence": {
+    "profilesChecked": 8,
+    "runtimes": [
+      "official",
+      "headless"
+    ],
+    "modes": [
+      "smoke",
+      "load",
+      "diagnostic",
+      "endurance"
+    ],
+    "deterministicIdsForComparison": true,
+    "unchanged": [
+      "HTTP request templates",
+      "rates and timing",
+      "CSV contents",
+      "topology",
+      "SUT values",
+      "Redis evidence settings"
+    ],
+    "allowedDifferences": [
+      "Work adapter declarations",
+      "scenario display name",
+      "workTransport manifest metadata",
+      "YAML serialization"
+    ]
+  },
+  "bundleHashesVerified": 6,
+  "liveDeploymentTested": false,
+  "performanceRunStarted": false,
+  "requiredBeforeImport": [
+    "Select POCKETHIVE_WORK_TYPE=RABBITMQ in the target deployment",
+    "Set each SUT baseUrl and the evidence Redis endpoint for that deployment"
+  ]
+}

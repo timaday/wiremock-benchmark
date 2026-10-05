@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.pockethive.work.config.WorkConfigurationMode;
 import io.pockethive.work.config.composition.CurrentWorkConfigurationProviders;
@@ -6,7 +7,7 @@ import java.nio.file.*;
 import java.util.Map;
 class WorkConfigProbe {
  public static void main(String[] args) throws Exception {
-  var mapper=new ObjectMapper().findAndRegisterModules();
+  var mapper=new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
   var parser=new CurrentWorkConfigurationProviders().workConfigurationParser();
   int count=0;
   for(String file:args){

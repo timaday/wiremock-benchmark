@@ -1,0 +1,85 @@
+{
+  "runId": "c5a5e6b00b2ff13f",
+  "scenarioId": "ph-wiremock-official-endurance-c5a5e6b0",
+  "runtime": "official",
+  "mode": "endurance",
+  "workTransport": "RABBITMQ",
+  "offeredRate": 1020,
+  "expectedRequests": 3763800,
+  "warmupSeconds": 60,
+  "measurementSeconds": 3600,
+  "cases": [
+    {
+      "id": "static-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-1024-6000",
+      "size": 1024,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-5120-6000",
+      "size": 5120,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-10240-6000",
+      "size": 10240,
+      "delay": 6000,
+      "template": "text"
+    },
+    {
+      "id": "static-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "static"
+    },
+    {
+      "id": "json-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "json"
+    },
+    {
+      "id": "text-51200-6000",
+      "size": 51200,
+      "delay": 6000,
+      "template": "text"
+    }
+  ]
+}

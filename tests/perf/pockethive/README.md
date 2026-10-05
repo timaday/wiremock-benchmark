@@ -6,7 +6,36 @@ verification tools. Both runtimes passed the six-second, one-hour measured hold;
 see [the endurance report](ENDURANCE-2026-09-30.md) and its recorded limitations.
 The [short-run report](RUN-2026-09-29.md) is retained as historical evidence.
 
-## Included bundles
+## RabbitMQ bundles for new runs
+
+`prepare.py` creates bundles that use **PocketHive's RabbitMQ for Work traffic**.
+Fresh official/headless smoke, load and endurance bundles are in
+[rabbitmq-20261005/bundles](rabbitmq-20261005/bundles). These bundles have new run
+identities and have not been performance-qualified. Their `benchmark.json`
+records `workTransport: RABBITMQ`.
+
+| Runtime | Smoke | Load | One-hour hold |
+| --- | --- | --- | --- |
+| Official | [smoke](rabbitmq-20261005/bundles/ph-wiremock-official-smoke-77287655) | [load](rabbitmq-20261005/bundles/ph-wiremock-official-load-7bb0509e) | [endurance](rabbitmq-20261005/bundles/ph-wiremock-official-endurance-c5a5e6b0) |
+| Headless | [smoke](rabbitmq-20261005/bundles/ph-wiremock-headless-smoke-1f84bda5) | [load](rabbitmq-20261005/bundles/ph-wiremock-headless-load-be6daac2) | [endurance](rabbitmq-20261005/bundles/ph-wiremock-headless-endurance-6fdd726e) |
+
+The Work adapter settings match the earlier
+[RabbitMQ comparison](hfm-rabbit-20261001/README.md): prefetch 50, one consumer,
+nonexclusive consumption, persistent output and publisher confirms disabled.
+All 13 Work input/output boundaries select RabbitMQ explicitly. Broker connection
+settings come from the selected PocketHive deployment; no separate Work broker
+or broker credentials are embedded in these bundles. The evidence worker still
+writes compact results to Redis.
+
+Fresh `scenario.yaml` and `sut.yaml` files use conventional YAML formatting;
+`benchmark.json` remains JSON. Historical snapshots retain their original format.
+Selection is explicit: these bundles do not inherit or switch to Artemis. A local
+probe against PocketHive 0.15.35 libraries accepts all 54 workers with RabbitMQ
+bootstrap and rejects all 54 with Artemis bootstrap during resolved configuration
+validation, because their Rabbit destinations remain unresolved. This checks the
+configuration path, not a live deployment or performance run.
+
+## Historical Artemis bundles
 
 | Runtime | Smoke: 4/s, 12s | Load: 1,020/s, 90s | Endurance: 1,020/s, 3,690s |
 | --- | --- | --- | --- |
@@ -55,11 +84,18 @@ template file as its argument; it checks the actual Pebble/WorkItem/hop contract
 
 ## Required environment
 
-The original environment was PocketHive 0.15.35. Each bundle explicitly uses
-**Artemis for PocketHive Work traffic** and a dedicated **Redis evidence sink**.
-WireMock's independent durable capture goes through **RabbitMQ** into the archive.
-The RabbitMQ in the Portainer lab does not replace the bundle's Artemis or Redis.
-No postprocessor reconciliation adapter is included.
+For new bundles, configure the selected PocketHive deployment with
+`POCKETHIVE_WORK_TYPE=RABBITMQ` before creating the swarm. In HiveForge, set this
+runtime value for PocketHive's existing profile and update that deployment.
+PocketHive supplies the workers' RabbitMQ connection settings. The generator and
+processor lanes exchange Work through that broker; the evidence worker consumes
+their RabbitMQ results and writes to the dedicated Redis evidence sink.
+
+WireMock's independent durable capture goes through its configured RabbitMQ
+connection into the archive. The RabbitMQ in the standalone Portainer WireMock
+lab does not replace PocketHive's Work broker or Redis. No postprocessor
+reconciliation adapter is included. The original September 30 environment used
+PocketHive 0.15.35 with Artemis; its historical snapshots retain that transport.
 
 Provision a compatible PocketHive deployment with the generator, processor,
 moderator and swarm-controller images corresponding to the tested release. The
@@ -86,6 +122,7 @@ shared infrastructure. Allow capacity and evidence storage before a hold.
 Run from the `wiremock-benchmark` repository root, using Python 3.10+:
 
 ```sh
+python3 -m pip install -r tests/perf/pockethive/requirements.txt
 python3 tests/perf/pockethive/prepare.py \
   --canonical-repo . --output results/pockethive-official \
   --runtime official --mode endurance
@@ -161,9 +198,12 @@ report; preserve raw captures for independent body-level investigation.
 ## Provenance and validation
 
 [source-provenance.json](source-provenance.json) records the PocketHive source
-repository, commits and SHA-256 hashes of the copied artifacts. The six bundle
-snapshots, Python tools, Java probes and historical reports are unchanged copies;
-this README is adapted for their new repository location. `stream_verify.py` is
+repository, commits and SHA-256 hashes at the original import. The six historical
+bundle snapshots and reports retain their original transport and identities.
+`prepare.py` now generates RabbitMQ bundles and `WorkConfigProbe.java` reads YAML;
+the original provenance does not describe those updated tools or the new bundles.
+Fresh bundle hashes are recorded in
+[preparation.json](rabbitmq-20261005/preparation.json). `stream_verify.py` is
 copied from the retained endurance artifact volume and matches the hash recorded
 in [the original provenance](evidence-endurance-2026-09-30/provenance.json).
 The other run-specific monitor/resource scripts remain in that artifact volume;
@@ -173,3 +213,7 @@ The historical results apply to their recorded images and environment, not a
 fresh endurance qualification of the newer instrumented Portainer images.
 `TemplateProbe.java` and `WorkConfigProbe.java` are retained release-specific
 checks requiring PocketHive's Java dependencies, not standalone benchmark builds.
+`RabbitWorkTransportProbe.java` additionally checks correct RabbitMQ bootstrap
+and wrong-Artemis rejection for the fresh RabbitMQ scenarios without connecting
+to a broker. Compile these configuration probes against PocketHive's release
+libraries and pass the generated `scenario.yaml` paths as arguments.

@@ -1,0 +1,7 @@
+id: official
+name: Isolated benchmark WireMock official
+type: http
+endpoints:
+  default:
+    kind: http
+    baseUrl: http://wmb-ph-official:8080

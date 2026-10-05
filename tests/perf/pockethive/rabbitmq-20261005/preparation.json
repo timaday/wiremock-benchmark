@@ -1,0 +1,96 @@
+{
+  "deploymentWorkType": "RABBITMQ",
+  "performanceQualified": false,
+  "bundles": [
+    {
+      "path": "bundles/ph-wiremock-official-smoke-77287655",
+      "runId": "77287655625d1498",
+      "runtime": "official",
+      "mode": "smoke",
+      "expectedRequests": 48,
+      "sha256": {
+        "benchmark.json": "072073ccbb78f4ce9f80553a3997278c77e46ddd03c5c90475940b07a0fd8a2e",
+        "datasets/lane-0.csv": "00290d2c76133882cc2bb17f5406e670dd9714c16b4c4196e2f89962e2387978",
+        "datasets/lane-1.csv": "140cb72df6cede5d62f40ccaa44c134c17cd7935791489ccfcd62bade841d1e5",
+        "datasets/lane-2.csv": "8996f2f714111eff72e5980275cf9dd044be651f21cd39f43b13d8a4379a8a1b",
+        "datasets/lane-3.csv": "ef13f9fa845fea78ea2d644455bdf8f6ffc84e8d1d05e07e4d12acea3f38d2d8",
+        "scenario.yaml": "70609b6315e15c937f26df72a355eaaa2c3d88a88bb6f58c9e8a6c50b7e903ac",
+        "sut/official/sut.yaml": "f0ee95f91c2a7530ae289bc75f619d6edf597653bbc29730227095294d20f8fb"
+      }
+    },
+    {
+      "path": "bundles/ph-wiremock-official-load-7bb0509e",
+      "runId": "7bb0509e39260343",
+      "runtime": "official",
+      "mode": "load",
+      "expectedRequests": 91800,
+      "sha256": {
+        "benchmark.json": "9d2a4e6e51ad91e1bc852dac67fee7325abf535d09f6624c41872506ffe0b077",
+        "datasets/lane-0.csv": "f2ebdb720d8ae2f0e890d0a0d773b604b1ae17e88517e64fe7259fc23206ba42",
+        "datasets/lane-1.csv": "97dbf3a023d4b97bd9458bb722a6a9edceba15e87615f058db9e0bc5965c0472",
+        "datasets/lane-2.csv": "31c8097b8107b174edae59fffbd58d79bf46b22847f200c7293c3589bf06d44c",
+        "datasets/lane-3.csv": "1a3c03f5978b08c05bf193e5ef7d55c91b81c3dd5030092460e66e1e97b2e9a4",
+        "scenario.yaml": "a69005b21a11ea1dc0547b4e94251f0b99784bc51a0fc7acbb757c84581f65ab",
+        "sut/official/sut.yaml": "f0ee95f91c2a7530ae289bc75f619d6edf597653bbc29730227095294d20f8fb"
+      }
+    },
+    {
+      "path": "bundles/ph-wiremock-official-endurance-c5a5e6b0",
+      "runId": "c5a5e6b00b2ff13f",
+      "runtime": "official",
+      "mode": "endurance",
+      "expectedRequests": 3763800,
+      "sha256": {
+        "benchmark.json": "e9776766df3c4a73b6f09177647a821a7b8d234399ecd7eeb921640b986cf27c",
+        "datasets/shared.csv": "6e5faa96d60396db0ebc9f55413bc4e18c690a9b5fd6382d2c614d36dd03e7f9",
+        "scenario.yaml": "f5748578f67b4e667869483d7fd53240d58d851979f14696fce3fda9252e4f9a",
+        "sut/official/sut.yaml": "f0ee95f91c2a7530ae289bc75f619d6edf597653bbc29730227095294d20f8fb"
+      }
+    },
+    {
+      "path": "bundles/ph-wiremock-headless-smoke-1f84bda5",
+      "runId": "1f84bda5c2d74656",
+      "runtime": "headless",
+      "mode": "smoke",
+      "expectedRequests": 48,
+      "sha256": {
+        "benchmark.json": "940598462fed53c5c4bc4c622d8895015dd3c746df25583b3e8d35cb26fc7907",
+        "datasets/lane-0.csv": "eb82720361c1658a11127f0e496138391f26525f41311980231dbf005553bb48",
+        "datasets/lane-1.csv": "5834f45fca56c9cd60da2b117fece4907628f70f7afab7207ebdcbf6340b6642",
+        "datasets/lane-2.csv": "efba81772c93946cfb74b2adfe08ad373cc21aeff994aeca1591444add38b355",
+        "datasets/lane-3.csv": "a72a6a8952c4f41e03db9aadd8714b8fd2c22f08b1c3ceee03cef4b804ca2948",
+        "scenario.yaml": "c48a5fc1d24baade9fdd413938680813b1c013438396179ba80a8b3d46f7dd99",
+        "sut/headless/sut.yaml": "1d716545cb677b203259a765ec7c226b37291ae468c70840fea7712a7d83f5f3"
+      }
+    },
+    {
+      "path": "bundles/ph-wiremock-headless-load-be6daac2",
+      "runId": "be6daac2741b8c99",
+      "runtime": "headless",
+      "mode": "load",
+      "expectedRequests": 91800,
+      "sha256": {
+        "benchmark.json": "5991c9a0abdd3cf9838adf17f5e7f6fcbe200b0ccfec2f14dd44cee62b32a552",
+        "datasets/lane-0.csv": "eb8a1286f20365f99c50c0d0516006abdc64d8da2c6c0fa23474917caa459d37",
+        "datasets/lane-1.csv": "ad9bd0644906d18b41f2248554e0b8f9d6f48fefb475212531d672cadc6396bc",
+        "datasets/lane-2.csv": "0b2f52ec6369915c285c87477a326a018d581fb93e8fb1c499aa690f4b752d83",
+        "datasets/lane-3.csv": "5a0c9c91457e309c07fd3fb37af7d6fd4f3536c25ae03ce859d462edd0e20660",
+        "scenario.yaml": "e7f72d4d668a8ad1077e2d927292633668b5937d89512d4319502ffd247e8e01",
+        "sut/headless/sut.yaml": "1d716545cb677b203259a765ec7c226b37291ae468c70840fea7712a7d83f5f3"
+      }
+    },
+    {
+      "path": "bundles/ph-wiremock-headless-endurance-6fdd726e",
+      "runId": "6fdd726ebdecab55",
+      "runtime": "headless",
+      "mode": "endurance",
+      "expectedRequests": 3763800,
+      "sha256": {
+        "benchmark.json": "b00136874dc263d53dcf0420e6e1e6ee265fbb3ce5fcd4c33345560e80600b74",
+        "datasets/shared.csv": "6e5faa96d60396db0ebc9f55413bc4e18c690a9b5fd6382d2c614d36dd03e7f9",
+        "scenario.yaml": "30e7a64328a40c5efea79dbf8218a83a6afd8093a6be755075aab00b2a5b6f46",
+        "sut/headless/sut.yaml": "1d716545cb677b203259a765ec7c226b37291ae468c70840fea7712a7d83f5f3"
+      }
+    }
+  ]
+}

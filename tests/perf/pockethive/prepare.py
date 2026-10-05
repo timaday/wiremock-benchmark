@@ -1,4 +1,4 @@
-"""Prepare finite PocketHive workloads from wiremock-benchmark's canonical catalogue."""
+"""Prepare finite workloads using PocketHive's RabbitMQ and the canonical catalogue."""
 
 import argparse
 import csv
@@ -7,13 +7,19 @@ import json
 import secrets
 from pathlib import Path
 
-
-def artemis_input():
-    return {'type': 'ARTEMIS', 'artemis': {'consumerWindowBytes': 1048576}}
+import yaml
 
 
-def artemis_output():
-    return {'type': 'ARTEMIS', 'artemis': {'persistent': True}}
+def rabbit_input():
+    return {'type': 'RABBITMQ', 'rabbit': {
+        'prefetch': 50, 'concurrentConsumers': 1, 'exclusive': False,
+    }}
+
+
+def rabbit_output():
+    return {'type': 'RABBITMQ', 'rabbit': {
+        'persistent': True, 'publisherConfirms': False,
+    }}
 
 
 def evidence_output(run_id):
@@ -103,7 +109,7 @@ def prepare(canonical_repo, output, runtime, mode):
                         'delimiter': ',', 'charset': 'UTF-8',
                         'startupDelaySeconds': 10, 'tickIntervalMs': 100,
                     }},
-                    'outputs': artemis_output(),
+                    'outputs': rabbit_output(),
                     'message': {
                         'bodyType': 'HTTP', 'method': 'POST',
                         'path': '/bench/{{ payloadAsJson.caseId }}',
@@ -128,8 +134,8 @@ def prepare(canonical_repo, output, runtime, mode):
                     'threadCount': 16 if mode == 'smoke' else 1800,
                     'connectionReuse': 'PER_THREAD', 'keepAlive': True,
                     'timeoutMs': 30000, 'sslVerify': True, 'historyPolicy': 'FULL',
-                    'inputs': artemis_input(),
-                    'outputs': artemis_output(),
+                    'inputs': rabbit_input(),
+                    'outputs': rabbit_output(),
                 },
             },
         ])
@@ -145,7 +151,7 @@ def prepare(canonical_repo, output, runtime, mode):
             'ports': [{'id': 'in', 'direction': 'in'}],
             'config': {
                 'mode': {'type': 'pass-through', 'ratePerSec': 0},
-                'inputs': artemis_input(), 'outputs': evidence_output(run_id),
+                'inputs': rabbit_input(), 'outputs': evidence_output(run_id),
                 'historyPolicy': 'LATEST_ONLY',
                 'interceptors': {'templating': {'template': result_template()}},
             },
@@ -153,20 +159,21 @@ def prepare(canonical_repo, output, runtime, mode):
     ])
     scenario = {
         'protocolVersion': '2.0.0', 'id': scenario_id,
-        'name': f'WireMock {runtime}: PocketHive {mode}',
+        'name': f'WireMock {runtime}: PocketHive RabbitMQ {mode}',
         'description': f'Finite six-second benchmark: {4 * rate} offered requests/s; {4 * rows} unique requests.',
         'template': {'image': 'swarm-controller:latest', 'bees': bees},
         'topology': {'version': 1, 'edges': edges},
     }
-    (bundle / 'scenario.yaml').write_text(json.dumps(scenario, indent=2) + '\n')
+    (bundle / 'scenario.yaml').write_text(yaml.safe_dump(scenario, sort_keys=False))
     sut = bundle / 'sut' / runtime
     sut.mkdir(parents=True)
-    (sut / 'sut.yaml').write_text(json.dumps({
+    (sut / 'sut.yaml').write_text(yaml.safe_dump({
         'id': runtime, 'name': f'Isolated benchmark WireMock {runtime}', 'type': 'http',
         'endpoints': {'default': {'kind': 'http', 'baseUrl': f'http://wmb-ph-{runtime}:8080'}},
-    }, indent=2) + '\n')
+    }, sort_keys=False))
     manifest = {
         'runId': run_id, 'scenarioId': scenario_id, 'runtime': runtime, 'mode': mode,
+        'workTransport': 'RABBITMQ',
         'offeredRate': rate * 4, 'expectedRequests': rows * 4,
         'warmupSeconds': warmup, 'measurementSeconds': measurement,
         'cases': [{key: case[key] for key in ['id', 'size', 'delay', 'template']} for case in cases],
