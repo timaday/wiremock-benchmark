@@ -1,0 +1,18 @@
+{
+  "id": "3d0f66aa-e397-4d5a-b4ad-dae7f6514208",
+  "request": {
+    "method": "POST",
+    "urlPath": "/transaction"
+  },
+  "response": {
+    "status": 200,
+    "fixedDelayMilliseconds": 1000,
+    "transformerParameters": {
+      "capture": {
+        "runId": "work-test-001",
+        "correlationJsonPath": "$.correlationId",
+        "missingCorrelation": "RECORD_UNCORRELATED"
+      }
+    }
+  }
+}

@@ -29,6 +29,7 @@ services:
       FIXTURES: /home/wiremock
       JAVA_TOOL_OPTIONS: -Xms256m -Xmx3g -XX:+ExitOnOutOfMemoryError -Xlog:gc:stdout:time,level,tags
       WIREMOCK_ACCEPT_BACKLOG: ${WIREMOCK_ACCEPT_BACKLOG:?set positive accept backlog}
+      CAPTURE_IDENTITY_MODE: ${CAPTURE_IDENTITY_MODE:?set BENCHMARK_HEADERS or STUB_JSON}
       RABBIT_QUEUE_TYPE: ${RABBIT_QUEUE_TYPE:?set classic or quorum}
       CAPTURE_CONFIRM_TIMEOUT_MS: ${CAPTURE_CONFIRM_TIMEOUT_MS:?set positive confirmation
         deadline}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build both direct-capture images locally; do not publish or deploy them.
+"""Build both direct-capture mocks and their matching archive; do not publish or deploy.
 
 Responsibility: package the current capture jar over explicitly locked runtime bases.
 Must not: substitute old capture images, push images or modify running services.
@@ -19,16 +19,18 @@ def main():
     parser.add_argument('--prefix', required=True, help='Image prefix, e.g. ghcr.io/timaday/wiremock-lab')
     parser.add_argument('--tag', required=True, help='New unique tag for this build')
     args = parser.parse_args()
-    subprocess.run(['mvn', '-B', '-ntp', 'package'], cwd=ROOT, check=True)
+    build_directory = ROOT / 'target/direct-maven'
+    subprocess.run(['mvn', '-B', '-ntp', f'-Dbenchmark.build.directory={build_directory}', 'package'],
+                   cwd=ROOT, check=True)
     context = ROOT / 'target/direct-image'
     context.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ROOT / 'target/capture.jar', context / 'capture.jar')
+    shutil.copyfile(build_directory / 'capture.jar', context / 'capture.jar')
     lock = json.loads((ROOT / 'deploy/portainer/image-lock.json').read_text())
     build_args = []
-    for runtime in ('official', 'headless'):
+    for runtime in ('official', 'headless', 'archive'):
         build_args += ['--build-arg', f'{runtime.upper()}_BASE={lock["images"][runtime]["reference"]}']
     images = {}
-    for runtime in ('official', 'headless'):
+    for runtime in ('official', 'headless', 'archive'):
         image = f'{args.prefix}-{runtime}:{args.tag}'
         subprocess.run(['docker', 'build', '--file', str(Path(__file__).with_name('Dockerfile')),
                         '--target', f'direct-{runtime}', *build_args,

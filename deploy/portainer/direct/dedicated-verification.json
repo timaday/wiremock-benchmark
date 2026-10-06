@@ -1,0 +1,40 @@
+{
+  "verifiedAtUtc": "2026-10-06T12:05:19.659766+00:00",
+  "scope": "Local Docker bridge smoke with pinned images; Swarm parser validation only",
+  "runtimeResults": [
+    {
+      "runtime": "headless",
+      "requestsReconciled": 24,
+      "eventsReconciled": 72,
+      "brokerRestartRetainedEvents": 36,
+      "overflowFailedClosedExit": 70,
+      "overflowRetainedMessages": 1,
+      "passed": true
+    },
+    {
+      "runtime": "official",
+      "requestsReconciled": 24,
+      "eventsReconciled": 72,
+      "brokerRestartRetainedEvents": 36,
+      "overflowFailedClosedExit": 70,
+      "overflowRetainedMessages": 1,
+      "passed": true
+    }
+  ],
+  "portainerRegressionTestsPassed": 14,
+  "hiveforgeRegressionTestsPassed": 6,
+  "generatedStacksReproducible": true,
+  "awsDeploymentTested": false,
+  "fullRateOrHourQualified": false,
+  "sha256": {
+    "deploy/portainer/stack-direct-headless-rabbit.yml": "14d17607eb068f30dbe630b8a806ad39f749cd75b3ef2fc48ec6de17644d763f",
+    "deploy/portainer/stack-direct-official-rabbit.yml": "ff808c5b3c562d733cc1f1a88a96364709b74989ed92f33bad622fa03b7e2336",
+    "deploy/portainer/direct/rabbit-bootstrap.sh": "dfc05af59d16e6c8a03578108992c6762d74e7e75929fd30fa8ab1d32daad3af",
+    "deploy/portainer/direct/dedicated-smoke.py": "7fd45c4dfe4f7aa98ea143bd6aa6022554d783ca76a6d76fbe237bd0a45022a0",
+    "results/direct-dedicated-20261006-final/headless/clients.json": "8c6453324f4f3889f1ede93d24efd79c3ef191eb831f04adc6b65b9881bb922c",
+    "results/direct-dedicated-20261006-final/official/clients.json": "875153dd72fc62cca6fafd13cc20d4cc310ef11025df0a95cf4683e0c919981a",
+    "results/direct-dedicated-20261006-final/headless/restart-clients.json": "583bcb9a53c312e92f27899e95300f8c4637af02bd7b1a9cb0c55186f4e3c089",
+    "results/direct-dedicated-20261006-final/official/restart-clients.json": "8ed164f2d24a5b6699f9907a801ead084dbf35c8045abe6a506218546ffbde4a",
+    "results/direct-dedicated-20261006-final/verification.json": "66a63f939c1201550b46d0f606a2d4df8e678c78013a9cc1630d9b40ececb573"
+  }
+}

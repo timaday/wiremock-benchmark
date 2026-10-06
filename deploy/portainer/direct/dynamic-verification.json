@@ -1,0 +1,121 @@
+{
+  "verifiedAtUtc": "2026-10-06T14:46:24.939515+00:00",
+  "captureSchemaVersion": 2,
+  "images": {
+    "official": {
+      "tag": "wiremock-dynamic-official:20261006-1",
+      "id": "sha256:6a078e6f5ea3cc1cdd204c2807989cad33c081943033b2e6d1ef88f9db1a0c18"
+    },
+    "headless": {
+      "tag": "wiremock-dynamic-headless:20261006-1",
+      "id": "sha256:1fed1c931c3dfeceb6fd117a337883c853867bc4ab88d0f42f34770c26225562"
+    },
+    "archive": {
+      "tag": "wiremock-dynamic-archive:20261006-1",
+      "id": "sha256:f9ec079bb167b4ed095c9a56f70e805c7e8794408b81d7ae864ebfb2897cd596"
+    }
+  },
+  "published": false,
+  "dynamic": [
+    {
+      "runtime": "headless",
+      "requestsReconciled": 12,
+      "eventsReconciled": 36,
+      "emptyResponsesVerified": 11,
+      "liveFieldChange": true,
+      "invalidEditRejected": true,
+      "missingAndInvalidCorrelationCaptured": true,
+      "duplicateIdsRemainDistinct": true,
+      "oversizeRejected": true,
+      "restarts": 0,
+      "passed": true
+    },
+    {
+      "runtime": "official",
+      "requestsReconciled": 12,
+      "eventsReconciled": 36,
+      "emptyResponsesVerified": 11,
+      "liveFieldChange": true,
+      "invalidEditRejected": true,
+      "missingAndInvalidCorrelationCaptured": true,
+      "duplicateIdsRemainDistinct": true,
+      "oversizeRejected": true,
+      "restarts": 0,
+      "passed": true
+    }
+  ],
+  "headerRegression": [
+    {
+      "runtime": "headless",
+      "requestsReconciled": 24,
+      "eventsReconciled": 72,
+      "brokerRestartRetainedEvents": 36,
+      "overflowFailedClosedExit": 70,
+      "overflowRetainedMessages": 1,
+      "passed": true
+    },
+    {
+      "runtime": "official",
+      "requestsReconciled": 24,
+      "eventsReconciled": 72,
+      "brokerRestartRetainedEvents": 36,
+      "overflowFailedClosedExit": 70,
+      "overflowRetainedMessages": 1,
+      "passed": true
+    }
+  ],
+  "mavenTests": {
+    "passed": 31,
+    "skipped": 0
+  },
+  "portainerTestsPassed": 14,
+  "hiveforgeTestsPassed": 6,
+  "runtimeScope": "Local Docker bridge; real persistent RabbitMQ and archive; no AWS or full-rate qualification",
+  "sha256": {
+    "src/main/java/bench/Archive.java": "6c8d04e5c1df20fff938d9b7435454706406f32c4ae53d926fe6eaa422891fbc",
+    "src/main/java/bench/CaptureAdmission.java": "e9293e4d27670032e9d38429c73f89c154f97a3dbfba6214ab82e3a390a36a8b",
+    "src/main/java/bench/CaptureCodec.java": "7ff4c8427f913ce6c8a39ec65e0427511c372d833a6eef2ad849a26076ee3b2c",
+    "src/main/java/bench/CaptureDiagnostics.java": "0c1fc945c8204b7e9d5c2a500a8876e2fe4fec6f8e47f0f6b6c7afb626154a73",
+    "src/main/java/bench/CaptureEvent.java": "c55572e0133a244502bbf3193cc4f4b1f6b52b56038d4bea040ba5452d15cfa9",
+    "src/main/java/bench/CaptureEventFactory.java": "3038a9aa7ac1b49a1c172aa5998848f723cf6f7321d98ae97ea04e6aee24c773",
+    "src/main/java/bench/CaptureExtension.java": "95b9c5718ba5b0b6794ec622fe2709316b608c4d57f00e10d9ea00d2d5706948",
+    "src/main/java/bench/CaptureIdentity.java": "dca68702d123f96ef44e6aca744760ca56e8b6f9f1bd801897fa9e7cdb797b3c",
+    "src/main/java/bench/CaptureIdentityMode.java": "abfcdabd335916ea8f00d7f6b9a6b7499479124379a5c76f1c76145d7a6ede81",
+    "src/main/java/bench/CaptureIdentitySnapshot.java": "5598afdf081cc33fa1fa1bce92a9a6a82b77f291e3ee965907e0fff4adb833c7",
+    "src/main/java/bench/CaptureLifecycle.java": "50b4d4e9a6850432fe721917006991d29bf9b676a51928e7d1673cdf4405cc23",
+    "src/main/java/bench/CaptureMode.java": "3265f23dccb2200c2352f370cdbdc1c9ed51710b1df955fa2bb332e21f86f719",
+    "src/main/java/bench/CaptureRequestPolicy.java": "10aa6e302fc8b053c74ff8c3bc22ec63226d7f348db14f6ce417221516261f51",
+    "src/main/java/bench/CaptureSink.java": "ec0a50956475ed762f27c7c85a7759bc83b4247f200a178fcdc0fcbb62a56b54",
+    "src/main/java/bench/CaptureSnapshot.java": "663012cfdc6d66177055fc2a7a6aa8ba275b9f60939425a72c3c168ed9c19d12",
+    "src/main/java/bench/ConfirmedCaptureBatch.java": "52a44caae5d029abca032553261e1fe46e86cb7bc36e33f4fd6605e7fc605ae6",
+    "src/main/java/bench/CorrelationStatus.java": "4e09fd4e7ad98ba1fb86b4b594227408a046863d4f27b6c877e6c5d3a8f19947",
+    "src/main/java/bench/DirectCaptureOperation.java": "6058740edb192bef01911fc6ea75374f4bf6e7d606e80395e58d13ee8e4a3864",
+    "src/main/java/bench/DirectRabbitCaptureSink.java": "14b4d2a0c9ed4c159ada4524b25531cfd7bc9bc815bf7d7eeabc1189cee752bb",
+    "src/main/java/bench/DurableOutbox.java": "e9ae680ae4ac8798a5f132415a9ded03e999211a825c98c671332faf9ecd12ae",
+    "src/main/java/bench/DurationMetric.java": "9b78a10f16f17f629e57dcb13f77ec86bfba575d37e291ca37e6ec40cf1e4c45",
+    "src/main/java/bench/Headless.java": "b4a21f2a619ac401fe0177a300b25c7643b86162c493f82decc11e78a58f4ff3",
+    "src/main/java/bench/HttpMetrics.java": "07030358b99276104173d593a45405d67186c4f29e9866779cd7906ecb67a780",
+    "src/main/java/bench/Json.java": "3036b8da3b769084c63aa40add128baf082b4a890989d4f5d8c7ca92672aa614",
+    "src/main/java/bench/JvmMetrics.java": "25fc1cf6a31b6fe1a8af9cec13271e0fb371fb4ce7de0c9a58e39191cd863caa",
+    "src/main/java/bench/MetricsServer.java": "363a7d8e5bc281fa122c66017f49c8ce69ad0ebb7962f43c7d56cc91af087c74",
+    "src/main/java/bench/MissingCorrelationPolicy.java": "404cd04181dd0b9d0c004bafbd271f543b62ad999aa810c020a554b32e61028a",
+    "src/main/java/bench/OutboxCaptureSink.java": "a416d8500365779b1cb1d68fb2a7edd26df7356638d0fef9e1a71c41eaf1c14e",
+    "src/main/java/bench/OutboxRow.java": "3d3b392d23d07ed0c48966a007f016eac7738fffa2aa0dfd854a5703fa4afd92",
+    "src/main/java/bench/Phase.java": "175b02a4349a43ddbec4abdcd7b894748cdc572963b6560d6cd66e54a088df4c",
+    "src/main/java/bench/RabbitCaptureBatch.java": "8613f7a2f2882b3d438b775f84a3d2ea1779e8582414c8b496201c8cf8757b8d",
+    "src/main/java/bench/RabbitPublisher.java": "036d6fcb661a604f1fd4d19c2a3bc4b031dee563b0b092654e7b74a932ca559a",
+    "src/main/java/bench/RabbitQueueType.java": "4151cea25be658eba2ffb5cbaedb920b754039aa2ea70f5cc0f126a674b3f326",
+    "src/main/java/bench/RequestCorrelation.java": "72524d09ec7d627218c9658d197d5f40ae13f9e5c5144bb52dbd38bdf0405a7c",
+    "src/main/java/bench/Settings.java": "f20239bd12ba18690b8d137611b709c17726b6bea6652e72779ee81dd12ea81d",
+    "src/main/java/bench/StubCaptureRule.java": "91c985d5d58e52de46d4da85892e1fb438aa051b649ed1cb040e559cfa651fcb",
+    "pom.xml": "5481b7a6bf009e610f68c1a687489062f0ca898f60678cc8b07d5a0847ac0d0b",
+    "deploy/portainer/direct/Dockerfile": "5dd37c88ec7a34c1519724342bccdeb0155ad78c71f7d60cd3a4fc8a55222b22",
+    "target/direct-maven/capture.jar": "d97901c178d9a067bed0d6e23c7980dd994afe37d026f5e8ce8eef0b40050224",
+    "results/direct-dynamic-20261006-final/verification.json": "0e24f2d0cb4052a6fb81aaa00a17641627fdb4651a4bd855c16903580be37579",
+    "results/direct-dynamic-headers-20261006/verification.json": "66a63f939c1201550b46d0f606a2d4df8e678c78013a9cc1630d9b40ececb573",
+    "results/direct-dynamic-20261006-final/headless/captured-events.json": "4a23ca83406d6e2823dbc81cb6242b492ca62298391f718dbf88474d90f786d5",
+    "results/direct-dynamic-20261006-final/official/captured-events.json": "99f3ae0abecb42b900f29ce060b3c459277af6ef35ff833223b7c4cdd6c24154",
+    "results/direct-dynamic-20261006-final/headless/client-results.json": "92765b7d164bfe04eed8cbc8fb1564e8da656f4c77083c4b3e5804fe35c387c8",
+    "results/direct-dynamic-20261006-final/official/client-results.json": "50556d863fd96259648f9c4985a531930451754e975e596f2159264d15d949ae"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "finishedAt": "2026-10-06T16:07:37.272888+00:00",
+  "scope": "Local headless, direct RabbitMQ and persistent archive, one-second delay, five-minute hold; not AWS/Swarm or one-hour qualification",
+  "result": {
+    "passed": true,
+    "runtime": "headless",
+    "delayMs": 1000,
+    "holdSeconds": 300,
+    "noRestartsOrOOM": true,
+    "finalQueueMessages": 0,
+    "phases": [
+      {
+        "requests": 100,
+        "events": 300,
+        "failedRequests": 0,
+        "missingCaptures": 0,
+        "extraCaptures": 0,
+        "exactBodyHashesVerified": true,
+        "successfulCompletionsPerSecondByHoldMinute": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "latencyMs": {
+          "p50": 1030,
+          "p95": 1043,
+          "p99": 1240,
+          "max": 1240
+        },
+        "runId": "dynamic-smoke-0234160218f64c7db2b4c1ab0f9560ed",
+        "phase": "smoke",
+        "offeredRate": 10,
+        "field": "correlationId",
+        "minimumAvailableGiB": 8.57650375366211,
+        "swapInPages": 24,
+        "swapOutPages": 0,
+        "maximumQueueMessages": 0
+      },
+      {
+        "requests": 344257,
+        "events": 1032771,
+        "failedRequests": 0,
+        "missingCaptures": 0,
+        "extraCaptures": 0,
+        "exactBodyHashesVerified": true,
+        "successfulCompletionsPerSecondByHoldMinute": [
+          1020.4166666666666,
+          1019.8666666666667,
+          1020.15,
+          1019.6666666666666,
+          1020.0
+        ],
+        "latencyMs": {
+          "p50": 1023,
+          "p95": 1041,
+          "p99": 1073,
+          "max": 1174
+        },
+        "runId": "dynamic-hold-4e4e4101df044b958f11ce2f21cc8974",
+        "phase": "hold",
+        "offeredRate": 1020,
+        "field": "requestId",
+        "minimumAvailableGiB": 7.452178955078125,
+        "swapInPages": 4463,
+        "swapOutPages": 27740,
+        "maximumQueueMessages": 96
+      }
+    ]
+  },
+  "resources": {
+    "cpu": {
+      "headless": {
+        "meanCores": 0.66062,
+        "maximumSampledCores": 0.7243
+      },
+      "rabbit": {
+        "meanCores": 0.25052,
+        "maximumSampledCores": 1.1315
+      },
+      "archive": {
+        "meanCores": 0.20633666666666667,
+        "maximumSampledCores": 0.22519999999999998
+      }
+    },
+    "heapUsedMiB": {
+      "minimum": 241.872314453125,
+      "maximum": 566.843879699707
+    },
+    "maxHostMemoryFullAvg10": 0.0,
+    "hostSwapInMiB": 17.43359375,
+    "hostSwapOutMiB": 108.359375,
+    "note": "Host-wide swap activity includes unrelated workloads; no claim of zero paging."
+  },
+  "images": {
+    "official": {
+      "tag": "wiremock-dynamic-official:20261006-1",
+      "id": "sha256:6a078e6f5ea3cc1cdd204c2807989cad33c081943033b2e6d1ef88f9db1a0c18"
+    },
+    "headless": {
+      "tag": "wiremock-dynamic-headless:20261006-1",
+      "id": "sha256:1fed1c931c3dfeceb6fd117a337883c853867bc4ab88d0f42f34770c26225562"
+    },
+    "archive": {
+      "tag": "wiremock-dynamic-archive:20261006-1",
+      "id": "sha256:f9ec079bb167b4ed095c9a56f70e805c7e8794408b81d7ae864ebfb2897cd596"
+    }
+  },
+  "captureJarSha256": "d97901c178d9a067bed0d6e23c7980dd994afe37d026f5e8ce8eef0b40050224",
+  "evidenceRoot": "results/direct-dynamic-load-20261006-2",
+  "evidenceSha256": {
+    "verification.json": "9273c4f52c82d120faecb05f390dfb398a67a8c4a4ee7fbfb6a56637c5c53b0f",
+    "hold/clients.csv": "ab783994488d87811950c65eb0453555e62d5d78a60050175d8c22b109b345ba",
+    "hold/samples.jsonl": "fca1eac87f438f601f6523870d8a4df5348f9760db704adde9f3001b4b2a4632",
+    "smoke/clients.csv": "c0eb028c91615fe8558593e8ec4ffb28d4f08b8d8f6af06f624aed0ee4b10be8",
+    "final-state.json": "983b4cba1bd401bf0aa1e826f7843ed6fa3bc8778303b871be7e15a7154da667",
+    "final-metrics.txt": "79eb92c92df288d913733202ecde75c8df008144479fb4fff4c6ce31c2b7f15b",
+    "archive/events.db": "db0b6110affbf2d07ae0defab6cdde771180e55b1c7d621fa171a450626640b9",
+    "resource-summary.json": "c94dd3c04343fedd79a3a5b309c43db0bec8db555fddf8d940f8fbf033925fdc"
+  },
+  "sourceSha256": {
+    "deploy/portainer/direct/dynamic-load.py": "3dbe4ff0f514db400fe7b089f69184d2292143b09b9174718d4a4c9903ee454e",
+    "deploy/portainer/direct/dedicated-smoke.py": "8e8e5952ff1ba4a15ca7f7f83248e8ddd4e3ec276681b88e936122c8989278c0",
+    "deploy/portainer/direct/test_dynamic_load.py": "dbf8177da895f0f62a39af2a5251dc73357b9200cfca501b9127e79f550d842e",
+    "tests/perf/gatling/DYNAMIC.md": "783a2eda8421650122ded83d67f943aa900fab652881abe73b9dd4d2bbe0c453",
+    "tests/perf/gatling/src/main/java/bench/load/DynamicCaptureSimulation.java": "da1b12e14286109cc0e2193008d1de1ba9eb7c349fdc81d1201a1c34c67e410f",
+    "tests/perf/gatling/src/main/java/bench/load/DynamicCaptureJournal.java": "37492032c47ade15faaa08722ff632daf426b4031b4496d2ecb6a43c493bd4d8",
+    "tests/perf/gatling/src/main/resources/logback.xml": "da939d80d0388fb01233a42602c1c7b3226da0380e86b0699322dfadc492543d"
+  },
+  "checks": {
+    "reconciliationOracleTests": 4,
+    "portainerRenderTests": 14
+  },
+  "discardedAttempt": {
+    "path": "results/direct-dynamic-load-20261006-1",
+    "reason": "Stopped during warmup to disable unintended Gatling HTTP debug logging; not a qualifying run."
+  }
+}

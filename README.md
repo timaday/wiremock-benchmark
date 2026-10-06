@@ -18,6 +18,11 @@ For a mock with no writable persistent volume, use the separate
 [direct RabbitMQ headless/official stacks](deploy/portainer/DIRECT-RABBIT.md).
 They require new images and make RabbitMQ confirmation the capture durability
 boundary; there is no local broker-outage buffer.
+The [direct capture + dedicated RabbitMQ + archive variation](deploy/portainer/DIRECT-WITH-RABBIT.md)
+isolates capture from PocketHive's broker and supports a laptop-hosted generator.
+The [dynamic correlation guide](docs/DYNAMIC-CAPTURE.md) describes version-2
+capture metadata configured per stub, including header-free requests and empty
+HTTP responses. This requires matching new mock/archive builds.
 
 For HiveForge v0.5.9, use the [HiveForge lab deployment](docs/HIVEFORGE.md):
 the same seven services, public lab credentials and no Docker secrets.
@@ -157,7 +162,8 @@ To run the embedded launcher directly, build with `mvn package`, place the pinne
 WireMock standalone3.13.2 jar beside `target/capture.jar`, and run on JDK27:
 
 ```sh
-CAPTURE_MODE=OUTBOX CAPTURE_ENABLED=true OUTBOX_PATH=/absolute/outbox.db \
+CAPTURE_MODE=OUTBOX CAPTURE_ENABLED=true CAPTURE_IDENTITY_MODE=BENCHMARK_HEADERS \
+OUTBOX_PATH=/absolute/outbox.db \
 RABBIT_URI=amqp://benchmark:benchmark@localhost:5672/%2f RABBIT_QUEUE=captures \
 FIXTURES=/absolute/fixtures WIREMOCK_ACCEPT_BACKLOG=4096 \
 java --enable-native-access=ALL-UNNAMED -Xmx3g \

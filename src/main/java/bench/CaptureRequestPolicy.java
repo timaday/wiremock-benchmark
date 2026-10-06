@@ -19,8 +19,21 @@ final class CaptureRequestPolicy {
     if (!isBenchmark(request)) return CaptureAdmission.ACCEPTED;
     if (!validHeader(request, REQUEST_ID) || !validHeader(request, RUN_ID))
       return CaptureAdmission.INVALID_CORRELATION;
-    if (request.getBody().length > MAX_REQUEST_BYTES) return CaptureAdmission.REQUEST_TOO_LARGE;
+    if (oversized(request)) return CaptureAdmission.REQUEST_TOO_LARGE;
     return CaptureAdmission.ACCEPTED;
+  }
+
+  static CaptureAdmission evaluate(Request request, CaptureIdentityMode mode) {
+    return switch (mode) {
+      case BENCHMARK_HEADERS -> evaluate(request);
+      case STUB_JSON -> oversized(request)
+          ? CaptureAdmission.REQUEST_TOO_LARGE : CaptureAdmission.ACCEPTED;
+    };
+  }
+
+  private static boolean oversized(Request request) {
+    byte[] body = request.getBody();
+    return body != null && body.length > MAX_REQUEST_BYTES;
   }
 
   private static boolean validHeader(Request request, String name) {

@@ -18,7 +18,13 @@ DIRECT = {
     'POCKETHIVE_RABBIT_URI': 'amqp://test:test@pockethive-rabbit:5672/bench',
     'POCKETHIVE_NETWORK': 'pockethive-overlay', 'RABBIT_QUEUE_TYPE': 'classic',
     'CAPTURE_CONFIRM_TIMEOUT_MS': '10000',
+    'CAPTURE_IDENTITY_MODE': 'BENCHMARK_HEADERS',
 }
+DEDICATED = dict(DIRECT, ARCHIVE_IMAGE='example.invalid/archive@sha256:' + 'a' * 64,
+                 RABBIT_NODE='broker-worker', ARCHIVE_NODE='archive-worker',
+                 RABBIT_DATA_DIR='/srv/test/rabbit', ARCHIVE_DATA_DIR='/srv/test/archive',
+                 RABBIT_PASSWORD='a' * 48, CAPTURE_QUEUE_MAX_BYTES='1073741824',
+                 CAPTURE_QUEUE_MAX_MESSAGES='200000', RABBIT_DISK_FREE_LIMIT_BYTES='5368709120')
 
 class SwarmConfigurationTest(unittest.TestCase):
     def test_stack_lists_are_indented_beneath_their_keys(self):
@@ -31,7 +37,7 @@ class SwarmConfigurationTest(unittest.TestCase):
                                            len(line) - len(line.lstrip()))
 
     def render(self, file, **settings):
-        excluded = {'RABBIT_PASSWORD', 'POCKETHIVE_RABBIT_URI', *DISTRIBUTED, *DIRECT}
+        excluded = {'RABBIT_PASSWORD', 'POCKETHIVE_RABBIT_URI', *DISTRIBUTED, *DIRECT, *DEDICATED}
         env = {k:v for k,v in os.environ.items() if k not in excluded}
         env.update(LAB_NODE='test-node', CAPTURE_PREFIX='test-capture', GRAFANA_PASSWORD='test-only-grafana', WIREMOCK_ACCEPT_BACKLOG='4096')
         env.update(settings)
@@ -147,7 +153,7 @@ class SwarmConfigurationTest(unittest.TestCase):
     def test_direct_stacks_require_new_image_and_explicit_broker_configuration(self):
         for runtime in ('official', 'headless'):
             for missing in ('POCKETHIVE_RABBIT_URI', 'POCKETHIVE_NETWORK', 'RABBIT_QUEUE_TYPE',
-                            'CAPTURE_CONFIRM_TIMEOUT_MS', runtime.upper() + '_DIRECT_IMAGE'):
+                            'CAPTURE_CONFIRM_TIMEOUT_MS', 'CAPTURE_IDENTITY_MODE', runtime.upper() + '_DIRECT_IMAGE'):
                 with self.subTest(runtime=runtime, missing=missing):
                     settings = dict(DIRECT)
                     del settings[missing]
@@ -162,6 +168,65 @@ class SwarmConfigurationTest(unittest.TestCase):
             result = self.render(f'stack-direct-{runtime}.yml', **example)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(yaml.safe_load(result.stdout)['services'][runtime]['ports'][0]['published'], port)
+
+    def test_dedicated_broker_stacks_isolate_capture_and_preserve_local_state(self):
+        for runtime in ('official', 'headless'):
+            result = self.render(f'stack-direct-{runtime}-rabbit.yml', **DEDICATED)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = yaml.safe_load(result.stdout)
+            services = config['services']
+            self.assertEqual(set(services), {runtime, 'rabbit', 'archive'})
+            self.assertEqual(config['networks']['capture']['driver'], 'overlay')
+            self.assertNotIn('external', config['networks']['capture'])
+            mock, broker, archive = (services[key] for key in (runtime, 'rabbit', 'archive'))
+            self.assertTrue(mock['read_only'])
+            self.assertEqual(mock['environment']['CAPTURE_MODE'], 'DIRECT_RABBIT')
+            self.assertEqual(mock['environment']['RABBIT_QUEUE_TYPE'], 'classic')
+            self.assertEqual(mock['environment']['RABBIT_URI'], archive['environment']['RABBIT_URI'])
+            self.assertIn('@rabbit:5672/', mock['environment']['RABBIT_URI'])
+            self.assertEqual(mock['environment']['RABBIT_QUEUE'], archive['environment']['RABBIT_QUEUE'])
+            self.assertEqual(broker['hostname'], 'rabbit')
+            self.assertEqual(broker['environment']['RABBITMQ_NODENAME'], 'rabbit@rabbit')
+            self.assertEqual({p['target'] for p in broker['ports']}, {15672})
+            # Alarms must block publishing without creating a broker restart loop.
+            self.assertNotIn('check_local_alarms', ' '.join(broker['healthcheck']['test']))
+            for service, source, node in ((broker, '/srv/test/rabbit', 'broker-worker'),
+                                          (archive, '/srv/test/archive', 'archive-worker')):
+                self.assertEqual(service['volumes'][0]['source'], source)
+                self.assertEqual(service['volumes'][0]['type'], 'bind')
+                self.assertEqual(service['deploy']['placement']['constraints'], ['node.hostname == ' + node])
+                self.assertEqual(service['deploy']['update_config']['order'], 'stop-first')
+                self.assertIn('@sha256:', service['image'])
+
+    def test_dedicated_stacks_require_storage_and_safety_limits(self):
+        for missing in ('ARCHIVE_IMAGE', 'RABBIT_NODE', 'ARCHIVE_NODE', 'RABBIT_DATA_DIR', 'ARCHIVE_DATA_DIR',
+                        'RABBIT_PASSWORD', 'CAPTURE_QUEUE_MAX_BYTES', 'CAPTURE_QUEUE_MAX_MESSAGES',
+                        'RABBIT_DISK_FREE_LIMIT_BYTES'):
+            settings = dict(DEDICATED)
+            del settings[missing]
+            result = self.render('stack-direct-headless-rabbit.yml', **settings)
+            self.assertNotEqual(result.returncode, 0, missing)
+            self.assertIn(missing, result.stderr)
+
+    def test_bootstrap_rejects_invalid_values_before_writing_configuration(self):
+        for variable, value in [('RABBIT_PASSWORD', 'unsafe"password'), ('RABBIT_PASSWORD', 'abc'),
+                                ('CAPTURE_QUEUE_MAX_MESSAGES', '0'), ('CAPTURE_QUEUE_MAX_BYTES', '-1'),
+                                ('RABBIT_DISK_FREE_LIMIT_BYTES', '05')]:
+            env = dict(os.environ, **DEDICATED)
+            env[variable] = value
+            result = subprocess.run(['/bin/sh', str(ROOT / 'direct/rabbit-bootstrap.sh')],
+                                    env=env, text=True, capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertNotIn(value, result.stderr)
+
+    def test_dedicated_embedded_bootstrap_matches_canonical_source(self):
+        source = (ROOT / 'direct/rabbit-bootstrap.sh').read_text()
+        for runtime in ('official', 'headless'):
+            config = yaml.safe_load((ROOT / f'stack-direct-{runtime}-rabbit.yml').read_text())
+            embedded = config['services']['rabbit']['command'][0]
+            self.assertEqual(embedded, source.replace('$', '$$'))
+            self.assertIn('"overflow":"reject-publish"', source)
+            self.assertNotIn('drop-head', source)
 
 if __name__ == '__main__':
     unittest.main()

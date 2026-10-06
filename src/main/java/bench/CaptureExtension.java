@@ -2,7 +2,9 @@ package bench;
 
 import com.github.tomakehurst.wiremock.extension.*;
 import com.github.tomakehurst.wiremock.extension.requestfilter.*;
-import com.github.tomakehurst.wiremock.http.HttpHeaders;
+import com.github.tomakehurst.wiremock.common.Errors;
+import com.github.tomakehurst.wiremock.common.InvalidInputException;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
@@ -15,13 +17,15 @@ import java.util.concurrent.atomic.AtomicLong;
  * Must not: serve metric projections or perform broker IO on callback threads.
  * Contract: docs/CONTRACT.md and docs/PORTAINER.md.
  */
-public final class CaptureExtension implements ServeEventListener, StubRequestFilterV2 {
+public final class CaptureExtension implements ServeEventListener, StubRequestFilterV2, StubLifecycleListener {
   private CaptureSink sink;
   private MetricsServer metrics;
   private final HttpMetrics http = new HttpMetrics();
   private final AtomicLong errors = new AtomicLong();
   private final AtomicLong rejected = new AtomicLong();
   private boolean enabled;
+  private CaptureIdentityMode identityMode;
+  private CaptureLifecycle lifecycle;
 
   public String getName() {
     return "durable-rabbit-capture";
@@ -34,11 +38,13 @@ public final class CaptureExtension implements ServeEventListener, StubRequestFi
         throw new IllegalArgumentException("CAPTURE_ENABLED must be true or false");
       enabled = Boolean.parseBoolean(setting);
       if (enabled) {
+        identityMode = CaptureIdentityMode.valueOf(Settings.required("CAPTURE_IDENTITY_MODE"));
         sink = switch (CaptureMode.valueOf(Settings.required("CAPTURE_MODE"))) {
           case OUTBOX -> new OutboxCaptureSink(Path.of(Settings.required("OUTBOX_PATH")));
           case DIRECT_RABBIT -> DirectRabbitCaptureSink.configured();
         };
       }
+      if (enabled) lifecycle = new CaptureLifecycle(identityMode, sink, http, errors);
       metrics = new MetricsServer(sink, errors, rejected, http);
     } catch (Exception e) {
       if (sink != null) {
@@ -49,7 +55,7 @@ public final class CaptureExtension implements ServeEventListener, StubRequestFi
   }
 
   public RequestFilterAction filter(Request request, ServeEvent event) {
-    var admission = enabled ? CaptureRequestPolicy.evaluate(request) : CaptureAdmission.ACCEPTED;
+    var admission = enabled ? CaptureRequestPolicy.evaluate(request, identityMode) : CaptureAdmission.ACCEPTED;
     if (admission == CaptureAdmission.ACCEPTED) return RequestFilterAction.continueWith(request);
     rejected.incrementAndGet();
     return RequestFilterAction.stopWith(ResponseDefinitionBuilder.responseDefinition()
@@ -58,63 +64,33 @@ public final class CaptureExtension implements ServeEventListener, StubRequestFi
   }
 
   public void beforeMatch(ServeEvent event, Parameters parameters) {
-    if (isBenchmark(event)) http.received();
-    capture(event, Phase.REQUEST);
+    if (enabled) lifecycle.beforeMatch(event);
+    else if (CaptureRequestPolicy.isBenchmark(event.getRequest())) http.received();
+  }
+
+  public void afterMatch(ServeEvent event, Parameters parameters) {
+    if (enabled) lifecycle.afterMatch(event);
   }
 
   public void beforeResponseSent(ServeEvent event, Parameters parameters) {
-    capture(event, Phase.RESPONSE_PREPARED);
+    if (enabled) lifecycle.beforeResponseSent(event);
   }
 
   public void afterComplete(ServeEvent event, Parameters parameters) {
-    capture(event, Phase.SEND_COMPLETED);
-    if (isBenchmark(event))
+    if (enabled) lifecycle.afterComplete(event);
+    else if (CaptureRequestPolicy.isBenchmark(event.getRequest()))
       http.completed(event.getResponse().getStatus(), event.getTiming().getTotalTime());
   }
 
-  private boolean isBenchmark(ServeEvent event) {
-    return CaptureRequestPolicy.isBenchmark(event.getRequest())
-        && (!enabled || CaptureRequestPolicy.evaluate(event.getRequest()) == CaptureAdmission.ACCEPTED);
-  }
+  public void beforeStubCreated(StubMapping mapping) { validate(mapping); }
 
-  private void capture(ServeEvent event, Phase phase) {
-    if (!enabled || !isBenchmark(event)) return;
-    try {
-      var request = event.getRequest();
-      String requestId = request.getHeader(CaptureRequestPolicy.REQUEST_ID);
-      String runId = request.getHeader(CaptureRequestPolicy.RUN_ID);
-      String id = event.getId() + ":" + phase;
-      byte[] body =
-          phase == Phase.REQUEST
-              ? request.getBody()
-              : phase == Phase.RESPONSE_PREPARED ? event.getResponse().getBody() : new byte[0];
-      HttpHeaders headers =
-          phase == Phase.REQUEST
-              ? request.getHeaders()
-              : phase == Phase.RESPONSE_PREPARED
-                  ? event.getResponse().getHeaders()
-                  : new HttpHeaders();
-      var values = new LinkedHashMap<String, List<String>>();
-      for (var header : headers.all()) values.put(header.key(), header.values());
-      var record =
-          new CaptureEvent(
-              id,
-              runId,
-              requestId,
-              phase,
-              System.currentTimeMillis(),
-              request.getMethod().getName(),
-              request.getUrl(),
-              phase == Phase.REQUEST ? 0 : event.getResponse().getStatus(),
-              values,
-              Base64.getEncoder().encodeToString(body));
-      sink.append(id, CaptureCodec.encode(record));
-    } catch (Throwable failure) {
-      errors.incrementAndGet();
-      System.err.println(
-          "FATAL: durable capture unavailable (" + failure.getClass().getSimpleName()
-              + "); terminating rather than silently losing records");
-      Runtime.getRuntime().halt(70);
+  public void beforeStubEdited(StubMapping before, StubMapping after) { validate(after); }
+
+  private void validate(StubMapping mapping) {
+    if (!StubCaptureRule.selected(mapping.getResponse())) return;
+    try { StubCaptureRule.parse(mapping.getResponse()); }
+    catch (IllegalArgumentException e) {
+      throw new InvalidInputException(Errors.singleWithDetail(400, "Invalid capture configuration", e.getMessage()));
     }
   }
 

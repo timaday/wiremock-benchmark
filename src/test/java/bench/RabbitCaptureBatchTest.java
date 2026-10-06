@@ -34,7 +34,7 @@ class RabbitCaptureBatchTest {
       var transport = new RabbitCaptureBatch(connection, channel, queue);
       byte[] body = new byte[50 * 1024];
       new Random(29).nextBytes(body);
-      var event = new CaptureEvent("id", "run", "request", Phase.REQUEST, 123,
+      var event = new CaptureEvent(2, "id", "run", "request", "request", CorrelationStatus.PRESENT, Phase.REQUEST, 123,
           "POST", "/bench/test", 0, Map.of("X-Test", List.of("one", "two")),
           Base64.getEncoder().encodeToString(body));
       transport.publish(List.of(new OutboxRow(event.eventId(), CaptureCodec.encode(event))), 3000);

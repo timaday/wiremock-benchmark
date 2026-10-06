@@ -8,6 +8,14 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 
 class CaptureRequestPolicyTest {
+  @Test void stubModeAcceptsRequestsWithoutHeadersOnAnyStubPathButBoundsBodySize() {
+    for (String path : List.of("/transaction", "/bench/custom")) {
+      assertEquals(CaptureAdmission.ACCEPTED,
+          CaptureRequestPolicy.evaluate(request(path, Map.of(), 1024), CaptureIdentityMode.STUB_JSON));
+      assertEquals(CaptureAdmission.REQUEST_TOO_LARGE,
+          CaptureRequestPolicy.evaluate(request(path, Map.of(), 65537), CaptureIdentityMode.STUB_JSON));
+    }
+  }
   private Request request(String path, Map<String, List<String>> headers, int bytes) {
     return (Request) Proxy.newProxyInstance(Request.class.getClassLoader(), new Class<?>[] {Request.class},
         (proxy, method, args) -> switch (method.getName()) {

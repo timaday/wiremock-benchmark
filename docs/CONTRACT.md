@@ -22,8 +22,9 @@ is optional later work, not a substitute for the primary WireMock deliverable.
 
 ## Durable capture
 
-The extension writes REQUEST before matching, RESPONSE_PREPARED before send, and
-SEND_COMPLETED after WireMock's completion callback. Payloads contain run/request
+The extension writes REQUEST before matching in BENCHMARK_HEADERS mode and after
+matching in STUB_JSON mode, RESPONSE_PREPARED before send, and SEND_COMPLETED after
+WireMock's completion callback. Payloads contain run/request
 IDs, phase, timestamp, method/URL, headers and complete body bytes. Completion
 means server callback observed, **not proof the client received the response**.
 Headers are the WireMock lifecycle view, before any transport headers added by
@@ -73,6 +74,66 @@ The archive remains a portable SQLite file containing full replayable events.
 
 ## Direct RabbitMQ capture (filesystem-free mocks)
 
+### Capture identity and live stub configuration (envelope version 2)
+
+`CAPTURE_IDENTITY_MODE` is required when capture is enabled and explicitly selects
+`BENCHMARK_HEADERS` or `STUB_JSON`. The first preserves the existing `/bench/`
+selection and mandatory benchmark headers. `STUB_JSON` requires no client headers
+and selects matched stubs containing `response.transformerParameters.capture`,
+on any non-admin request path. Stubs without that block and unmatched requests are
+not captured in this mode. The block requires exactly these fields:
+
+```json
+{"runId":"work-test-001","correlationJsonPath":"$.correlationId","missingCorrelation":"RECORD_UNCORRELATED"}
+```
+
+The run ID is a nonblank string of at most 256 characters. JSONPath must select a
+single value (no wildcard/filter/multiple-result paths). Supported correlation
+values are nonblank strings up to 256 characters. Missing/null/blank values are
+`MISSING`; malformed JSON is `INVALID_BODY`; non-string/oversized values are
+`INVALID_VALUE`. In these cases `correlationId` is empty and full capture continues.
+The sole supported missing-value policy is the explicit `RECORD_UNCORRELATED`.
+Invalid capture configuration is rejected on stub creation/edit before replacing
+the active mapping. A valid live edit applies to subsequent matches; each request
+snapshots its matched configuration and correlation once, before response rendering.
+
+Version 2 adds required `schemaVersion: 2`, `correlationId` and
+`correlationStatus` (`PRESENT`, `MISSING`, `INVALID_BODY`, `INVALID_VALUE`) to the
+capture envelope. In `STUB_JSON`, `requestId` is WireMock's generated serve-event
+UUID and identifies one exchange, even if business correlation values are missing
+or duplicated. `runId`, `requestId`, `correlationId` and `correlationStatus` are
+identical across its three phases. `BENCHMARK_HEADERS` keeps the header-derived
+request ID and also records it as `correlationId` with status `PRESENT`.
+
+STUB_JSON captures REQUEST after matching and before response templating; it
+cannot promise capture for a request that fails before matching. The existing
+header mode captures REQUEST before matching. Both capture the rendered response,
+including an empty HTTP 200 (`bodyBase64: ""`), without modifying its body or
+headers. STUB_JSON rejects request bodies over 64 KiB with 413 before matching,
+even on unselected stub paths; it does not validate application JSON schemas.
+Admin endpoints are not subject to the stub request filter.
+
+The archive preserves the version-2 envelope in `payload_zlib` and groups/indexes
+by internal request ID; business correlation is read from the stored envelope.
+Consumers must explicitly support version 2. Version-1 envelopes are rejected by
+the new decoder: use fresh queues/archives and deploy mock and archive images from
+the same build. Old images remain unchanged; no silent schema compatibility is
+introduced. Missing business IDs still prevent definitive per-client reconciliation.
+
+Live mappings use WireMock's ordinary POST/PUT `/__admin/mappings` API. Read-only
+images do not persist those edits across replacement; retain and reapply the
+mapping externally. Response templates may optionally reference
+`parameters.capture.correlationJsonPath`; response templating and a response body
+are not prerequisites for capture correlation. See `docs/DYNAMIC-CAPTURE.md`.
+
+The dedicated-broker Portainer variations add a persistent single-node RabbitMQ
+and the existing commit-before-ack archive consumer. They retain this direct
+capture contract. Broker boot imports a ready-message count/byte limit with
+`reject-publish`, not record eviction; rejection fails capture and the run.
+Broker and archive directories require explicitly selected node-local storage.
+Queue bounds are not total disk bounds and archive retention remains operator
+owned. See `deploy/portainer/DIRECT-WITH-RABBIT.md` for the deployment contract.
+
 `CAPTURE_MODE` explicitly selects `OUTBOX` (the SQLite contract above) or
 `DIRECT_RABBIT` when capture is enabled. Container images for the original path
 set `OUTBOX`; the two direct Portainer deployments set `DIRECT_RABBIT`. There is
@@ -96,7 +157,7 @@ Unconfirmed process memory is not durable. Startup requires a usable broker.
 Shutdown rejects new work and fails unconfirmed operations. Capture failure stops
 the mock with exit 70 rather than continuing a misleading successful run.
 
-Client validation is not a capture-storage failure. With capture enabled,
+Client validation is not a capture-storage failure. With capture enabled in BENCHMARK_HEADERS mode,
 `/bench/` requests require exactly one nonblank `X-Bench-Run` and `X-Bench-Id`,
 each at most 256 characters. Invalid correlation returns HTTP 400. Request bodies
 over 64 KiB return HTTP 413 (the workload maximum remains 50 KiB). Rejection occurs
@@ -113,7 +174,7 @@ confirmed events in DIRECT_RABBIT. JSON metrics include `mode`; direct diagnosti
 include callback wait and publish/confirm durations and do not pretend to measure
 SQLite transactions. Broker connection telemetry also checks the live connection.
 
-The direct stacks contain one mock each and reuse an explicitly addressed
+The external-broker direct stacks contain one mock each and reuse an explicitly addressed
 PocketHive RabbitMQ. Images contain immutable fixtures, GC/application logs go to
 stdout, the root filesystem is read-only and `/tmp` is bounded tmpfs scratch.
 There are no persistent volumes, EFS mounts, archive services or bundled broker.

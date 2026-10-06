@@ -1,0 +1,151 @@
+{
+  "finishedAt": "2026-10-06T16:17:49.174868+00:00",
+  "scope": "Local headless, six-second empty responses, five-minute hold, direct RabbitMQ and durable archive; not AWS/Swarm or one-hour qualification",
+  "result": {
+    "passed": true,
+    "runtime": "headless",
+    "delayMs": 6000,
+    "holdSeconds": 300,
+    "noRestartsOrOOM": true,
+    "finalQueueMessages": 0,
+    "phases": [
+      {
+        "requests": 100,
+        "events": 300,
+        "failedRequests": 0,
+        "missingCaptures": 0,
+        "extraCaptures": 0,
+        "exactBodyHashesVerified": true,
+        "successfulCompletionsPerSecondByHoldMinute": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "latencyMs": {
+          "p50": 6018,
+          "p95": 6023,
+          "p99": 6164,
+          "max": 6164
+        },
+        "runId": "dynamic-smoke-09593abc68b34504b2cc92ffb946f329",
+        "phase": "smoke",
+        "offeredRate": 10,
+        "field": "correlationId",
+        "minimumAvailableGiB": 8.472454071044922,
+        "swapInPages": 28,
+        "swapOutPages": 0,
+        "maximumQueueMessages": 0
+      },
+      {
+        "requests": 344257,
+        "events": 1032771,
+        "failedRequests": 0,
+        "missingCaptures": 0,
+        "extraCaptures": 0,
+        "exactBodyHashesVerified": true,
+        "successfulCompletionsPerSecondByHoldMinute": [
+          1019.8166666666667,
+          1019.55,
+          1020.65,
+          1020.1,
+          1019.9
+        ],
+        "latencyMs": {
+          "p50": 6022,
+          "p95": 6034,
+          "p99": 6056,
+          "max": 6839
+        },
+        "runId": "dynamic-hold-0b199b40ff5a4aaeb4f5ca5be27ec7cf",
+        "phase": "hold",
+        "offeredRate": 1020,
+        "field": "requestId",
+        "minimumAvailableGiB": 3.599468231201172,
+        "swapInPages": 3861,
+        "swapOutPages": 7554,
+        "maximumQueueMessages": 99
+      }
+    ]
+  },
+  "resources": {
+    "cpu": {
+      "headless": {
+        "meanCores": 0.6620733333333333,
+        "maximumSampledCores": 0.8143
+      },
+      "rabbit": {
+        "meanCores": 0.19933666666666666,
+        "maximumSampledCores": 1.0671
+      },
+      "archive": {
+        "meanCores": 0.21054,
+        "maximumSampledCores": 0.2875
+      }
+    },
+    "containerMemory": {
+      "headless": {
+        "minimumMiB": 1893.376,
+        "maximumMiB": 2126.848
+      },
+      "rabbit": {
+        "minimumMiB": 142.6,
+        "maximumMiB": 207.6
+      },
+      "archive": {
+        "minimumMiB": 155.2,
+        "maximumMiB": 163.7
+      }
+    },
+    "heapUsedMiB": {
+      "minimum": 1211.024673461914,
+      "maximum": 1679.209701538086
+    },
+    "maxHostMemoryFullAvg10": 0.31,
+    "hostSwapInMiB": 15.08203125,
+    "hostSwapOutMiB": 29.5078125,
+    "maximumSampledActiveClients": 6158,
+    "note": "Host-wide swap statistics include unrelated workloads. Five-minute observation does not prove long-term memory stability."
+  },
+  "images": {
+    "official": {
+      "tag": "wiremock-dynamic-official:20261006-1",
+      "id": "sha256:6a078e6f5ea3cc1cdd204c2807989cad33c081943033b2e6d1ef88f9db1a0c18"
+    },
+    "headless": {
+      "tag": "wiremock-dynamic-headless:20261006-1",
+      "id": "sha256:1fed1c931c3dfeceb6fd117a337883c853867bc4ab88d0f42f34770c26225562"
+    },
+    "archive": {
+      "tag": "wiremock-dynamic-archive:20261006-1",
+      "id": "sha256:f9ec079bb167b4ed095c9a56f70e805c7e8794408b81d7ae864ebfb2897cd596"
+    }
+  },
+  "captureJarSha256": "d97901c178d9a067bed0d6e23c7980dd994afe37d026f5e8ce8eef0b40050224",
+  "evidenceRoot": "results/direct-dynamic-load-6s-20261006-1",
+  "evidenceSha256": {
+    "verification.json": "9d74f85d0e517eb18ba5840dd68c03e0243262a97562a3c6c499ae5471ab0a9c",
+    "hold/clients.csv": "d3b229de1ed207bd8c404945767c52838f11adf06aa0530f7adc16dfc213b4bc",
+    "hold/samples.jsonl": "a1ff2390fcad59a25d750935bde651e2e42298e1a810d3bf10b1fb5c478540f5",
+    "smoke/clients.csv": "58d97cda91925f05568514ca958016fb5e374b7585839d174b76fab94251bf26",
+    "final-state.json": "515860021a7d9551a2d7960a57774cc5aae54a44df6bb2e07ba0840ccf0bd4b0",
+    "final-metrics.json": "39c5e644439386a7cd474e43dafee7d8833926f3d160791794234a375ab1db93",
+    "final-prometheus.txt": "8194641d32be69d4bdf80f64cdd77058c5e2c1ba0833ef01891317180dcec7a0",
+    "archive/events.db": "2afbc55316f00face3034a0f52495f967d783196add9357a3126b902fa788323",
+    "resource-summary.json": "ed392c457dfd68c06675e41281f47531294f49533eda9ba6cc219ea9846560a0"
+  },
+  "sourceSha256": {
+    "deploy/portainer/direct/dynamic-load.py": "b21a3af6b6c7a24603ee265cda425852af51b3d1f258c8c9f72d026f19992738",
+    "deploy/portainer/direct/dedicated-smoke.py": "8e8e5952ff1ba4a15ca7f7f83248e8ddd4e3ec276681b88e936122c8989278c0",
+    "deploy/portainer/direct/test_dynamic_load.py": "2e6414aa9c9b98c39e77a28aa32cf24189305d755563b56bee98b2427237bd95",
+    "tests/perf/gatling/DYNAMIC.md": "bd5cc1ab7d897a5af2a60aacdd554c5e3ef61a6469288d713564de51fcb84b5f",
+    "tests/perf/gatling/src/main/java/bench/load/DynamicCaptureSimulation.java": "1ee557cb87c20b0294740414a2762869a22e04d26824dc9ed50790859c2695b9",
+    "tests/perf/gatling/src/main/java/bench/load/DynamicCaptureJournal.java": "37492032c47ade15faaa08722ff632daf426b4031b4496d2ecb6a43c493bd4d8",
+    "tests/perf/gatling/src/main/resources/logback.xml": "da939d80d0388fb01233a42602c1c7b3226da0380e86b0699322dfadc492543d"
+  },
+  "checks": {
+    "reconciliationOracleTests": 5,
+    "diffWhitespaceCheck": "passed"
+  }
+}

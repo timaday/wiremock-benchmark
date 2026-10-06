@@ -1,5 +1,15 @@
 # WireMock with direct PocketHive RabbitMQ capture
 
+For an isolated broker plus a compatible archive consumer, use the
+[dedicated RabbitMQ variation](DIRECT-WITH-RABBIT.md). It keeps the mock
+filesystem-free while storing broker data and capture archives on explicit
+node-local paths.
+
+The [dynamic capture guide](../../docs/DYNAMIC-CAPTURE.md) covers the new
+version-2 build, `CAPTURE_IDENTITY_MODE=STUB_JSON`, per-stub correlation and empty
+responses. The published direct-2 images documented below retain version 1 and
+header admission; they do not acquire dynamic behavior from an environment change.
+
 Upload **`stack-direct-headless.yml`** or **`stack-direct-official.yml`** as a named
 Portainer Docker Swarm stack. Each file contains just one mock. Both retain full
 capture and the same fixtures/tuning; neither needs a writable persistent volume,

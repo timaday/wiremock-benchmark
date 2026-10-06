@@ -9,14 +9,26 @@ import org.junit.jupiter.api.Test;
 
 class CaptureCodecTest {
   @Test
+  void emptyResponseKeepsCorrelationAndMissingCorrelationIsExplicit() throws Exception {
+    for (var status : CorrelationStatus.values()) {
+      var event = new CaptureEvent(2, "event", "run", "internal-id",
+          status == CorrelationStatus.PRESENT ? "business-id" : "", status,
+          Phase.RESPONSE_PREPARED, 123, "POST", "/transaction", 200, Map.of(), "");
+      assertEquals(event, CaptureCodec.decode(CaptureCodec.encode(event)));
+    }
+    assertThrows(IllegalArgumentException.class, () -> new CaptureEvent(1, "event", "run", "id",
+        "id", CorrelationStatus.PRESENT, Phase.REQUEST, 0, "POST", "/", 0, Map.of(), ""));
+  }
+
+  @Test
   void retainsBinaryBodiesHeadersAndIdentity() throws Exception {
     byte[] body = new byte[51200];
     new Random(522).nextBytes(body);
     var event =
         new CaptureEvent(
-            "event",
+            2, "event",
             "run",
-            "request",
+            "request", "request", CorrelationStatus.PRESENT,
             Phase.RESPONSE_PREPARED,
             123,
             "POST",

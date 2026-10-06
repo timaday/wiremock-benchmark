@@ -11,3 +11,11 @@ class IndentedSafeDumper(yaml.SafeDumper):
 
 def stack_yaml(content):
     return yaml.dump(content, Dumper=IndentedSafeDumper, sort_keys=False)
+
+
+def _string(dumper, value):
+    return dumper.represent_scalar('tag:yaml.org,2002:str', value,
+                                   style='|' if '\n' in value else None)
+
+
+IndentedSafeDumper.add_representer(str, _string)

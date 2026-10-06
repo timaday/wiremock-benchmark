@@ -19,6 +19,7 @@ ENV JAVA_HOME=/opt/java
 
 FROM java27 AS headless
 ENV CAPTURE_MODE=OUTBOX
+ENV CAPTURE_IDENTITY_MODE=BENCHMARK_HEADERS
 WORKDIR /app
 COPY --from=build /src/target/capture.jar /app/capture.jar
 COPY --from=build /runtime/wiremock-standalone-3.13.2.jar /app/wiremock.jar
@@ -26,6 +27,7 @@ ENTRYPOINT ["java","--enable-native-access=ALL-UNNAMED","-cp","/app/capture.jar:
 
 FROM wiremock/wiremock:3.13.2 AS official
 ENV CAPTURE_MODE=OUTBOX
+ENV CAPTURE_IDENTITY_MODE=BENCHMARK_HEADERS
 COPY --from=build /src/target/capture.jar /var/wiremock/extensions/capture.jar
 
 FROM java27 AS archive
