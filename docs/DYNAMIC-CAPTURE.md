@@ -96,7 +96,7 @@ identities match the locally tested builds. Portainer does not need GHCR credent
 The [publication record](../deploy/portainer/direct/dynamic-image-lock.json)
 contains immutable digests and the source revision.
 
-All four `stack-direct-*.yml` files now pin the published mock digests directly;
+All `stack-direct-*.yml` files pin the published mock digests directly;
 the dedicated RabbitMQ variations also pin the matching version-2 archive.
 Their image references cannot be overridden by stale Portainer image variables.
 Load `example-direct.env` or `example-direct-rabbit.env`, which explicitly select

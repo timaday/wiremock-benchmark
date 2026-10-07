@@ -20,6 +20,39 @@ not published; its management UI is published for diagnostics.
 
 ## Storage and placement
 
+For a provisioned Grafana dashboard, upload
+`stack-direct-headless-rabbit-monitored.yml` or
+`stack-direct-official-rabbit-monitored.yml` instead. These are complete five-service
+stacks. Import `example-direct-rabbit.env` and add the settings from
+`example-direct-monitoring.env`. Replace all password/node placeholders.
+The three capture services are identical to the unmonitored variant.
+
+Set `MONITORING_NODE` to a node with capacity for an additional 2 CPU / 2 GiB
+in service limits. On 4-core workers, prefer a separate node from the mock and
+the broker/archive. Set `PROMETHEUS_DATA_DIR=/data/wb/prometheus` and
+`GRAFANA_DATA_DIR=/data/wb/grafana` to fresh existing local XFS/ext4 directories
+on that node; neither may resolve to EFS/NFS. Prepare them writable by UID/GID
+65534:65534 and 472:0 respectively. As with capture storage, use separate paths
+and a different `GRAFANA_PORT` when deploying both variants on the same nodes.
+
+Open `http://<swarm-host>:13300/d/wiremock-direct` (or your `GRAFANA_PORT`).
+Sign in using `GRAFANA_USER` / `GRAFANA_PASSWORD`. The dashboard includes HTTP
+completion rate, non-2xx responses, latency, in-flight requests, JVM heap/CPU/GC,
+capture confirmation rate/waiting events/errors, queue ready/unacknowledged
+messages, archive consumer count and acknowledgements, plus RabbitMQ memory
+and free disk versus alarm limits. `STUB_JSON` charts count capture-enabled
+mappings; `BENCHMARK_HEADERS` charts count admitted `/bench/` requests.
+
+Scrapes run every 5 seconds on the private overlay. Only Grafana is published;
+Prometheus and metrics endpoints have no host ports. Grafana provisioning and
+Prometheus config are embedded in the stack, with existing public image pins.
+Prometheus retains up to 7 days / 2 GB of blocks (WAL/head data adds overhead).
+Monitoring has health checks, bounded logs and restart-on-failure policies.
+No alert notification receiver is configured. Missing metrics mean missing
+telemetry, not a healthy zero. Queue acknowledgements indicate consumer progress;
+they do not replace archive ID/body reconciliation. Archive filesystem usage,
+container RSS and host swapping are not exported by these images.
+
 Set `LAB_NODE` to the mock worker and `RABBIT_NODE` / `ARCHIVE_NODE` to the workers
 with the prepared storage. On 4-core, 16-GiB nodes, dedicate one node to the mock;
 the broker and archive may share a second node. Limits are mock 4 CPU / 4 GiB,
@@ -131,3 +164,17 @@ The temporary one-message policy is confined to the disposable test broker.
 It stops its own containers and retains containers, broker data, archives and logs.
 This checks application/storage behavior; it is not an AWS Swarm deployment,
 power-loss durability test or 1,000 requests/s qualification.
+
+### Monitoring smoke
+
+Run `python3 deploy/portainer/direct/monitoring-smoke.py --output results/NEW-MONITORING-RUN`.
+The [2026-10-07 verification](direct/monitoring-verification.json) covers both
+monitored variants with their published images. Each returned three empty 200s
+with six-second delays and reconciled nine capture records. Grafana's provisioned
+datasource reached all three scrape jobs; all 27 dashboard queries returned data.
+Pausing the archive produced six ready messages and zero consumers; restarting
+it restored one consumer and drained the queue to zero. All five service health
+checks passed. Nineteen Portainer tests and six HiveForge regression tests passed,
+and regenerating the files produced identical bytes. Test containers were stopped;
+databases, metrics, dashboard JSON and logs remain in the evidence directory.
+This is local integration evidence, not an AWS deployment or full-rate test.

@@ -1,0 +1,51 @@
+{
+  "verifiedAtUTC": "2026-10-07T14:12:26.098073+00:00",
+  "scope": "Local bridge smoke using the published image digests; not an AWS Swarm or throughput qualification.",
+  "command": "python3 deploy/portainer/direct/monitoring-smoke.py --output results/direct-monitoring-20261007-1",
+  "evidenceRoot": "results/direct-monitoring-20261007-1",
+  "portainerConfigurationTests": 19,
+  "hiveforgeRegressionTests": 6,
+  "generatedOutputsReproducible": true,
+  "stackSha256": {
+    "headless": "1e9aa08e8966a7ab665548272b379343ab98261bc13ecabae3ff178c2b53b9f2",
+    "official": "60e60970470f04e112eca03298be8bbdd2bafcbde97308ff4c2ee0d80e34e435"
+  },
+  "runs": [
+    {
+      "runtime": "headless",
+      "requests": 3,
+      "captures": 9,
+      "delayMs": 6000,
+      "scrapeTargetsUp": 3,
+      "dashboardQueriesWithData": 27,
+      "pausedArchiveQueueReady": 6,
+      "pausedArchiveConsumers": 0,
+      "finalQueueReady": 0,
+      "finalConsumers": 1,
+      "captureErrors": 0,
+      "allServiceHealthchecksPassed": true,
+      "project": "direct-monitor-headless-01cf0da3"
+    },
+    {
+      "runtime": "official",
+      "requests": 3,
+      "captures": 9,
+      "delayMs": 6000,
+      "scrapeTargetsUp": 3,
+      "dashboardQueriesWithData": 27,
+      "pausedArchiveQueueReady": 6,
+      "pausedArchiveConsumers": 0,
+      "finalQueueReady": 0,
+      "finalConsumers": 1,
+      "captureErrors": 0,
+      "allServiceHealthchecksPassed": true,
+      "project": "direct-monitor-official-a4814b57"
+    }
+  ],
+  "allTestContainersStopped": true,
+  "limitations": [
+    "No archive filesystem, host memory pressure or container RSS exporter.",
+    "No alert notification receiver.",
+    "Local filesystem is ext4; XFS/AWS performance is not qualified by this test."
+  ]
+}

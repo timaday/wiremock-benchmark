@@ -134,7 +134,7 @@ Broker and archive directories require explicitly selected node-local storage.
 Queue bounds are not total disk bounds and archive retention remains operator
 owned. See `deploy/portainer/DIRECT-WITH-RABBIT.md` for the deployment contract.
 
-The four generated `stack-direct-*.yml` Portainer files pin the published version-2
+The generated `stack-direct-*.yml` Portainer files pin the published version-2
 mock images directly; the dedicated-broker files also pin their matching archive.
 `deploy/portainer/direct/dynamic-image-lock.json` owns those image references.
 `OFFICIAL_DIRECT_IMAGE`, `HEADLESS_DIRECT_IMAGE` and `ARCHIVE_IMAGE` are not
@@ -142,6 +142,18 @@ deployment selectors in these files. The direct example environments select
 `STUB_JSON`; existing benchmark bundles must explicitly select `BENCHMARK_HEADERS`.
 Local verification harnesses may explicitly substitute a matched unpublished
 build for testing; that does not change the deployment pins.
+
+Optional `stack-direct-<runtime>-rabbit-monitored.yml` variants add Prometheus
+and Grafana to the same private network without changing the capture services.
+`deploy/portainer/direct_monitoring.py` owns their composition and derives a
+direct-capture dashboard from the comparison dashboard. Configuration and
+provisioning are embedded in the YAML; no extra uploads or image builds are needed.
+Prometheus and Grafana use explicit local bind directories and fixed placement.
+Only Grafana is published; scrape endpoints and Prometheus stay internal.
+Metrics describe captured HTTP exchanges, JVM activity, broker confirmations,
+RabbitMQ queue depth/consumers, broker memory and broker data-disk headroom.
+They do not measure archive disk space, container RSS, host swapping, or prove
+capture reconciliation. Missing telemetry must remain missing, not become zero.
 
 `CAPTURE_MODE` explicitly selects `OUTBOX` (the SQLite contract above) or
 `DIRECT_RABBIT` when capture is enabled. Container images for the original path

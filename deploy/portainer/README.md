@@ -3,6 +3,11 @@
 Use [the deployment guide](../../docs/PORTAINER.md) for Docker Swarm / Portainer.
 
 - `stack-ghcr.yml`: ready-to-upload stack with GHCR image digests and its own RabbitMQ.
+- `stack-direct-headless-rabbit-monitored.yml` / `stack-direct-official-rabbit-monitored.yml`:
+  one mock, dedicated RabbitMQ, archive, Prometheus and provisioned Grafana dashboard.
+  All persistent directories are environment-configured local bind mounts. See
+  [the dedicated guide](DIRECT-WITH-RABBIT.md), `example-direct-rabbit.env` and
+  `example-direct-monitoring.env`.
 - `stack-direct-headless.yml` / `stack-direct-official.yml`: one filesystem-free
   mock per stack, publishing directly to PocketHive RabbitMQ; requires new images.
   See [the direct-capture guide](DIRECT-RABBIT.md) and `example-direct.env`.
