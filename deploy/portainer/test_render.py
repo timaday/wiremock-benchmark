@@ -1,11 +1,13 @@
 """Regression checks for Swarm interpolation and the explicit external-broker mode."""
 import os
+import json
 from pathlib import Path
 import subprocess
 import unittest
 import yaml
 
 ROOT = Path(__file__).resolve().parent
+DIRECT_IMAGES = json.loads((ROOT / 'direct/dynamic-image-lock.json').read_text())['images']
 PLACEMENTS = {
     'OFFICIAL_NODE': 'mock-worker', 'HEADLESS_NODE': 'mock-worker',
     'RABBIT_NODE': 'broker-worker', 'ARCHIVE_NODE': 'archive-worker',
@@ -135,7 +137,8 @@ class SwarmConfigurationTest(unittest.TestCase):
                 self.assertNotIn('volumes', config)
                 mock = config['services'][runtime]
                 self.assertTrue(mock['read_only'])
-                self.assertEqual(mock['image'], DIRECT[runtime.upper() + '_DIRECT_IMAGE'])
+                # Stale Portainer image variables cannot override the published pins.
+                self.assertEqual(mock['image'], DIRECT_IMAGES[runtime]['reference'])
                 self.assertEqual(mock['environment']['CAPTURE_MODE'], 'DIRECT_RABBIT')
                 self.assertEqual(mock['environment']['CAPTURE_ENABLED'], 'true')
                 self.assertNotIn('OUTBOX_PATH', mock['environment'])
@@ -150,10 +153,10 @@ class SwarmConfigurationTest(unittest.TestCase):
                 self.assertTrue(config['networks']['pockethive']['external'])
                 self.assertEqual(config['networks']['pockethive']['name'], DIRECT['POCKETHIVE_NETWORK'])
 
-    def test_direct_stacks_require_new_image_and_explicit_broker_configuration(self):
+    def test_direct_stacks_require_explicit_broker_and_capture_configuration(self):
         for runtime in ('official', 'headless'):
             for missing in ('POCKETHIVE_RABBIT_URI', 'POCKETHIVE_NETWORK', 'RABBIT_QUEUE_TYPE',
-                            'CAPTURE_CONFIRM_TIMEOUT_MS', 'CAPTURE_IDENTITY_MODE', runtime.upper() + '_DIRECT_IMAGE'):
+                            'CAPTURE_CONFIRM_TIMEOUT_MS', 'CAPTURE_IDENTITY_MODE'):
                 with self.subTest(runtime=runtime, missing=missing):
                     settings = dict(DIRECT)
                     del settings[missing]
@@ -168,6 +171,10 @@ class SwarmConfigurationTest(unittest.TestCase):
             result = self.render(f'stack-direct-{runtime}.yml', **example)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(yaml.safe_load(result.stdout)['services'][runtime]['ports'][0]['published'], port)
+            self.assertEqual(yaml.safe_load(result.stdout)['services'][runtime]['image'],
+                             DIRECT_IMAGES[runtime]['reference'])
+            self.assertEqual(yaml.safe_load(result.stdout)['services'][runtime]['environment']['CAPTURE_IDENTITY_MODE'],
+                             'STUB_JSON')
 
     def test_dedicated_broker_stacks_isolate_capture_and_preserve_local_state(self):
         for runtime in ('official', 'headless'):
@@ -179,6 +186,8 @@ class SwarmConfigurationTest(unittest.TestCase):
             self.assertEqual(config['networks']['capture']['driver'], 'overlay')
             self.assertNotIn('external', config['networks']['capture'])
             mock, broker, archive = (services[key] for key in (runtime, 'rabbit', 'archive'))
+            self.assertEqual(mock['image'], DIRECT_IMAGES[runtime]['reference'])
+            self.assertEqual(archive['image'], DIRECT_IMAGES['archive']['reference'])
             self.assertTrue(mock['read_only'])
             self.assertEqual(mock['environment']['CAPTURE_MODE'], 'DIRECT_RABBIT')
             self.assertEqual(mock['environment']['RABBIT_QUEUE_TYPE'], 'classic')
@@ -199,7 +208,7 @@ class SwarmConfigurationTest(unittest.TestCase):
                 self.assertIn('@sha256:', service['image'])
 
     def test_dedicated_stacks_require_storage_and_safety_limits(self):
-        for missing in ('ARCHIVE_IMAGE', 'RABBIT_NODE', 'ARCHIVE_NODE', 'RABBIT_DATA_DIR', 'ARCHIVE_DATA_DIR',
+        for missing in ('RABBIT_NODE', 'ARCHIVE_NODE', 'RABBIT_DATA_DIR', 'ARCHIVE_DATA_DIR',
                         'RABBIT_PASSWORD', 'CAPTURE_QUEUE_MAX_BYTES', 'CAPTURE_QUEUE_MAX_MESSAGES',
                         'RABBIT_DISK_FREE_LIMIT_BYTES'):
             settings = dict(DEDICATED)
@@ -207,6 +216,25 @@ class SwarmConfigurationTest(unittest.TestCase):
             result = self.render('stack-direct-headless-rabbit.yml', **settings)
             self.assertNotEqual(result.returncode, 0, missing)
             self.assertIn(missing, result.stderr)
+
+    def test_dedicated_examples_select_matching_dynamic_images_without_image_variables(self):
+        example = dict(line.split('=', 1) for line in (ROOT / 'example-direct-rabbit.env').read_text().splitlines()
+                       if line and not line.startswith('#'))
+        self.assertFalse({'HEADLESS_DIRECT_IMAGE', 'OFFICIAL_DIRECT_IMAGE', 'ARCHIVE_IMAGE'} & example.keys())
+        for runtime in ('official', 'headless'):
+            result = self.render(f'stack-direct-{runtime}-rabbit.yml', **example)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            services = yaml.safe_load(result.stdout)['services']
+            self.assertEqual(services[runtime]['image'], DIRECT_IMAGES[runtime]['reference'])
+            self.assertEqual(services['archive']['image'], DIRECT_IMAGES['archive']['reference'])
+            self.assertEqual(services[runtime]['environment']['CAPTURE_IDENTITY_MODE'], 'STUB_JSON')
+
+    def test_custom_compose_image_variables_match_the_publication_lock(self):
+        values = dict(line.split('=', 1) for line in (ROOT / 'direct/published-dynamic.env').read_text().splitlines()
+                      if line and not line.startswith('#'))
+        for runtime in ('headless', 'official', 'archive'):
+            key = 'ARCHIVE_IMAGE' if runtime == 'archive' else runtime.upper() + '_DIRECT_IMAGE'
+            self.assertEqual(values[key], DIRECT_IMAGES[runtime]['reference'])
 
     def test_bootstrap_rejects_invalid_values_before_writing_configuration(self):
         for variable, value in [('RABBIT_PASSWORD', 'unsafe"password'), ('RABBIT_PASSWORD', 'abc'),

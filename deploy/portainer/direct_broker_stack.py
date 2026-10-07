@@ -7,7 +7,7 @@ import copy
 from pathlib import Path
 
 
-def dedicated_stack(runtime, direct, images):
+def dedicated_stack(runtime, direct, broker_image, archive_image):
     mock = copy.deepcopy(direct)
     uri = 'amqp://benchmark:${RABBIT_PASSWORD:?set generated hexadecimal password}@rabbit:5672/%2f'
     mock['environment']['RABBIT_URI'] = uri
@@ -28,7 +28,7 @@ def dedicated_stack(runtime, direct, images):
 
     bootstrap = (Path(__file__).parent / 'direct/rabbit-bootstrap.sh').read_text()
     rabbit = {
-        'image': images['rabbit']['reference'],
+        'image': broker_image,
         'hostname': 'rabbit',
         'environment': {
             'RABBITMQ_NODENAME': 'rabbit@rabbit',
@@ -51,7 +51,7 @@ def dedicated_stack(runtime, direct, images):
         'stop_grace_period': '120s', 'networks': ['capture'], 'logging': copy.deepcopy(logging),
     }
     archive = {
-        'image': '${ARCHIVE_IMAGE:?set archive image matching the capture schema}',
+        'image': archive_image,
         'environment': {'RABBIT_URI': uri, 'RABBIT_QUEUE': mock['environment']['RABBIT_QUEUE'],
                         'ARCHIVE_PATH': '/archive/events.db',
                         'JAVA_TOOL_OPTIONS': '-XX:+ExitOnOutOfMemoryError'},

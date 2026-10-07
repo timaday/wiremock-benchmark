@@ -87,8 +87,25 @@ include client CSV, archive database, queue/resource samples and image identitie
 Add `--delay-ms 6000` to repeat with six-second responses; the mapping and client
 timing checks both use the selected delay.
 
-For deployment, publish these matching images to your registry, then set
-`HEADLESS_DIRECT_IMAGE` or `OFFICIAL_DIRECT_IMAGE`, `ARCHIVE_IMAGE`, and
-`CAPTURE_IDENTITY_MODE=STUB_JSON` in the dedicated stack's environment. Use fresh
-queues and archive paths for the new envelope. The existing `example-direct*.env`
-files continue to pin the previously published version-1 images and header mode.
+## Published images
+
+The tested official, headless and archive images were published publicly on
+7 October 2026 under `ghcr.io/timaday/wiremock-lab-<runtime>:20261007-dynamic-1`
+for `linux/amd64`. Anonymous digest pulls succeeded for all three, and their image
+identities match the locally tested builds. Portainer does not need GHCR credentials.
+The [publication record](../deploy/portainer/direct/dynamic-image-lock.json)
+contains immutable digests and the source revision.
+
+All four `stack-direct-*.yml` files now pin the published mock digests directly;
+the dedicated RabbitMQ variations also pin the matching version-2 archive.
+Their image references cannot be overridden by stale Portainer image variables.
+Load `example-direct.env` or `example-direct-rabbit.env`, which explicitly select
+`CAPTURE_IDENTITY_MODE=STUB_JSON`, and fill in your node, broker and storage settings.
+Then apply your capture-enabled stub mapping through the WireMock admin API.
+Use fresh queues and archive paths for the version-2 envelope. For existing
+header-based benchmark bundles, explicitly select `BENCHMARK_HEADERS` instead.
+
+[Published image variables](../deploy/portainer/direct/published-dynamic.env) remain
+available for custom Compose files; the bundled stacks use the publication lock
+directly. With an external PocketHive broker, its capture consumer must support
+version 2; changing the mock image does not upgrade that consumer.

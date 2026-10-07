@@ -4,9 +4,11 @@ Upload `stack-direct-headless-rabbit.yml` or `stack-direct-official-rabbit.yml`
 as a **named Docker Swarm stack** in Portainer. Load `example-direct-rabbit.env`
 and replace its node, storage and password placeholders. Each stack contains
 one direct-capture mock, a dedicated RabbitMQ and the existing archive consumer.
-`ARCHIVE_IMAGE` is explicit and must match the mock's capture schema. The example
-pins the previously published version-1 build; see [dynamic capture](../../docs/DYNAMIC-CAPTURE.md)
-for the version-2 build and live per-stub correlation settings.
+Both files pin the published `20261007-dynamic-1` mock and matching version-2
+archive directly, using [the publication lock](direct/dynamic-image-lock.json).
+Old `HEADLESS_DIRECT_IMAGE`, `OFFICIAL_DIRECT_IMAGE` and `ARCHIVE_IMAGE` environment
+values do not override those pins. The example selects `STUB_JSON`; see
+[dynamic capture](../../docs/DYNAMIC-CAPTURE.md) for live per-stub correlation settings.
 The generated YAML is self-contained; no checkout, Docker secrets, configuration
 file upload or image build is needed. Existing public GHCR images are pinned.
 
@@ -82,8 +84,11 @@ is ready. Wait for stable tasks, no alarms and one queue consumer before load.
 With the example ports, target `http://<AWS-swarm-host>:19381` for headless or
 `:19380` for official. RabbitMQ UI is `http://<AWS-swarm-host>:15675`, with user
 `benchmark`. Change its port if deploying both variations simultaneously.
-Queue names are `<CAPTURE_PREFIX>.headless` / `.official`. Fixtures, backlog 4096,
-six-second responses, full bodies and template behavior match the direct stacks.
+Queue names are `<CAPTURE_PREFIX>.headless` / `.official`. Apply a capture-enabled
+mapping for `STUB_JSON`, choosing the response delay in that mapping. For the
+built-in six-second `/bench/...` fixtures and existing benchmark bundles, explicitly
+set `CAPTURE_IDENTITY_MODE=BENCHMARK_HEADERS`. Backlog 4096, full bodies and template
+behavior are retained.
 
 Start with a short smoke, then a full-rate short run. Confirm the queue has one
 consumer, capture errors remain zero, no tasks restart, and queues drain. The

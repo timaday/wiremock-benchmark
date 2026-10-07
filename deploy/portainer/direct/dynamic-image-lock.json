@@ -1,0 +1,52 @@
+{
+  "version": "20261007-dynamic-1",
+  "verifiedAtUTC": "2026-10-07T08:57:18.599617+00:00",
+  "sourceRepository": "https://github.com/timaday/wiremock-benchmark",
+  "sourceRevision": "28993312a5c4f4245c555b34511c3f8cef373f6b",
+  "captureSchemaVersion": 2,
+  "captureJarSha256": "d97901c178d9a067bed0d6e23c7980dd994afe37d026f5e8ce8eef0b40050224",
+  "images": {
+    "official": {
+      "tag": "ghcr.io/timaday/wiremock-lab-official:20261007-dynamic-1",
+      "reference": "ghcr.io/timaday/wiremock-lab-official@sha256:6a078e6f5ea3cc1cdd204c2807989cad33c081943033b2e6d1ef88f9db1a0c18",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "runtimeManifestDigest": "sha256:fe9645efae39cb6ccf95fc3a210f2aa8f6997dd8f2479d5c2755ca5e4c8b4802",
+      "matchesTestedImage": true,
+      "anonymousManifestAndConfigVerified": true,
+      "anonymousDigestPullVerified": true,
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-official"
+    },
+    "headless": {
+      "tag": "ghcr.io/timaday/wiremock-lab-headless:20261007-dynamic-1",
+      "reference": "ghcr.io/timaday/wiremock-lab-headless@sha256:1fed1c931c3dfeceb6fd117a337883c853867bc4ab88d0f42f34770c26225562",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "runtimeManifestDigest": "sha256:953d10412ea428c89ffbf09684f4a7d00bfd94b5fa01f84f830e6004ccde1fbf",
+      "matchesTestedImage": true,
+      "anonymousManifestAndConfigVerified": true,
+      "anonymousDigestPullVerified": true,
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-headless"
+    },
+    "archive": {
+      "tag": "ghcr.io/timaday/wiremock-lab-archive:20261007-dynamic-1",
+      "reference": "ghcr.io/timaday/wiremock-lab-archive@sha256:f9ec079bb167b4ed095c9a56f70e805c7e8794408b81d7ae864ebfb2897cd596",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      "runtimeManifestDigest": "sha256:75b3f0493478005e556ac81d29dd245447012ad2fe855597ae5910380af3c703",
+      "matchesTestedImage": true,
+      "anonymousManifestAndConfigVerified": true,
+      "anonymousDigestPullVerified": true,
+      "visibility": "public",
+      "packageUrl": "https://github.com/users/timaday/packages/container/package/wiremock-lab-archive"
+    }
+  }
+}

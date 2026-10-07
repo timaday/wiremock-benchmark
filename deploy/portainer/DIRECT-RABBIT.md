@@ -5,10 +5,10 @@ For an isolated broker plus a compatible archive consumer, use the
 filesystem-free while storing broker data and capture archives on explicit
 node-local paths.
 
-The [dynamic capture guide](../../docs/DYNAMIC-CAPTURE.md) covers the new
+The [dynamic capture guide](../../docs/DYNAMIC-CAPTURE.md) covers the published
 version-2 build, `CAPTURE_IDENTITY_MODE=STUB_JSON`, per-stub correlation and empty
-responses. The published direct-2 images documented below retain version 1 and
-header admission; they do not acquire dynamic behavior from an environment change.
+responses. The stacks pin that release directly; the example environment selects
+`STUB_JSON`. An external capture consumer must support version-2 envelopes.
 
 Upload **`stack-direct-headless.yml`** or **`stack-direct-official.yml`** as a named
 Portainer Docker Swarm stack. Each file contains just one mock. Both retain full
@@ -21,32 +21,34 @@ changes that require filesystem writes are intentionally unsupported.
 
 ## Published images and future builds
 
-Both `20261005-direct-2` images are now published publicly to GHCR.
-`example-direct.env` pins their verified digests from [direct/image-lock.json](direct/image-lock.json);
-Portainer can pull them without registry credentials. No local build is needed
-to deploy this release.
+The `20261007-dynamic-1` images are published publicly to GHCR. The stack files
+pin verified digests from [direct/dynamic-image-lock.json](direct/dynamic-image-lock.json).
+Portainer can pull them without registry credentials. No local build is needed.
+Image environment variables do not override these pins.
 
 The older outbox tags cannot implement direct capture. To build a future version,
 choose a fresh tag and run:
 
 ```sh
 python3 deploy/portainer/direct/build.py \
-  --prefix ghcr.io/timaday/wiremock-lab --tag 20261005-direct-3
+  --prefix ghcr.io/timaday/wiremock-lab --tag YOUR-NEW-UNIQUE-TAG
 ```
 
 This requires Java 21, Maven, Python 3 and Docker on the build machine. It runs
-tests and resolves both base images from `image-lock.json`; fixtures and the
+tests and resolves all three base images from `image-lock.json`; fixtures and the
 official/headless JVM versions stay matched to those bases. The locked images
 are Linux AMD64. It builds locally and records image IDs under `target/direct-image`.
 The script does not publish. To publish a future build, use its fresh tag:
 
 ```sh
-docker push ghcr.io/timaday/wiremock-lab-official:20261005-direct-3
-docker push ghcr.io/timaday/wiremock-lab-headless:20261005-direct-3
+docker push ghcr.io/timaday/wiremock-lab-official:YOUR-NEW-UNIQUE-TAG
+docker push ghcr.io/timaday/wiremock-lab-headless:YOUR-NEW-UNIQUE-TAG
+docker push ghcr.io/timaday/wiremock-lab-archive:YOUR-NEW-UNIQUE-TAG
 ```
 
-Use a new tag for subsequent builds and preferably put the resulting digest
-references into Portainer's image variables. GHCR package visibility/registry
+Use a new tag for subsequent builds, verify the digests, update
+`direct/dynamic-image-lock.json`, and regenerate the stack files with `render.py`.
+GHCR package visibility/registry
 credentials must allow every eligible Swarm node to pull the new packages.
 
 ## Portainer settings
@@ -73,10 +75,12 @@ that expire/drop messages. A queue without an active consumer grows continuously
 With the example environment, point the existing benchmark bundles/generator at
 `http://<swarm-host>:19281` (headless) or `:19280` (official). The files' built-in
 port defaults remain 19081/19080 if the example overrides are omitted. Send the
-same `/bench/...` workloads and required `X-Bench-Run` / `X-Bench-Id` headers.
+same `/bench/...` workloads and required `X-Bench-Run` / `X-Bench-Id` headers only
+with `CAPTURE_IDENTITY_MODE=BENCHMARK_HEADERS`. With the example's `STUB_JSON`,
+apply your capture-enabled mapping and send its configured request-body ID.
 The image healthcheck uses `/__admin/health`, not an uncorrelated benchmark request.
 
-Bad benchmark requests do not kill the mock: missing, blank, duplicated or overlong
+In `BENCHMARK_HEADERS` mode, bad benchmark requests do not kill the mock: missing, blank, duplicated or overlong
 correlation headers return **400**, and request bodies over **64 KiB** return **413**.
 The maximum fixture remains 50 KiB. Rejections are counted separately as
 `wiremock_capture_rejected_requests_total` / JSON `rejectedRequests`; they have no

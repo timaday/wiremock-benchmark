@@ -74,6 +74,12 @@ def trial(runtime, root, exercise=None, settings=None, publish_amqp=False, publi
     if settings is not None:
         env.update(settings)
     config = yaml.safe_load((PORTAINER / f'stack-direct-{runtime}-rabbit.yml').read_text())
+    # Explicit local-test substitutions do not alter the published stack files.
+    if settings is not None:
+        if runtime.upper() + '_DIRECT_IMAGE' in settings:
+            config['services'][runtime]['image'] = settings[runtime.upper() + '_DIRECT_IMAGE']
+        if 'ARCHIVE_IMAGE' in settings:
+            config['services']['archive']['image'] = settings['ARCHIVE_IMAGE']
     if publish_amqp:
         config['services']['rabbit']['ports'].append({'target': 5672, 'protocol': 'tcp', 'mode': 'ingress'})
     if publish_metrics:
@@ -185,7 +191,7 @@ if __name__ == '__main__':
     args.output = args.output.resolve()
     args.output.mkdir(exist_ok=False)
     results = []
-    settings = None
+    settings = {'CAPTURE_IDENTITY_MODE': 'BENCHMARK_HEADERS'}
     if args.images is not None:
         images = json.loads(args.images.read_text())
         settings = {key.upper() + '_DIRECT_IMAGE': images[key]['tag'] for key in ('headless', 'official')}

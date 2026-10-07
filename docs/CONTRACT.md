@@ -134,6 +134,15 @@ Broker and archive directories require explicitly selected node-local storage.
 Queue bounds are not total disk bounds and archive retention remains operator
 owned. See `deploy/portainer/DIRECT-WITH-RABBIT.md` for the deployment contract.
 
+The four generated `stack-direct-*.yml` Portainer files pin the published version-2
+mock images directly; the dedicated-broker files also pin their matching archive.
+`deploy/portainer/direct/dynamic-image-lock.json` owns those image references.
+`OFFICIAL_DIRECT_IMAGE`, `HEADLESS_DIRECT_IMAGE` and `ARCHIVE_IMAGE` are not
+deployment selectors in these files. The direct example environments select
+`STUB_JSON`; existing benchmark bundles must explicitly select `BENCHMARK_HEADERS`.
+Local verification harnesses may explicitly substitute a matched unpublished
+build for testing; that does not change the deployment pins.
+
 `CAPTURE_MODE` explicitly selects `OUTBOX` (the SQLite contract above) or
 `DIRECT_RABBIT` when capture is enabled. Container images for the original path
 set `OUTBOX`; the two direct Portainer deployments set `DIRECT_RABBIT`. There is

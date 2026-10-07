@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   headless:
-    image: ${HEADLESS_DIRECT_IMAGE:?set newly built direct capture image}
+    image: ghcr.io/timaday/wiremock-lab-headless@sha256:1fed1c931c3dfeceb6fd117a337883c853867bc4ab88d0f42f34770c26225562
     deploy:
       replicas: 1
       placement:
@@ -160,7 +160,7 @@ services:
         max-size: 10m
         max-file: '3'
   archive:
-    image: ${ARCHIVE_IMAGE:?set archive image matching the capture schema}
+    image: ghcr.io/timaday/wiremock-lab-archive@sha256:f9ec079bb167b4ed095c9a56f70e805c7e8794408b81d7ae864ebfb2897cd596
     environment:
       RABBIT_URI: amqp://benchmark:${RABBIT_PASSWORD:?set generated hexadecimal password}@rabbit:5672/%2f
       RABBIT_QUEUE: ${CAPTURE_PREFIX:?set unique capture queue prefix}.headless
