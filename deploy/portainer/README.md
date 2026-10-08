@@ -2,6 +2,9 @@
 
 Use [the deployment guide](../../docs/PORTAINER.md) for Docker Swarm / Portainer.
 
+- `stack-official-no-capture.yml`: one official WireMock with bundled mappings,
+  capture disabled, no broker and no persistent storage. See
+  [the capture-off guide](OFFICIAL-NO-CAPTURE.md).
 - `stack-ghcr.yml`: ready-to-upload stack with GHCR image digests and its own RabbitMQ.
 - `stack-direct-headless-rabbit-monitored.yml` / `stack-direct-official-rabbit-monitored.yml`:
   one mock, dedicated RabbitMQ, archive, Prometheus and provisioned Grafana dashboard.
