@@ -2,6 +2,10 @@
 
 Use [the deployment guide](../../docs/PORTAINER.md) for Docker Swarm / Portainer.
 
+- `stack-official-five.yml`: five upstream official WireMocks on ports 19001–19005,
+  plus Nginx on 19081 with `/mock-1/` through `/mock-5/` routing. Retains our JVM/HTTP
+  tuning, with no custom extensions or baked mappings. See
+  [the five-instance guide](OFFICIAL-FIVE.md) for per-instance node placement.
 - `stack-official-no-capture.yml`: one official WireMock with bundled mappings,
   capture disabled, no broker and no persistent storage. See
   [the capture-off guide](OFFICIAL-NO-CAPTURE.md).

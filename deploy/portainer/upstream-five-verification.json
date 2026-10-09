@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "scope": "Five simultaneous upstream mocks plus Nginx; local Compose HTTP smoke only",
+  "directPortsMatchProxyMappings": true,
+  "nginxConfigValid": true,
+  "deploymentDifference": "Published ports bound to loopback for local test",
+  "mappingIsolation": true,
+  "restarts": 0,
+  "ooms": 0,
+  "services": [
+    {
+      "instance": 1,
+      "port": 19001,
+      "initialMappings": 0,
+      "nginxPrefix": "/mock-1/",
+      "queryAndHeaderPreserved": true,
+      "empty200DelaySeconds": 6.01172015699558,
+      "templateDelaySeconds": 1.0642203550087288,
+      "templateBodyMatched": true,
+      "healthyAfterMalformedMapping": true
+    },
+    {
+      "instance": 2,
+      "port": 19002,
+      "initialMappings": 0,
+      "nginxPrefix": "/mock-2/",
+      "queryAndHeaderPreserved": true,
+      "empty200DelaySeconds": 6.009546615066938,
+      "templateDelaySeconds": 1.0665608840063214,
+      "templateBodyMatched": true,
+      "healthyAfterMalformedMapping": true
+    },
+    {
+      "instance": 3,
+      "port": 19003,
+      "initialMappings": 0,
+      "nginxPrefix": "/mock-3/",
+      "queryAndHeaderPreserved": true,
+      "empty200DelaySeconds": 6.008378940052353,
+      "templateDelaySeconds": 1.0656089179683477,
+      "templateBodyMatched": true,
+      "healthyAfterMalformedMapping": true
+    },
+    {
+      "instance": 4,
+      "port": 19004,
+      "initialMappings": 0,
+      "nginxPrefix": "/mock-4/",
+      "queryAndHeaderPreserved": true,
+      "empty200DelaySeconds": 6.008641352993436,
+      "templateDelaySeconds": 1.058716099942103,
+      "templateBodyMatched": true,
+      "healthyAfterMalformedMapping": true
+    },
+    {
+      "instance": 5,
+      "port": 19005,
+      "initialMappings": 0,
+      "nginxPrefix": "/mock-5/",
+      "queryAndHeaderPreserved": true,
+      "empty200DelaySeconds": 6.007891133078374,
+      "templateDelaySeconds": 1.0614604729926214,
+      "templateBodyMatched": true,
+      "healthyAfterMalformedMapping": true
+    }
+  ],
+  "date": "2026-10-09",
+  "nginxVersion": "1.30.5",
+  "nginxRestarts": 0,
+  "nginxOom": false,
+  "configurationTestsPassed": 22,
+  "stackSha256": "ff310a5af3021c699e8c1b07729c7f1e0cb9e0d70455d7d4f7334920813fa19f",
+  "generatedStackReproducesExactly": true,
+  "evidenceDirectory": "results/upstream-five-nginx-20261009"
+}
