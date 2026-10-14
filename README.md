@@ -40,6 +40,19 @@ bundles and their measured results remain available in the package.
 
 ## Run
 
+To configure customer/product-class POST responses on an existing WireMock, use
+[`wb` and its YAML configuration](docs/WB.md): `./wb --all-mocks --all-customers --delay 1000`.
+Named targets, customer assignments and groups are in `wb.yaml`; named error
+and timeout profiles are supported. Each customer selects a response profile;
+product classes inherit it unless explicitly overridden. Profiles support JSON,
+text and empty HTTP 200 responses.
+Use `./wb list --customer 2342342` or `./wb list --all-customers` to list
+YAML-configured endpoints without contacting WireMock.
+Use `./wb verify --customer 2342342 --delay 1000` to check installed mappings
+and probe public endpoints for the expected status, headers, body and delay.
+Use `./wb clean --mock mock-5 --customer 2342342 --stale-only` to preview obsolete
+owned mappings; add `--execute` to delete them and verify their absence.
+
 Requires Docker Engine/Compose, a local Swarm manager, and Python 3.10+ on a Linux
 Docker host (Windows: run inside WSL2). No local Java, Maven, RabbitMQ or Gatling
 is needed. Linux x86-64 is the initial test host. Image recipes also select upstream

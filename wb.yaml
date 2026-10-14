@@ -1,0 +1,111 @@
+# Every target explicitly declares its URL, proxy behavior and customer assignments.
+# Our Nginx strips /mock-N. Use preserve with direct URLs such as http://HOST:19001.
+# Optional customer uri_extension: transactions precedes /productClasses/<product>.
+# Products may override it, including uri_extension: "" to remove it.
+# Optional customer_path_override: partner/orders replaces /<name>/<code>.
+wiremocks:
+  mock-1:
+    api: http://localhost:19081/mock-1
+    prefix_handling: strip
+    customers:
+      - "3243423434"
+      - "2342342"
+  mock-2:
+    api: http://localhost:19081/mock-2
+    prefix_handling: strip
+    customers:
+      - "3243423434"
+      - "2342342"
+  mock-3:
+    api: http://localhost:19081/mock-3
+    prefix_handling: strip
+    customers:
+      - "3243423434"
+      - "2342342"
+  mock-4:
+    api: http://localhost:19081/mock-4
+    prefix_handling: strip
+    customers:
+      - "3243423434"
+      - "2342342"
+  mock-5:
+    api: http://localhost:19081/mock-5
+    prefix_handling: strip
+    customers:
+      - "3243423434"
+      - "2342342"
+
+customer_groups:
+  slow-customers:
+    - "2342342"
+  test-customers:
+    - "3243423434"
+    - "2342342"
+
+response_profiles:
+  accepted:
+    status: 200
+    headers:
+      Content-Type: application/json
+    jsonBody:
+      txn_result:
+        result: ACCEPTED
+        result_message: Mocked success request
+      reason_text: txnResultContent
+      reason_code: "400"
+  empty-ok:
+    status: 200
+    headers: {}
+    body: ""
+
+customers:
+  "3243423434":
+    name: TestCustomer
+    endpoint_scope: product-class
+    response_profile: accepted
+    delay:
+      - 0
+      - 1000
+      - 1500
+      - 2000
+      - 3000
+      - 4000
+      - 5000
+      - 6000
+    ProductClasses:
+      Productclass:
+  "2342342":
+    name: SecondCustomer
+    endpoint_scope: product-class
+    # Productclass inherits empty-ok; AnotherProduct explicitly returns JSON.
+    response_profile: empty-ok
+    delay:
+      - 0
+      - 1000
+      - 1500
+      - 2000
+      - 3000
+      - 4000
+      - 5000
+      - 6000
+    ProductClasses:
+      Productclass:
+      AnotherProduct:
+        response_profile: accepted
+
+error_profiles:
+  server-error:
+    type: http-error
+    response:
+      status: 500
+      headers:
+        Content-Type: application/json
+      jsonBody:
+        txn_result:
+          result: REJECTED
+          result_message: Mocked server error
+        reason_text: Simulated server failure
+        reason_code: "500"
+  timeout:
+    type: timeout
+    delay: 60000
