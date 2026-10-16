@@ -9,7 +9,7 @@ from http.client import HTTPException
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-from tools.wb_http_errors import transport_failure
+from wiremock_benchmark_cli.http_errors import transport_failure
 
 
 class AdminError(RuntimeError):
@@ -71,7 +71,7 @@ def mapping_matches(actual, expected):
                                     if key not in body_keys | {"headers"}}))
 
 
-def apply_plans(plan, timeout, progress=print):
+def apply_plans(plan, timeout, progress=print, observe=lambda event: None):
     prepared = []
     verified = 0
     completed = []
@@ -89,28 +89,35 @@ def apply_plans(plan, timeout, progress=print):
             operations = []
             for mapping in target["mappings"]:
                 path = "/__admin/mappings/" + mapping["id"]
+                observe({"operation": "preflight", "status": "started", "mock": name, "mapping_id": mapping["id"]})
                 current = admin.request("GET", path, missing_ok=True)
                 if current is not None:
                     if (not isinstance(current, dict)
                             or current.get("metadata") != mapping["metadata"]):
                         raise AdminError(f"Refusing to overwrite mapping {mapping['id']}: ownership mismatch")
                 operations.append((mapping, path, current is not None))
+                observe({"operation": "preflight", "status": "passed", "mock": name, "mapping_id": mapping["id"]})
             prepared.append((name, admin, operations))
         for name, admin, operations in prepared:
             for mapping, path, exists in operations:
                 stage = "write"
+                observe({"operation": "write", "status": "attempted", "mock": name, "mapping_id": mapping["id"],
+                         "method": "PUT" if exists else "POST"})
                 admin.request("PUT" if exists else "POST", path if exists else "/__admin/mappings", mapping)
                 stage = "readback"
                 actual = admin.request("GET", path)
                 if not mapping_matches(actual, mapping):
                     raise AdminError(f"Readback mismatch for mapping {mapping['id']}")
                 verified += 1
+                observe({"operation": "write", "status": "verified", "mock": name, "mapping_id": mapping["id"]})
                 response = mapping["response"]
                 progress(f"[{name}] Verified {verified}/{total}: {mapping['request']['urlPath']} "
                          f"status={response['status']} delay={response['fixedDelayMilliseconds']}ms")
             completed.append(name)
             progress(f"[{name}] Applied and verified {len(operations)} mapping(s).")
     except AdminError as exc:
+        observe({"operation": stage, "status": "failed", "mock": name, "mapping_id": mapping["id"],
+                 "detail": str(exc), "verified": verified, "total": total, "completed_targets": completed})
         effects = ("No writes attempted on any target." if stage == "preflight" else
                    "Writes are not atomic and the failing write may have applied.")
         raise AdminError(f"[{name}] {stage} failed: {exc}. Verified {verified}/{total}; "

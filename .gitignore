@@ -5,4 +5,5 @@ fixtures/
 .runtime/
 __pycache__/
 *.pyc
+dist/
 .env

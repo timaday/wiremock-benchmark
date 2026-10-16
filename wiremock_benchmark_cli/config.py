@@ -1,7 +1,7 @@
 """Responsibility: load and validate the customer, target and group configuration.
 
 Must not: perform HTTP requests or mutate WireMock state.
-Contract: docs/WB.md, configuration and CLI version 5.
+Contract: docs/WB.md, configuration schema version 1.
 """
 
 import json
@@ -11,7 +11,11 @@ from urllib.parse import quote, urlsplit, urlunsplit
 
 import yaml
 
-from tools.wb_identity import CUSTOMER_SCOPE, PRODUCT_CLASS_SCOPE
+from wiremock_benchmark_cli.identity import CUSTOMER_SCOPE, PRODUCT_CLASS_SCOPE
+
+CONFIG_SCHEMA_VERSION = 1
+MAX_DELAY_MS = 2147483647
+NO_ERROR_PROFILE = "none"
 
 
 class ConfigError(ValueError):
@@ -50,6 +54,12 @@ def integer(value, minimum, maximum, where):
 def endpoint_scope(value, where):
     if value not in (CUSTOMER_SCOPE, PRODUCT_CLASS_SCOPE):
         raise ConfigError(f"{where}: endpoint_scope must explicitly be customer or product-class")
+
+
+def validate_delay(value, customer, where):
+    integer(value, 0, MAX_DELAY_MS, where)
+    if "allowed_delays_ms" in customer and value not in customer["allowed_delays_ms"]:
+        raise ConfigError(f"{where}: delay {value}ms is not allowed by allowed_delays_ms")
 
 
 def segment(value, where):
@@ -107,7 +117,8 @@ def json_value(value):
 
 
 def validate_response(value, error=False):
-    fields(value, {"status", "headers"}, {"body", "jsonBody"}, "profile response")
+    optional = {"body", "jsonBody"} | ({"request_profile"} if not error else set())
+    fields(value, {"status", "headers"}, optional, "profile response")
     integer(value["status"], 400 if error else 200, 599 if error else 299, "response.status")
     if ("body" in value) + ("jsonBody" in value) != 1:
         raise ConfigError("Each response must declare exactly one of body or jsonBody")
@@ -155,6 +166,11 @@ def customer_references(value, customers, where):
     return codes
 
 
+def error_profile_reference(name, profiles, where):
+    if not isinstance(name, str) or (name != NO_ERROR_PROFILE and name not in profiles):
+        raise ConfigError(f"{where}: error_profile must be none or a known profile name")
+
+
 def validate_targets_and_groups(data):
     targets = data["wiremocks"]
     if not isinstance(targets, dict) or not targets:
@@ -175,7 +191,19 @@ def validate_targets_and_groups(data):
         if identity in endpoints:
             raise ConfigError(f"mock {name}: duplicate API endpoint")
         endpoints.add(identity)
-        target["customers"] = customer_references(target["customers"], data["customers"], f"mock {name}")
+        assignments = target["customers"]
+        if not isinstance(assignments, dict) or not assignments:
+            raise ConfigError(f"mock {name}: customers must be a nonempty mapping of code to explicit override settings or {{}}")
+        codes = customer_references(list(assignments), data["customers"], f"mock {name}")
+        normalized = {}
+        for code, settings in zip(codes, assignments.values(), strict=True):
+            fields(settings, set(), {"delay_ms", "error_profile"}, f"mock {name} customer {code}")
+            if "error_profile" in settings:
+                error_profile_reference(settings["error_profile"], data["error_profiles"], f"mock {name} customer {code}")
+            if "delay_ms" in settings:
+                validate_delay(settings["delay_ms"], data["customers"][code], f"mock {name} customer {code} delay_ms")
+            normalized[code] = settings
+        target["customers"] = normalized
     if not isinstance(data["customer_groups"], dict):
         raise ConfigError("customer_groups must be a mapping")
     for name, members in data["customer_groups"].items():
@@ -183,28 +211,38 @@ def validate_targets_and_groups(data):
         data["customer_groups"][name] = customer_references(members, data["customers"], f"group {name}")
 
 
-def load_config(path):
+def load_config(path, source_observer=None):
+    from wiremock_benchmark_cli.requests import REQUEST_FIELDS, request_profile_reference, validate_request_profiles
     try:
-        data = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
+        content = Path(path).read_bytes()
+        if source_observer is not None:
+            source_observer(path, content)
+        data = yaml.load(content.decode("utf-8"), Loader=UniqueKeyLoader)
     except (OSError, UnicodeError) as exc:
         raise ConfigError(f"Cannot read configuration file: {type(exc).__name__}") from exc
     except yaml.YAMLError as exc:
         mark = getattr(exc, "problem_mark", None)
         location = f" at line {mark.line + 1}" if mark else ""
         raise ConfigError(f"Invalid YAML{location}") from exc
+    if not isinstance(data, dict) or type(data.get("schema_version")) is not int or data["schema_version"] != CONFIG_SCHEMA_VERSION:
+        raise ConfigError("schema_version must be the integer 1; migrate unversioned files using docs/WB.md")
     if isinstance(data, dict) and ("wiremock_api" in data or "prefix_handling" in data):
         raise ConfigError("Single-target YAML has been replaced: use wiremocks with api, "
                           "prefix_handling and customers per target, plus customer_groups (see docs/WB.md)")
     if isinstance(data, dict) and "response" in data:
         raise ConfigError("Global response has been replaced: use response_profiles and an explicit "
                           "response_profile for every customer (see docs/WB.md)")
-    fields(data, {"wiremocks", "customer_groups", "response_profiles", "customers", "error_profiles"}, set(), "configuration")
+    fields(data, {"schema_version", "wiremocks", "customer_groups", "response_profiles", "customers", "error_profiles"}, {"request_profiles"}, "configuration")
+    data.setdefault("request_profiles", {})
+    validate_request_profiles(data["request_profiles"])
     responses = data["response_profiles"]
     if not isinstance(responses, dict) or not responses:
         raise ConfigError("response_profiles must be a nonempty mapping")
     for name, response in responses.items():
         segment(name, "response profile name")
         validate_response(response)
+        if "request_profile" in response:
+            request_profile_reference(response["request_profile"], data["request_profiles"], f"response profile {name}")
     if not isinstance(data["customers"], dict) or not data["customers"]:
         raise ConfigError("customers must be a nonempty mapping")
     customers = {}
@@ -215,7 +253,9 @@ def load_config(path):
         segment(code, "customer code")
         if code in customers:
             raise ConfigError("Duplicate customer code after string conversion")
-        fields(customer, {"name", "endpoint_scope", "response_profile", "delay"}, {"ProductClasses", "uri_extension", "customer_path_override"}, f"customer {code}")
+        fields(customer, {"name", "endpoint_scope", "response_profile", "delay_ms"}, {"error_profile", "ProductClasses", "uri_extension", "customer_path_override", "allowed_delays_ms"} | REQUEST_FIELDS, f"customer {code}")
+        if "request_profile" in customer:
+            request_profile_reference(customer["request_profile"], data["request_profiles"], f"customer {code}")
         segment(customer["name"], f"customer {code} name")
         if "uri_extension" in customer:
             relative_path(customer["uri_extension"], "uri_extension", allow_empty=True)
@@ -223,13 +263,15 @@ def load_config(path):
             relative_path(customer["customer_path_override"], "customer_path_override")
         endpoint_scope(customer["endpoint_scope"], f"customer {code}")
         profile_reference(customer["response_profile"], responses, f"customer {code}")
-        delays = customer["delay"]
-        if not isinstance(delays, list) or not delays:
-            raise ConfigError(f"customer {code} delay must be a nonempty list")
-        for delay in delays:
-            integer(delay, 0, 2147483647, f"customer {code} delay")
-        if len(set(delays)) != len(delays):
-            raise ConfigError(f"customer {code} has duplicate delays")
+        if "allowed_delays_ms" in customer:
+            delays = customer["allowed_delays_ms"]
+            if not isinstance(delays, list) or not delays:
+                raise ConfigError(f"customer {code} allowed_delays_ms must be a nonempty list")
+            for delay in delays:
+                integer(delay, 0, MAX_DELAY_MS, f"customer {code} allowed_delays_ms")
+            if len(set(delays)) != len(delays):
+                raise ConfigError(f"customer {code} has duplicate allowed delays")
+        validate_delay(customer["delay_ms"], customer, f"customer {code} delay_ms")
         products = customer.get("ProductClasses", {})
         if not isinstance(products, dict):
             raise ConfigError(f"customer {code} ProductClasses must be a mapping")
@@ -239,9 +281,11 @@ def load_config(path):
         for product, settings in products.items():
             segment(product, "product class")
             if settings is not None:
-                fields(settings, set(), {"response_profile", "endpoint_scope", "uri_extension"}, f"product {product}")
+                fields(settings, set(), {"response_profile", "endpoint_scope", "uri_extension"} | REQUEST_FIELDS, f"product {product}")
                 if not settings:
-                    raise ConfigError(f"product {product}: declare response_profile, endpoint_scope or uri_extension; use null to inherit all")
+                    raise ConfigError(f"product {product}: declare response_profile, endpoint_scope, uri_extension or request_profile; use null to inherit all")
+                if "request_profile" in settings:
+                    request_profile_reference(settings["request_profile"], data["request_profiles"], f"customer {code} product {product}")
                 if "uri_extension" in settings:
                     relative_path(settings["uri_extension"], "uri_extension", allow_empty=True)
                 if "response_profile" in settings:
@@ -255,13 +299,18 @@ def load_config(path):
         raise ConfigError("error_profiles must be a mapping")
     for name, profile in profiles.items():
         segment(name, "error profile name")
+        if name == NO_ERROR_PROFILE:
+            raise ConfigError("error_profiles: none is reserved for the normal response")
         if not isinstance(profile, dict) or profile.get("type") not in ("http-error", "timeout"):
             raise ConfigError("Error profile type must be http-error or timeout")
         if profile["type"] == "http-error":
             fields(profile, {"type", "response"}, set(), f"profile {name}")
             validate_response(profile["response"], error=True)
         else:
-            fields(profile, {"type", "delay"}, set(), f"profile {name}")
-            integer(profile["delay"], 1, 2147483647, f"profile {name} delay")
+            fields(profile, {"type", "delay_ms"}, set(), f"profile {name}")
+            integer(profile["delay_ms"], 1, MAX_DELAY_MS, f"profile {name} delay_ms")
+    for code, customer in customers.items():
+        if "error_profile" in customer:
+            error_profile_reference(customer["error_profile"], profiles, f"customer {code}")
     validate_targets_and_groups(data)
     return data

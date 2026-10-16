@@ -26,13 +26,13 @@ class NamedTargetsSmoke(unittest.TestCase):
         config = yaml.safe_load((ROOT / "wb.yaml").read_text())
         suffix = uuid.uuid4().hex[:10]
         a, b, c, d = [letter + "-" + suffix for letter in "abcd"]
-        config["customers"] = {code: dict(name="Test Customer " + code, response_profile="accepted", delay=[0, 1000, 6000],
+        config["customers"] = {code: dict(name="Test Customer " + code, response_profile="accepted", error_profile="none", delay_ms=1000, allowed_delays_ms=[0, 1000, 6000], endpoint_scope="product-class",
                                           ProductClasses={"Product": None}) for code in (a, b, c, d)}
         config["customer_groups"] = {"selected": [a, c], "all": [a, b, c, d]}
         assignments = [[a, b], [b, c], [c], [a], [d]]
         for index, members in enumerate(assignments, 1):
             config["wiremocks"][f"mock-{index}"] = dict(api=f"{base}/mock-{index}",
-                                                        prefix_handling="strip", customers=members)
+                                                        prefix_handling="strip", customers={code: {} for code in members})
 
         def mappings(target):
             with urlopen(config["wiremocks"][target]["api"] + "/__admin/mappings", timeout=5) as response:

@@ -28,7 +28,9 @@ def expected_criteria(mapping, early_ms, overhead_ms):
         "  Expected headers: " + json.dumps(response["headers"], sort_keys=True)
         + " (configured values must match; extra headers allowed)",
     ]
-    if "body" in response:
+    if mapping["request"]["method"] == "HEAD":
+        lines.append("  Expected body: empty for HEAD; configured response body is checked through the admin API")
+    elif "body" in response:
         lines.append(f"  Expected body: {len(expected_bytes(response))} UTF-8 bytes; exact match "
                      + json.dumps(response["body"]))
         if not response["body"] and not any(name.lower() == "content-type" for name in response["headers"]):

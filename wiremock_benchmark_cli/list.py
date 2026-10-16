@@ -7,9 +7,12 @@ Contract: docs/WB.md, list configured endpoints.
 import sys
 import json
 
-from tools.wb_help import command_parser
+from wiremock_benchmark_cli.help import command_parser
+from wiremock_benchmark_cli.report import (reported_command, start_report, record, record_source,
+                             record_error)
 
 
+@reported_command("list")
 def list_main(argv):
     parser = command_parser("wb list", "List configured endpoints from YAML; no network requests.",
                             "Examples:\n  wb list -f wb.phase1.yaml --all-customers\n"
@@ -24,11 +27,12 @@ def list_main(argv):
     targets.add_argument("--all-mocks", action="store_true", help="List all configured mocks (the listing default)")
     args = parser.parse_args(argv)
 
-    from tools.wb_config import ConfigError, load_config
-    from tools.wb_plan import configured_endpoints
+    start_report(args)
+    from wiremock_benchmark_cli.config import ConfigError, load_config
+    from wiremock_benchmark_cli.plan import configured_endpoints
 
     try:
-        config = load_config(args.config)
+        config = load_config(args.config, source_observer=record_source)
         if args.customer is not None and args.customer not in config["customers"]:
             raise ConfigError(f"Unknown customer: {args.customer}")
         if args.mock is not None and args.mock not in config["wiremocks"]:
@@ -39,9 +43,12 @@ def list_main(argv):
                      [code for code in customers if code in target["customers"]])
                      for name, target in mocks.items()}
     except ConfigError as exc:
+        record_error(exc)
         print(f"wb: {exc}", file=sys.stderr)
         return 2
 
+    record("resolved", {"targets": [{"mock": name, "wiremock_api": mocks[name]["api"],
+                                      "endpoints": values} for name, values in endpoints.items()]})
     print(f"Configured endpoints from {args.config} (YAML only; live state not checked).")
     total = 0
     for code in customers:
@@ -59,9 +66,14 @@ def list_main(argv):
                       f"mapping_path={endpoint['mapping_path']}")
                 print(f"    endpoint_scope={endpoint['endpoint_scope']} ({endpoint['scope_source']})")
                 print(f"    uri_extension={json.dumps(endpoint['uri_extension'])} ({endpoint['extension_source']})")
+                print(f"    delay={endpoint['delay_ms']}ms ({endpoint['delay_source']})")
+                print(f"    error_profile={endpoint['error_profile']} ({endpoint['error_profile_source']})")
+                print(f"    request_profile={endpoint['request_profile']} ({endpoint['request_profile_source']}); "
+                      f"probe_body={json.dumps(endpoint['probe_body'])}")
                 count += 1
         if count == 0:
             print("  No configured endpoints in the selected mocks.")
         total += count
+    record("summary", {"endpoints": total, "live_state_checked": False})
     print(f"\n{total} configured endpoint(s).")
     return 0

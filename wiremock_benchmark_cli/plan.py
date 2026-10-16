@@ -1,30 +1,16 @@
 """Responsibility: resolve explicit target/customer selections into mapping plans.
 
 Must not: load YAML or perform HTTP operations.
-Contract: docs/WB.md version 5; assignments constrain selection, explicit profile/scope/extension inheritance.
+Contract: docs/WB.md schema 1; explicit target assignments and profile inheritance.
 """
 
 import copy
 from urllib.parse import urlsplit
 
-from tools.wb_config import PRODUCT_CLASS_SCOPE, ConfigError, api_base, integer, relative_path, segment
-from tools.wb_identity import mapping_id, mapping_metadata
-
-
-def selected_delay(config, codes, delay, profile):
-    if profile is not None and profile not in config["error_profiles"]:
-        raise ConfigError(f"Unknown error profile: {profile}")
-    error = config["error_profiles"][profile] if profile is not None else None
-    if error and error["type"] == "timeout":
-        if delay is not None:
-            raise ConfigError("A timeout profile supplies its own delay; omit --delay")
-        delay = error["delay"]
-    else:
-        integer(delay, 0, 2147483647, "--delay")
-        for code in codes:
-            if delay not in config["customers"][code]["delay"]:
-                raise ConfigError(f"Delay {delay}ms is not allowed for customer {code}")
-    return delay
+from wiremock_benchmark_cli.config import NO_ERROR_PROFILE, PRODUCT_CLASS_SCOPE, ConfigError, api_base, relative_path, segment
+from wiremock_benchmark_cli.delays import resolve_delay, validate_delay_options
+from wiremock_benchmark_cli.identity import mapping_id, mapping_metadata
+from wiremock_benchmark_cli.requests import resolve_request
 
 
 def configured_endpoints(config, target, codes):
@@ -37,8 +23,10 @@ def configured_endpoints(config, target, codes):
                           "use preserve for a direct root URL")
     endpoints = []
     paths = {}
+    identities = {}
     for code in codes:
         customer = config["customers"][code]
+        timing = resolve_delay(config, target, code)
         customer_path = ("/" + relative_path(customer["customer_path_override"], "customer_path_override")
                          if "customer_path_override" in customer else
                          f"/{segment(customer['name'], 'name')}/{segment(code, 'code')}")
@@ -50,6 +38,8 @@ def configured_endpoints(config, target, codes):
             extension_override = settings is not None and "uri_extension" in settings
             source = "product" if profile_override else "customer"
             profile = settings["response_profile"] if profile_override else customer["response_profile"]
+            request = resolve_request(config, customer, settings, response_profile=profile)
+            method = request["method"]
             scope = settings["endpoint_scope"] if scope_override else customer["endpoint_scope"]
             extension = settings["uri_extension"] if extension_override else customer.get("uri_extension", "")
             extension_source = "product" if extension_override else ("customer" if "uri_extension" in customer else "none")
@@ -59,14 +49,23 @@ def configured_endpoints(config, target, codes):
             if scope == PRODUCT_CLASS_SCOPE:
                 path += f"/productClasses/{segment(product, 'product')}"
             endpoint_id = mapping_id(code, product if scope == PRODUCT_CLASS_SCOPE else None, extension)
-            if path in paths:
-                existing = paths[path]
+            route = (method, path)
+            if endpoint_id in identities and identities[endpoint_id] != route:
+                raise ConfigError(f"Conflicting request methods or paths for shared mapping {endpoint_id}; "
+                                  "use one method or distinct product-class routes")
+            identities[endpoint_id] = route
+            if route in paths:
+                existing = paths[route]
                 if existing["mapping_id"] != endpoint_id:
-                    raise ConfigError(f"Conflicting endpoint scopes or customers on POST {base + path}; choose distinct routes")
+                    raise ConfigError(f"Conflicting endpoint scopes or customers on {method} {base + path}; choose distinct routes")
                 if existing["response_profile"] != profile:
-                    raise ConfigError(f"Conflicting response profiles on shared POST endpoint {base + path}: "
+                    raise ConfigError(f"Conflicting response profiles on shared {method} endpoint {base + path}: "
                                       f"{existing['response_profile']} and {profile}; use one profile or product-class scope")
+                if existing["request_profile"] != request["request_profile"]:
+                    raise ConfigError(f"Conflicting request profiles on shared {method} endpoint {base + path}")
                 existing["product_classes"].append(product)
+                if existing["request_profile_source"] != request["request_profile_source"]:
+                    existing["request_profile_source"] = "mixed"
                 if existing["source"] != source:
                     existing["source"] = "mixed"
                 if existing["scope_source"] != ("product" if scope_override else "customer"):
@@ -77,22 +76,23 @@ def configured_endpoints(config, target, codes):
             endpoint = {
                 "mapping_id": endpoint_id,
                 "customer": code, "product_class": product if scope == PRODUCT_CLASS_SCOPE else None,
-                "product_classes": [product] if product is not None else [], "method": "POST", "request_url": base + path,
+                "product_classes": [product] if product is not None else [], "request_url": base + path,
                 "mapping_path": prefix + path if mode == "preserve" else path,
                 "response_profile": profile, "source": source,
                 "endpoint_scope": scope, "scope_source": "product" if scope_override else "customer",
                 "uri_extension": extension, "extension_source": extension_source,
+                **timing, **request,
             }
-            paths[path] = endpoint
+            paths[route] = endpoint
             endpoints.append(endpoint)
     return endpoints
 
 
 def resolved_response(config, profile, delay, error_profile):
-    error = config["error_profiles"][error_profile] if error_profile is not None else None
+    error = config["error_profiles"][error_profile] if error_profile != NO_ERROR_PROFILE else None
     definition = (error["response"] if error and error["type"] == "http-error"
                   else config["response_profiles"][profile])
-    response = copy.deepcopy(definition)
+    response = copy.deepcopy({key: value for key, value in definition.items() if key != "request_profile"})
     response["fixedDelayMilliseconds"] = delay
     return response
 
@@ -109,12 +109,14 @@ def target_plan(name, target, config, codes, delay, error_profile):
     mappings, request_urls, resolved_profiles = [], [], []
     for endpoint in configured_endpoints(config, target, codes):
         code, product = endpoint["customer"], endpoint["product_class"]
-        response = resolved_response(config, endpoint["response_profile"], delay, error_profile)
+        timing = resolve_delay(config, target, code, delay, error_profile)
+        response = resolved_response(config, endpoint["response_profile"], timing["delay_ms"], timing["error_profile"])
         request_urls.append(endpoint["request_url"])
         resolved_profiles.append({key: endpoint[key] for key in
                                   ("mapping_id", "customer", "product_class", "response_profile", "source",
-                                   "endpoint_scope", "scope_source", "product_classes", "uri_extension", "extension_source")}
-                                 | {"error_profile": error_profile})
+                                   "endpoint_scope", "scope_source", "product_classes", "uri_extension", "extension_source",
+                                   "method", "request_profile", "probe_body", "request_profile_source")}
+                                 | timing)
         mappings.append({
             "id": endpoint["mapping_id"],
             "name": f"wb: {code} / {product}" if product is not None else f"wb: {code} / shared customer route",
@@ -154,7 +156,7 @@ def make_plans(config, *, mock=None, all_mocks=False, customer=None, group=None,
     uncovered = requested - assigned
     if uncovered:
         raise ConfigError("Requested customers are not assigned to any selected mock: " + ", ".join(sorted(uncovered)))
-    delay = selected_delay(config, sorted(requested), delay, profile)
+    validate_delay_options(config, delay, profile)
     return {"targets": [target_plan(name, target, config,
                                     [code for code in target["customers"] if code in requested], delay, profile)
                         for name, target in targets.items()]}

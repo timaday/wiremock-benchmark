@@ -7,9 +7,12 @@ Contract: docs/WB.md, explicit cleanup selectors and preview by default.
 import math
 import sys
 
-from tools.wb_help import command_parser
+from wiremock_benchmark_cli.help import command_parser
+from wiremock_benchmark_cli.report import (reported_command, start_report, record, record_source,
+                             record_event, record_error)
 
 
+@reported_command("clean")
 def clean_main(argv):
     parser = command_parser("wb clean", "Preview wb-owned mapping removal; deletion requires --execute.",
                             "Examples:\n  wb clean -f wb.phase1.yaml --mock mock-5 --customer 2342342 --stale-only --dry-run\n"
@@ -33,13 +36,14 @@ def clean_main(argv):
     if not math.isfinite(args.admin_timeout) or args.admin_timeout <= 0:
         parser.error("--admin-timeout must be a positive finite number")
 
-    from tools.wb_api import AdminError
-    from tools.wb_clean import clean_targets
-    from tools.wb_config import ConfigError, load_config, segment
-    from tools.wb_plan import configured_endpoints
+    start_report(args)
+    from wiremock_benchmark_cli.api import AdminError
+    from wiremock_benchmark_cli.clean import clean_targets
+    from wiremock_benchmark_cli.config import ConfigError, load_config, segment
+    from wiremock_benchmark_cli.plan import configured_endpoints
 
     try:
-        config = load_config(args.config)
+        config = load_config(args.config, source_observer=record_source)
         if args.mock is not None and args.mock not in config["wiremocks"]:
             raise ConfigError(f"Unknown mock: {args.mock}")
         if args.customer is not None:
@@ -49,12 +53,17 @@ def clean_main(argv):
             endpoint["mapping_id"] for endpoint in configured_endpoints(config, target, target["customers"])}}
             for name, target in selected.items()]
     except ConfigError as exc:
+        record_error(exc)
         print(f"wb: {exc}", file=sys.stderr)
         return 2
+    record("resolved", {"targets": [{**target, "desired_ids": sorted(target["desired_ids"])}
+                                    for target in targets]})
     try:
-        clean_targets(targets, args.customer, args.stale_only, args.execute, args.admin_timeout,
-                      progress=lambda message: print(message, flush=True))
+        summary = clean_targets(targets, args.customer, args.stale_only, args.execute, args.admin_timeout,
+                      progress=lambda message: print(message, flush=True), observe=record_event)
     except AdminError as exc:
+        record_error(exc)
         print(f"wb: {exc}", file=sys.stderr)
         return 1
+    record("summary", {**summary, "mode": "execute" if args.execute else "preview"})
     return 0

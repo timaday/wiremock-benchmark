@@ -14,12 +14,12 @@ from unittest.mock import patch
 
 import yaml
 
-from tools.wb_cli import main
-from tools.wb_api import AdminError
-from tools.wb_config import load_config
-from tools.wb_plan import make_plans
-from tools.wb_verify import probe, response_problem, verify_plans
-from tools.wb_verify_expectations import expected_criteria
+from wiremock_benchmark_cli.cli import main
+from wiremock_benchmark_cli.api import AdminError
+from wiremock_benchmark_cli.config import load_config
+from wiremock_benchmark_cli.plan import make_plans
+from wiremock_benchmark_cli.verify import probe, response_problem, verify_plans
+from wiremock_benchmark_cli.verify_expectations import expected_criteria
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,9 +47,9 @@ class ResponseChecksTest(unittest.TestCase):
     def test_network_timeout_is_failure_even_for_delayed_success(self):
         mapping = {"request": {"method": "POST"}, "response": {
             "status": 200, "body": "", "headers": {}, "fixedDelayMilliseconds": 60000}}
-        with patch("tools.wb_verify.build_opener") as opener:
+        with patch("wiremock_benchmark_cli.verify.build_opener") as opener:
             opener.return_value.open.side_effect = TimeoutError()
-            passed, detail = probe("http://unused.test/endpoint", mapping, 50, 1000)
+            passed, detail = probe("http://unused.test/endpoint", mapping, 50, 1000, request_settings={"probe_body": {"type": "json", "value": {}}})
         self.assertFalse(passed)
         self.assertIn("connection/read timed out", detail)
 
@@ -115,7 +115,7 @@ class VerificationHttpTest(unittest.TestCase):
         self.thread.start()
         self.addCleanup(self.stop_server)
         self.config["wiremocks"] = {"test": dict(api=f"http://127.0.0.1:{self.server.server_port}",
-                                                 prefix_handling="preserve", customers=["2342342"])}
+                                                 prefix_handling="preserve", customers={"2342342": {}})}
         self.plan = self.make_plan()
         self.installed = {m["id"]: copy.deepcopy(m) for m in self.plan["targets"][0]["mappings"]}
 
@@ -176,7 +176,7 @@ class VerificationHttpTest(unittest.TestCase):
 
     def test_each_endpoint_reports_expectations_before_check_and_verdict(self):
         output = []
-        with patch("tools.wb_api.WireMockAdmin.request", side_effect=AdminError("unavailable")) as admin, patch("tools.wb_verify.probe") as probe:
+        with patch("wiremock_benchmark_cli.api.WireMockAdmin.request", side_effect=AdminError("unavailable")) as admin, patch("wiremock_benchmark_cli.verify.probe") as probe:
             def progress(line):
                 if line.startswith("CHECK"):
                     self.assertEqual(admin.call_count, sum(item.startswith("FAIL") for item in output))
@@ -223,11 +223,11 @@ class VerificationHttpTest(unittest.TestCase):
         self.assertFalse(any(path == "/unexpected" for _, path, _ in self.calls))
 
     def test_unreachable_admin_is_failure(self):
-        with patch("tools.wb_api.WireMockAdmin.request", side_effect=AdminError("unavailable")), patch("tools.wb_verify.probe") as probe:
+        with patch("wiremock_benchmark_cli.api.WireMockAdmin.request", side_effect=AdminError("unavailable")), patch("wiremock_benchmark_cli.verify.probe") as probe:
             self.assertTrue(all(not r["passed"] for r in self.verify()))
             probe.assert_not_called()
 
-    def test_cli_and_missing_delay_validation(self):
+    def test_cli_uses_file_delay_when_override_omitted(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "wb.yaml"
             path.write_text(yaml.safe_dump(self.config))
@@ -235,9 +235,11 @@ class VerificationHttpTest(unittest.TestCase):
             with contextlib.redirect_stdout(output):
                 self.assertEqual(main(["verify", "--config", str(path), "--customer", "2342342", "--delay", "0"]), 0)
             self.assertIn("2 passed, 0 failed", output.getvalue())
-            with patch("tools.wb_verify.verify_plans") as verify, contextlib.redirect_stderr(io.StringIO()):
-                self.assertEqual(main(["verify", "--config", str(path), "--customer", "2342342"]), 2)
-                verify.assert_not_called()
+            with patch("wiremock_benchmark_cli.verify.verify_plans", return_value=[{"passed": True}]) as verify, contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(main(["verify", "--config", str(path), "--customer", "2342342"]), 0)
+                target = verify.call_args.args[0]["targets"][0]
+                self.assertEqual(target["mappings"][0]["response"]["fixedDelayMilliseconds"], 1000)
+                self.assertEqual(target["resolved_profiles"][0]["delay_source"], "customer")
 
     def test_invalid_time_limits_are_rejected_before_network(self):
         for flag, value in (("--admin-timeout", "0"), ("--early-tolerance-ms", "-1"),

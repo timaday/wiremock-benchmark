@@ -40,20 +40,37 @@ bundles and their measured results remain available in the package.
 
 ## Run
 
-To configure customer/product-class POST responses on an existing WireMock, use
-[`wb` and its YAML configuration](docs/WB.md): `./wb --all-mocks --all-customers --delay 1000`.
+To configure customer/product-class HTTP responses on an existing WireMock, use
+[`wb` and its YAML configuration](docs/WB.md) ([wheel installation and packaging](docs/WB-PACKAGE.md)): `./wb apply -f wb.yaml --all-mocks --all-customers`.
+Profiles require `schema_version: 1`. Each customer declares `delay_ms`; individual
+mock/customer assignments can override it. Optional `allowed_delays_ms` constrains
+normal delays, and CLI `--delay` explicitly overrides file values.
+Customer `error_profile` is optional: omitting it selects `none` (normal responses). A
+mock/customer assignment can override it; CLI `--error-profile` takes precedence.
+Use `--error-profile none` to explicitly request normal responses.
 Named targets, customer assignments and groups are in `wb.yaml`; named error
 and timeout profiles are supported. Each customer selects a response profile;
 product classes inherit it unless explicitly overridden. Profiles support JSON,
-text and empty HTTP 200 responses.
+text and empty HTTP 200 responses. Optional named `request_profiles` define a method and probe body. Customers
+select `request_profile`; products inherit it unless overridden. Omitting the
+selection uses the normal response profile's optional `request_profile` link,
+then POST and JSON `{}` if no link exists. Error profiles retain that request.
+GET/HEAD profiles require `probe_body: {type: none}`.
 Use `./wb list --customer 2342342` or `./wb list --all-customers` to list
 YAML-configured endpoints without contacting WireMock.
-Use `./wb verify --customer 2342342 --delay 1000` to check installed mappings
+Use `./wb verify -f wb.yaml --customer 2342342` to check installed mappings
 and probe public endpoints for the expected status, headers, body and delay.
 Use `./wb clean --mock mock-5 --customer 2342342 --stale-only` to preview obsolete
 owned mappings; add `--execute` to delete them and verify their absence.
+All four `wb` commands accept `--output report.json` to save resolved settings,
+the YAML hash and outcomes, including partial failures. Existing reports require
+`--overwrite-output` to replace them; YAML remains the repeatable input.
+For a phase/configuration switch, follow the
+[reviewed switch workflow](docs/WB.md#switching-configuration-files): preview,
+apply, preview stale mappings, explicitly clean, then verify. Applying a new
+file leaves obsolete mappings until cleanup; removed mocks need separate scope.
 
-Requires Docker Engine/Compose, a local Swarm manager, and Python 3.10+ on a Linux
+The benchmark harness requires Docker Engine/Compose, a local Swarm manager, and Python 3.10+ on a Linux
 Docker host (Windows: run inside WSL2). No local Java, Maven, RabbitMQ or Gatling
 is needed. Linux x86-64 is the initial test host. Image recipes also select upstream
 Linux ARM64 JDK27, but that architecture needs its own qualification. macOS Docker Desktop can use the Linux images and shared bind paths, but has not

@@ -13,10 +13,10 @@ from unittest.mock import patch
 
 import yaml
 
-from tools.wb_api import AdminError, apply_plans, mapping_matches
-from tools.wb_cli import main
-from tools.wb_config import ConfigError, api_base, load_config
-from tools.wb_plan import make_plans
+from wiremock_benchmark_cli.api import AdminError, apply_plans, mapping_matches
+from wiremock_benchmark_cli.cli import main
+from wiremock_benchmark_cli.config import ConfigError, api_base, load_config
+from wiremock_benchmark_cli.plan import make_plans
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +36,9 @@ class ConfigurationTest(unittest.TestCase):
         self.raw["customers"]["2342342"]["name"] = "Second Customer"
         for customer in self.raw["customers"].values():
             customer["response_profile"] = "accepted"
+        for target in self.raw["wiremocks"].values():
+            for assignment in target["customers"].values():
+                assignment.clear()
 
     def load(self, raw=None):
         self.path.write_text(yaml.safe_dump(self.raw if raw is None else raw))
@@ -78,7 +81,7 @@ class ConfigurationTest(unittest.TestCase):
     def test_invalid_selection_and_delay_fail(self):
         for args in ({"delay": 0}, {"customer": "missing", "delay": 0},
                      {"customer": "2342342", "all_customers": True, "delay": 0},
-                     {"all_customers": True}, {"all_customers": True, "delay": 1},
+                     {"all_customers": True, "delay": 1},
                      {"all_customers": True, "delay": True},
                      {"all_customers": True, "delay": 0, "profile": "typo"},
                      {"all_customers": True, "delay": 1000, "profile": "timeout"}):
@@ -86,7 +89,8 @@ class ConfigurationTest(unittest.TestCase):
                 single_plan(self.load(), **args)
 
     def test_all_customers_requires_delay_allowed_for_every_customer(self):
-        self.raw["customers"]["2342342"]["delay"] = [0]
+        self.raw["customers"]["2342342"]["allowed_delays_ms"] = [0]
+        self.raw["customers"]["2342342"]["delay_ms"] = 0
         with self.assertRaisesRegex(ConfigError, "not allowed"):
             single_plan(self.load(), all_customers=True, delay=1000)
 
@@ -95,15 +99,15 @@ class ConfigurationTest(unittest.TestCase):
             lambda c: c.update(wiremock="typo"),
             lambda c: c["customers"]["2342342"].update(name="../bad"),
             lambda c: c["customers"]["2342342"].update(name="x%2fy"),
-            lambda c: c["customers"]["2342342"].update(delay=[True]),
-            lambda c: c["customers"]["2342342"].update(delay=[0, 0]),
+            lambda c: c["customers"]["2342342"].update(allowed_delays_ms=[True]),
+            lambda c: c["customers"]["2342342"].update(allowed_delays_ms=[0, 0]),
             lambda c: c["customers"]["2342342"].update(ProductClasses=[]),
             lambda c: c["customers"]["2342342"].update(ProductClasses={"foo": {}}),
             lambda c: c["response_profiles"]["accepted"].update(status=100),
             lambda c: c["response_profiles"]["accepted"].update(jsonBody={"x": float("nan")}),
             lambda c: c["response_profiles"]["accepted"].update(jsonBody={1: "value"}),
             lambda c: c["response_profiles"]["accepted"].update(headers={"bad\nheader": "bad"}),
-            lambda c: c["error_profiles"]["timeout"].update(delay=0),
+            lambda c: c["error_profiles"]["timeout"].update(delay_ms=0),
             lambda c: c["error_profiles"]["timeout"].update(type="typo"),
             lambda c: c["error_profiles"]["server-error"]["response"].update(status=200),
         ]
@@ -124,7 +128,7 @@ class ConfigurationTest(unittest.TestCase):
         customer = self.raw["customers"].pop("3243423434")
         self.raw["customers"][3243423434] = customer
         self.raw["customers"]["00123"] = copy.deepcopy(customer)
-        self.raw["wiremocks"]["mock-1"]["customers"].append("00123")
+        self.raw["wiremocks"]["mock-1"]["customers"]["00123"] = {}
         config = self.load()
         plan = single_plan(config, customer="00123", delay=0)
         self.assertIn("/00123/", plan["mappings"][0]["request"]["urlPath"])
@@ -169,18 +173,18 @@ class ConfigurationTest(unittest.TestCase):
 
     def test_dry_run_has_no_http_and_invalid_config_has_no_http(self):
         self.load()
-        with patch("tools.wb_cli.apply_plans") as apply, contextlib.redirect_stdout(io.StringIO()) as output, contextlib.redirect_stderr(io.StringIO()) as errors:
+        with patch("wiremock_benchmark_cli.cli.apply_plans") as apply, contextlib.redirect_stdout(io.StringIO()) as output, contextlib.redirect_stderr(io.StringIO()) as errors:
             self.assertEqual(main(["--config", str(self.path), "--mock", "mock-1", "--all-customers", "--delay", "0", "--dry-run"]), 0)
             self.assertEqual(len(json.loads(output.getvalue())["targets"][0]["mappings"]), 3)
             self.assertIn("WARNING [mock-1]:", errors.getvalue())
             self.assertIn("/mock-1", errors.getvalue())
             apply.assert_not_called()
-        with patch("tools.wb_cli.apply_plans") as apply, contextlib.redirect_stderr(io.StringIO()):
+        with patch("wiremock_benchmark_cli.cli.apply_plans") as apply, contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(main(["--config", str(self.path), "--mock", "mock-1", "--all-customers", "--delay", "1"]), 2)
             apply.assert_not_called()
 
     def test_all_mocks_apply_only_their_assignments(self):
-        self.raw["wiremocks"]["mock-1"]["customers"] = ["3243423434"]
+        self.raw["wiremocks"]["mock-1"]["customers"] = {"3243423434": {}}
         plan = make_plans(self.load(), all_mocks=True, all_customers=True, delay=1000)
         self.assertEqual(len(plan["targets"]), 5)
         self.assertEqual(plan["targets"][0]["customers"], ["3243423434"])
@@ -188,7 +192,7 @@ class ConfigurationTest(unittest.TestCase):
         self.assertEqual(len(plan["targets"][1]["mappings"]), 3)
 
     def test_groups_route_only_to_assignments_and_report_empty_targets(self):
-        self.raw["wiremocks"]["mock-1"]["customers"] = ["3243423434"]
+        self.raw["wiremocks"]["mock-1"]["customers"] = {"3243423434": {}}
         plan = make_plans(self.load(), all_mocks=True, group="slow-customers", delay=6000)
         self.assertEqual(plan["targets"][0]["customers"], [])
         self.assertEqual(plan["targets"][0]["mappings"], [])
@@ -199,8 +203,8 @@ class ConfigurationTest(unittest.TestCase):
 
     def test_group_can_span_disjoint_assignments(self):
         self.raw["wiremocks"] = {key: self.raw["wiremocks"][key] for key in ("mock-1", "mock-2")}
-        self.raw["wiremocks"]["mock-1"]["customers"] = ["3243423434"]
-        self.raw["wiremocks"]["mock-2"]["customers"] = ["2342342"]
+        self.raw["wiremocks"]["mock-1"]["customers"] = {"3243423434": {}}
+        self.raw["wiremocks"]["mock-2"]["customers"] = {"2342342": {}}
         plan = make_plans(self.load(), all_mocks=True, group="test-customers", delay=1000)
         self.assertEqual([t["customers"] for t in plan["targets"]], [["3243423434"], ["2342342"]])
         with self.assertRaisesRegex(ConfigError, "not assigned"):
@@ -213,8 +217,8 @@ class ConfigurationTest(unittest.TestCase):
             lambda c: c.update(customer_groups={"bad": ["missing"]}),
             lambda c: c.update(customer_groups={"bad": ["2342342", 2342342]}),
             lambda c: c["wiremocks"]["mock-1"].update(customers=[]),
-            lambda c: c["wiremocks"]["mock-1"].update(customers=["missing"]),
-            lambda c: c["wiremocks"]["mock-1"].update(customers=["2342342", 2342342]),
+            lambda c: c["wiremocks"]["mock-1"].update(customers={"missing": {}}),
+            lambda c: c["wiremocks"]["mock-1"].update(customers={"2342342": {}, 2342342: {}}),
             lambda c: c["wiremocks"]["mock-1"].update(api="http://LOCALHOST:19081/mock-2/"),
             lambda c: c.update(wiremock_api="http://old:8080"),
         ]
@@ -235,10 +239,11 @@ class ConfigurationTest(unittest.TestCase):
             make_plans(self.load(), mock="mock-1", group="slow-customers", customer="2342342", delay=0)
 
     def test_invalid_later_mock_delay_prevents_all_http(self):
-        self.raw["wiremocks"]["mock-1"]["customers"] = ["3243423434"]
-        self.raw["customers"]["2342342"]["delay"] = [0]
+        self.raw["wiremocks"]["mock-1"]["customers"] = {"3243423434": {}}
+        self.raw["customers"]["2342342"]["allowed_delays_ms"] = [0]
+        self.raw["customers"]["2342342"]["delay_ms"] = 0
         self.load()
-        with patch("tools.wb_cli.apply_plans") as apply, contextlib.redirect_stderr(io.StringIO()):
+        with patch("wiremock_benchmark_cli.cli.apply_plans") as apply, contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(main(["--config", str(self.path), "--all-mocks", "--group", "test-customers",
                                    "--delay", "1000"]), 2)
             apply.assert_not_called()
@@ -317,7 +322,7 @@ class ConfigurationTest(unittest.TestCase):
     def test_unknown_profile_on_unselected_customer_prevents_http(self):
         self.raw["customers"]["2342342"]["response_profile"] = "missing"
         self.path.write_text(yaml.safe_dump(self.raw))
-        with patch("tools.wb_cli.apply_plans") as apply, contextlib.redirect_stderr(io.StringIO()):
+        with patch("wiremock_benchmark_cli.cli.apply_plans") as apply, contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(main(["--config", str(self.path), "--mock", "mock-1", "--customer", "3243423434",
                                    "--delay", "1000"]), 2)
             apply.assert_not_called()
@@ -476,7 +481,7 @@ class ConfigFileOptionTest(unittest.TestCase):
             path.write_text(yaml.safe_dump(config))
             for command, flags in (([], ["--all-mocks", "--delay", "0", "--dry-run"]),
                                    (["list"], []), (["verify"], ["--delay", "0"])):
-                with self.subTest(command=command), patch("tools.wb_verify.verify_plans", return_value=[{"passed": True}]) as verify:
+                with self.subTest(command=command), patch("wiremock_benchmark_cli.verify.verify_plans", return_value=[{"passed": True}]) as verify:
                     output = io.StringIO()
                     with contextlib.redirect_stdout(output), contextlib.redirect_stderr(io.StringIO()):
                         self.assertEqual(main([*command, "-f", str(path), "--all-customers", *flags]), 0)
@@ -491,7 +496,7 @@ class ConfigFileOptionTest(unittest.TestCase):
             path = Path(directory) / "missing.yaml"
             for command, flags in (([], ["--all-mocks", "--delay", "0", "--dry-run"]),
                                    (["list"], []), (["verify"], ["--delay", "0"])):
-                with self.subTest(command=command), contextlib.redirect_stderr(io.StringIO()), patch("tools.wb_api.WireMockAdmin.request") as http:
+                with self.subTest(command=command), contextlib.redirect_stderr(io.StringIO()), patch("wiremock_benchmark_cli.api.WireMockAdmin.request") as http:
                     self.assertEqual(main([*command, "-f", str(path), "--all-customers", *flags]), 2)
                     http.assert_not_called()
 

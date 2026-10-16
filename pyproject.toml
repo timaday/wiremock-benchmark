@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wiremock-benchmark-cli"
+dynamic = ["version"]
+description = "Configure and verify repeatable customer profiles on WireMock"
+readme = "docs/WB-PACKAGE.md"
+requires-python = ">=3.10"
+dependencies = ["PyYAML==6.0.1"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Testing",
+]
+
+[project.scripts]
+wb = "wiremock_benchmark_cli.cli:main"
+
+[tool.hatch.version]
+path = "wiremock_benchmark_cli/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["wiremock_benchmark_cli"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"wb.yaml" = "wiremock_benchmark_cli/data/wb.yaml"
+"docs/WB.md" = "wiremock_benchmark_cli/data/docs/WB.md"
+"docs/WB-PACKAGE.md" = "wiremock_benchmark_cli/data/docs/WB-PACKAGE.md"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/wiremock_benchmark_cli/*.py",
+    "/pyproject.toml",
+    "/wb",
+    "/wb.yaml",
+    "/docs/WB.md",
+    "/docs/WB-PACKAGE.md",
+    "/tools/test_wb*.py",
+    "/tools/check_wb_package.py",
+    "/tools/requirements-wb*.txt",
+]

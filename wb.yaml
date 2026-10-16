@@ -1,39 +1,45 @@
+schema_version: 1
+
 # Every target explicitly declares its URL, proxy behavior and customer assignments.
 # Our Nginx strips /mock-N. Use preserve with direct URLs such as http://HOST:19001.
 # Optional customer uri_extension: transactions precedes /productClasses/<product>.
 # Products may override it, including uri_extension: "" to remove it.
 # Optional customer_path_override: partner/orders replaces /<name>/<code>.
+# Customer error_profile is optional; omission or none selects normal responses.
+# A mock/customer assignment may set error_profile: server-error or timeout.
+# CLI --error-profile none overrides file errors for a normal run.
 wiremocks:
   mock-1:
     api: http://localhost:19081/mock-1
     prefix_handling: strip
     customers:
-      - "3243423434"
-      - "2342342"
+      "3243423434": {}
+      "2342342": {}
   mock-2:
     api: http://localhost:19081/mock-2
     prefix_handling: strip
     customers:
-      - "3243423434"
-      - "2342342"
+      "3243423434": {}
+      "2342342":
+        delay_ms: 6000
   mock-3:
     api: http://localhost:19081/mock-3
     prefix_handling: strip
     customers:
-      - "3243423434"
-      - "2342342"
+      "3243423434": {}
+      "2342342": {}
   mock-4:
     api: http://localhost:19081/mock-4
     prefix_handling: strip
     customers:
-      - "3243423434"
-      - "2342342"
+      "3243423434": {}
+      "2342342": {}
   mock-5:
     api: http://localhost:19081/mock-5
     prefix_handling: strip
     customers:
-      - "3243423434"
-      - "2342342"
+      "3243423434": {}
+      "2342342": {}
 
 customer_groups:
   slow-customers:
@@ -42,8 +48,24 @@ customer_groups:
     - "3243423434"
     - "2342342"
 
+# Optional catalogue. Select request_profile on a customer or product to use it.
+# Omission selects built-in default: POST with JSON {}. default cannot be redefined.
+request_profiles:
+  submit-order:
+    method: POST
+    probe_body:
+      type: json
+      value:
+        correlationId: wb-check
+  read-only:
+    method: GET
+    probe_body:
+      type: none
+
 response_profiles:
   accepted:
+    # Optional default request; customer/product selections override it.
+    # request_profile: submit-order
     status: 200
     headers:
       Content-Type: application/json
@@ -63,7 +85,9 @@ customers:
     name: TestCustomer
     endpoint_scope: product-class
     response_profile: accepted
-    delay:
+    error_profile: none
+    delay_ms: 1000
+    allowed_delays_ms:
       - 0
       - 1000
       - 1500
@@ -79,7 +103,9 @@ customers:
     endpoint_scope: product-class
     # Productclass inherits empty-ok; AnotherProduct explicitly returns JSON.
     response_profile: empty-ok
-    delay:
+    error_profile: none
+    delay_ms: 1000
+    allowed_delays_ms:
       - 0
       - 1000
       - 1500
@@ -108,4 +134,4 @@ error_profiles:
         reason_code: "500"
   timeout:
     type: timeout
-    delay: 60000
+    delay_ms: 60000

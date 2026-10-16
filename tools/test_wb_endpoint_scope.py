@@ -10,9 +10,9 @@ from unittest.mock import patch
 
 import yaml
 
-from tools.wb_cli import main
-from tools.wb_config import ConfigError, load_config
-from tools.wb_plan import make_plans
+from wiremock_benchmark_cli.cli import main
+from wiremock_benchmark_cli.config import ConfigError, load_config
+from wiremock_benchmark_cli.plan import make_plans
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,7 +74,7 @@ class EndpointScopeTest(unittest.TestCase):
         self.load()
         for args in (["--all-mocks", "--delay", "1000"], ["list"],
                      ["verify", "--delay", "1000"], ["--all-mocks", "--delay", "1000", "--error-profile", "server-error"]):
-            with self.subTest(args=args), patch("tools.wb_api.WireMockAdmin.request") as http:
+            with self.subTest(args=args), patch("wiremock_benchmark_cli.api.WireMockAdmin.request") as http:
                 errors = io.StringIO()
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(errors):
                     self.assertEqual(main([*args, "-f", str(self.path), "--all-customers"]), 2)

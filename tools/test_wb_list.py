@@ -11,9 +11,9 @@ from unittest.mock import patch
 
 import yaml
 
-from tools.wb_cli import main
-from tools.wb_config import load_config
-from tools.wb_plan import make_plans
+from wiremock_benchmark_cli.cli import main
+from wiremock_benchmark_cli.config import load_config
+from wiremock_benchmark_cli.plan import make_plans
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,7 +33,7 @@ class ListEndpointsTest(unittest.TestCase):
         self.path.write_text(yaml.safe_dump(self.config, sort_keys=False))
         original = self.path.read_bytes()
         output, errors = io.StringIO(), io.StringIO()
-        with patch("tools.wb_cli.apply_plans") as apply, patch("tools.wb_api.WireMockAdmin.request") as http:
+        with patch("wiremock_benchmark_cli.cli.apply_plans") as apply, patch("wiremock_benchmark_cli.api.WireMockAdmin.request") as http:
             with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
                 result = main(["list", "--config", str(self.path), *args])
             apply.assert_not_called()
@@ -83,7 +83,7 @@ class ListEndpointsTest(unittest.TestCase):
         self.assertIn("Customer unassigned:", output)
         self.assertIn("No configured endpoints in the selected mocks.", output)
         self.assertIn("15 configured endpoint(s).", output)
-        self.config["wiremocks"]["mock-1"]["customers"] = ["3243423434"]
+        self.config["wiremocks"]["mock-1"]["customers"] = {"3243423434": {}}
         status, output, errors = self.run_list("--customer", "2342342", "--mock", "mock-1")
         self.assertEqual(status, 0, errors)
         self.assertIn("No configured endpoints", output)

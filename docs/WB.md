@@ -1,10 +1,63 @@
 # Customer mappings with `wb`
 
-`wb` configures POST mappings on a running WireMock from `wb.yaml` in the current
+`wb` configures HTTP mappings on a running WireMock from `wb.yaml` in the current
 directory. It works with upstream WireMock; no custom image or extension is needed.
 Edit the five named targets in [the example](../wb.yaml) before applying.
 
-## Help
+Install the `wiremock-benchmark-cli` wheel to use `wb` outside this checkout;
+see [installation, packaging and release checks](WB-PACKAGE.md). The examples
+below use the repository launcher `./wb`; use `wb` after installation.
+`wb --version` prints the application version without reading configuration.
+
+## JSON reports for every command
+
+Add `--output FILE` to `apply` (including the default command), `list`, `verify`
+or `clean`. Terminal output stays unchanged. Examples:
+
+```sh
+./wb apply -f wb.phase1.yaml --all-mocks --all-customers --output applied.json
+./wb list -f wb.phase1.yaml --all-customers --output endpoints.json
+./wb verify -f wb.phase1.yaml --all-customers --output verified.json
+./wb clean -f wb.phase1.yaml --all-mocks --all-customers --stale-only --dry-run --output cleanup.json
+```
+
+Reports are JSON with `report_version: 1`, `command`, UTC `started_at` and
+`finished_at`, `status` (`success`, `failed`, or `interrupted`), `exit_code`,
+parsed `options` (including CLI overrides and defaults), `config` (absolute path
+and SHA-256 of the exact bytes read), `resolved`, `events`, `summary`, and `errors`.
+`resolved` contains the canonical mapping plan for apply/verify, endpoint lists
+for list, or target URLs and desired mapping IDs for clean. It is null if
+configuration resolution failed. `config` is null if the file could not be read.
+Reports may contain configured probe bodies, response bodies and headers; treat them as you
+would the source YAML.
+The raw `--wiremock-api` option is represented by a reference to the validated
+URL in `resolved.targets`, so rejected credential-bearing URLs are not saved.
+`summary` is null if the command did not reach its final summary; completed
+events and errors still describe partial progress.
+
+Apply events distinguish preflight checks, attempted writes and verified
+readbacks. Clean events distinguish candidates, attempted deletes, verified
+deletions and already-absent mappings. An attempted mutation without its verified
+completion has an **unknown outcome**, not a successful or rolled-back outcome.
+Verify events contain each endpoint's pass/fail result and diagnostic detail.
+List and dry-run plans describe expectations, not live success. Clean preview
+reads live mappings but does not delete them. Errors and completed events are
+retained on configuration, network and partial-operation failures.
+
+The destination directory must already exist. Existing files are refused before
+any HTTP request; `--overwrite-output` explicitly permits replacement and requires
+`--output`. The input YAML cannot be the report destination, even with overwrite.
+Reports are published atomically at command completion, with private file
+permissions. A late write failure makes the command fail; it does not undo any
+WireMock changes. Help, argument parsing failures and invalid report destinations
+do not produce reports. Ctrl-C produces an interrupted report when possible;
+forced process termination cannot guarantee one.
+
+These reports are evidence, not configuration input or a state cache. Re-run the
+versioned YAML with the recorded overrides to repeat a configuration; verify it
+to establish the current live state.
+
+## Command help
 
 ```sh
 ./wb --help          # Global overview, commands and default apply options
@@ -25,18 +78,18 @@ Requires Python 3.10+ and PyYAML. From the repository root:
 ```sh
 python3 -m venv .runtime/wb-venv
 . .runtime/wb-venv/bin/activate
-python3 -m pip install -r tools/requirements-wb.txt
+python3 -m pip install -e .
 
-./wb --all-mocks --all-customers --delay 1000 --dry-run
-./wb --all-mocks --all-customers --delay 1000
+./wb apply -f wb.yaml --all-mocks --all-customers --dry-run
+./wb apply -f wb.yaml --all-mocks --all-customers
 ./wb --mock mock-1 --customer 2342342 --delay 6000
 ./wb --mock mock-1 --customer 2342342 --delay 1000 --error-profile server-error
 ./wb --mock mock-1 --customer 2342342 --error-profile timeout
 # Restore the selected customer's success response:
-./wb --mock mock-1 --customer 2342342 --delay 1000
+./wb --mock mock-1 --customer 2342342 --delay 1000 --error-profile none
 ```
 
-To call it as `wb`, add this checkout to PATH (`export PATH="$PWD:$PATH"`). Use
+The editable install also provides `wb` in the active virtual environment. Use
 `-f PATH` (equivalent to `--config PATH`) to select a YAML file for any command.
 Without either option, `wb.yaml` in the current directory is read. Relative paths
 are relative to the current directory; a missing or invalid selected file fails
@@ -74,8 +127,9 @@ Groups select customer codes, not delays or error profiles. `--delay` and
 ```
 
 `list` reads and validates YAML only. It never contacts WireMock or modifies
-mappings, and does not need `--delay`. It reports the configured public POST URL,
-mock name, product class, resolved response profile and whether the profile comes
+mappings, and does not accept `--delay`. It reports the configured public URL and method,
+mock name, product class, resolved file delay/source, error-profile selection/source,
+normal response profile and whether that response profile comes
 from the customer or product. It also shows the actual mapping path and explicit
 prefix handling, using the same resolver as mapping creation. It does not claim
 the mappings are installed or report a currently active delay/error profile.
@@ -99,10 +153,9 @@ listing (including an empty result) exits with code 0. Apply-only flags such as
 ./wb verify --customer 2342342 --error-profile timeout
 ```
 
-Verification requires the intended `--delay`, or a timeout profile supplying its
-own delay, just as applying does. The YAML allowlist alone does not identify
-which delay was installed; verification never adopts a server value as its
-expectation. Select a customer, group or all customers. All configured mocks are
+Verification resolves delays from the same profile file as apply. `--delay` is an
+optional explicit override; use the same file and overrides for apply and verify.
+Verification never adopts a server value as its expectation. Select a customer, group or all customers. All configured mocks are
 included by default; `--mock NAME` restricts the scope and `--all-mocks` makes it
 explicit. `--config PATH` selects another configuration file.
 
@@ -110,7 +163,8 @@ For each selected endpoint, verification reads its stable-ID mapping through the
 configured admin URL and compares it against the generated mapping, including
 the body representation, configured headers and delay. Missing or mismatched
 mappings fail that endpoint without sending a probe to it. For matching mappings,
-it sends one POST containing `{}` with `Content-Type: application/json` to the
+it sends one request using the resolved method and probe body (POST with JSON
+`{}` by default) to the
 **public endpoint URL**, including its Nginx prefix. The CLI never applies,
 repairs or removes mappings. Probes are real requests and may appear in server
 logs or capture queues.
@@ -218,6 +272,156 @@ applied. Mappings loaded from files can return after a restart; this command onl
 changes live admin state. Exit codes: 0 successful preview/cleanup (including no
 candidates), 1 admin/deletion failure, 2 invalid arguments or configuration.
 
+## Switching configuration files
+
+A configuration switch means replacing the desired endpoint set from one YAML
+file with another, for example `wb.phase1.yaml` → `wb.phase2.yaml`. It is separate
+from selecting a named request, response or error profile inside a file.
+There is no `wb switch` command or automatic deletion.
+
+Apply creates or updates the new file's desired mapping IDs. It leaves IDs that
+are no longer desired in place until explicit cleanup. For a customer changing
+from products A+B to B+C on the same mock:
+
+| Stage | Live wb-owned mappings |
+| --- | --- |
+| Phase 1 installed | A, B |
+| Phase 2 applied | A, updated B, C |
+| Phase 2 stale preview | A is a deletion candidate; nothing changes |
+| Phase 2 stale cleanup executed | B, C |
+
+Changes to a mapping's method, response or delay normally update its existing
+ID. Removed products, customers, assignments, or changed endpoint scopes can
+leave obsolete IDs. See [Paths and updates](#paths-and-updates) for identity rules.
+
+### Switch workflow with reports
+
+Use the **new file** for apply, stale detection and verification. Keep it unchanged
+throughout the switch. The examples assume `wb.phase2.yaml` is the complete desired
+configuration for all selected mocks; see cleanup scope below before using
+`--all-customers`. Run each stage separately and continue only after a successful
+exit. Review the preview before executing deletion.
+
+1. Create a new report directory and preview the desired mappings offline:
+
+   ```sh
+   mkdir -p results
+   wb_switch_reports="$(mktemp -d results/wb-switch-phase2.XXXXXXXX)"
+   ./wb apply -f wb.phase2.yaml --all-mocks --all-customers --dry-run \
+     --output "$wb_switch_reports/01-apply-preview.json"
+   ```
+
+2. Apply the new mappings and check the verified readback results:
+
+   ```sh
+   ./wb apply -f wb.phase2.yaml --all-mocks --all-customers \
+     --output "$wb_switch_reports/02-apply.json"
+   ```
+
+3. Preview obsolete mappings against the new file. This reads live WireMock state:
+
+   ```sh
+   ./wb clean -f wb.phase2.yaml --all-mocks --all-customers --stale-only --dry-run \
+     --output "$wb_switch_reports/03-stale-preview.json"
+   ```
+
+   Review each candidate's mock, customer, mapping ID and method/path. If anything
+   should remain, correct the desired configuration or narrow the cleanup scope
+   and repeat the relevant previews before continuing.
+
+4. After reviewing the candidates, explicitly execute stale cleanup:
+
+   ```sh
+   ./wb clean -f wb.phase2.yaml --all-mocks --all-customers --stale-only --execute \
+     --output "$wb_switch_reports/04-stale-cleanup.json"
+   ```
+
+   Execution recalculates candidates; it does not consume or replay the preview
+   report. Avoid concurrent edits between preview and execution. Keep
+   `--stale-only`: omitting it also selects currently desired owned mappings.
+
+5. Verify the new endpoints, then confirm no stale owned IDs remain in scope:
+
+   ```sh
+   ./wb verify -f wb.phase2.yaml --all-mocks --all-customers \
+     --output "$wb_switch_reports/05-verify.json"
+   ./wb clean -f wb.phase2.yaml --all-mocks --all-customers --stale-only --dry-run \
+     --output "$wb_switch_reports/06-final-stale-check.json"
+   ```
+
+   Require passing endpoint verification and zero candidates in the final stale
+   check. A successful clean preview can still contain candidates; exit code 0
+   alone does not establish that the stale set is empty. Verify checks desired
+   endpoints, not the absence of obsolete mappings.
+
+Reports record the input file hash, resolved settings and observed outcomes.
+Keep them with the configuration used. Existing output files are refused; use
+new report filenames for retries so earlier failure evidence is retained.
+If apply uses CLI `--delay` or `--error-profile`, repeat those overrides in its
+preview and verification. Clean accepts neither override; they do not change
+mapping IDs. Prefer storing phase behavior in YAML for repeatable switches.
+
+### Cleanup scope and removed mocks
+
+- `--all-mocks` means mocks declared in the selected file, not every server used
+  by an earlier configuration. A removed mock, or a mock whose API URL moved to
+  another server, is not cleaned at its old address by the new file.
+- On selected mocks, `--all-customers` considers every recognized wb-owned
+  mapping, including removed customers and assignments. Other wb configurations
+  do not have separate ownership namespaces: their mappings can be candidates
+  if absent from the new file. Use a complete desired file or narrow cleanup with
+  `--mock NAME --customer CODE`; clean has no `--group` selector.
+- Manual mappings and mappings whose wb ownership cannot be recognized are
+  preserved. This does not guarantee that they cannot overlap or interfere with
+  the new endpoints; public verification checks the actual responses.
+
+To retire all wb-owned mappings on a removed mock, keep the old valid file (or a
+separate valid cleanup file) declaring its old API address. Preview that target
+without `--stale-only`, because its mappings are still desired in the old file:
+
+```sh
+./wb clean -f wb.phase1.yaml --mock mock-5 --all-customers --dry-run \
+  --output "$wb_switch_reports/07-retired-mock-preview.json"
+```
+
+Only if that entire owned scope is being retired, review and execute:
+
+```sh
+./wb clean -f wb.phase1.yaml --mock mock-5 --all-customers --execute \
+  --output "$wb_switch_reports/08-retired-mock-cleanup.json"
+./wb clean -f wb.phase1.yaml --mock mock-5 --all-customers --dry-run \
+  --output "$wb_switch_reports/09-retired-mock-final-check.json"
+```
+
+The final preview should show zero candidates. Use `--customer CODE` instead of
+`--all-customers` when retiring only one customer's mappings. A cleanup file must
+still satisfy schema validation; empty mock assignment maps are not supported.
+
+### Partial failures and recovery
+
+A switch is not atomic. Old and new mappings coexist between apply and cleanup;
+run the switch outside the measured load period if that overlap would affect
+results. No automatic rollback restores the previous configuration.
+
+- If apply fails, stop before cleanup. Inspect its verified writes and any
+  attempted write whose outcome is unknown. Correct the failure and rerun apply
+  with the same intended file and overrides, writing a new report. Continue only
+  after apply succeeds.
+- If cleanup fails, some deletions may already have completed. Inspect the
+  report, correct the cause, take a fresh preview and review it before another
+  execution. A failed DELETE may have taken effect even without verified readback.
+- If verification fails, the switch is not verified complete. Investigate the
+  reported mapping/probe mismatch; verification does not repair it. After any
+  correction, rerun the relevant apply/cleanup stages and verification.
+- If report publication fails after an operation, remote changes may still be
+  in effect. Inspect live state before retrying; a missing report is not evidence
+  that no changes happened.
+
+To return to phase 1, perform the same reviewed workflow with `wb.phase1.yaml` as
+the desired file, including stale cleanup of phase-2-only IDs. Applying the old
+file alone does not remove newly introduced mappings. Cleanup affects live admin
+state; mappings loaded from files may return after a WireMock restart.
+
 ## Endpoint scope and product overrides
 
 Each customer must declare `endpoint_scope: customer` or
@@ -236,7 +440,9 @@ customers:
     name: SecondCustomer
     endpoint_scope: customer
     response_profile: empty-ok
-    delay:
+    error_profile: none
+    delay_ms: 1000
+    allowed_delays_ms:
       - 1000
       - 6000
     ProductClasses:
@@ -282,9 +488,9 @@ customers:
     customer_path_override: partner/orders
     endpoint_scope: customer
     response_profile: empty-ok
+    error_profile: none
     uri_extension: transactions
-    delay:
-      - 1000
+    delay_ms: 1000
     ProductClasses:
       ProductA:
       ProductB:
@@ -320,9 +526,9 @@ customers:
     name: SecondCustomer
     endpoint_scope: customer
     response_profile: empty-ok
+    error_profile: none
     uri_extension: transactions
-    delay:
-      - 1000
+    delay_ms: 1000
     ProductClasses:
       ProductA:
       ProductB:
@@ -355,31 +561,259 @@ extension can leave an old shared mapping; use `clean --stale-only --dry-run` to
 review it. Product-class IDs remain unchanged when their extension changes, so
 `apply` updates their path. Routes from different scopes that collide are rejected.
 
-## Configuration and CLI contract (version 5)
+## Configuration schema version 1
 
-Version 5 adds optional `uri_extension` at customer and product level and optional
-`customer_path_override` at customer level. Existing files without these fields
-retain their routes.
+### Reusable request profiles
 
-Version 4 requires an explicit `endpoint_scope` on every customer. Set it to
-`product-class` to retain the previous URL shape; missing values fail rather than
-guessing which route to install. Existing target prefix handling is unchanged.
+Optional top-level `request_profiles` defines named method/probe-body pairs.
+Omitting it is equivalent to `{}`. Each named profile requires `method` and
+`probe_body`; its definition is complete and is never merged with another one.
+Customers optionally select `request_profile`; products may override that
+selection. A normal response profile may also declare its default `request_profile`.
+Precedence: **product → customer → resolved normal response profile → built-in `default`**.
 
-The configuration requires `wiremocks`, `customer_groups`, `response_profiles`, `customers`
-and `error_profiles`. This replaces the earlier top-level `wiremock_api` and
-`prefix_handling` fields; old configuration fails explicitly. Move those fields
-into a named `wiremocks` entry (`wiremock_api` becomes `api`), add its `customers`
-assignment list, and add `customer_groups: {}` if no groups are needed. Unknown
-fields, duplicate YAML keys and invalid values fail before any HTTP request.
-YAML is parsed safely; it is not executable code.
+```yaml
+response_profiles:
+  accepted:
+    request_profile: submit-order
+    status: 200
+    headers:
+      Content-Type: application/json
+    jsonBody:
+      result: ACCEPTED
+```
 
-The former top-level `response` is replaced by named `response_profiles`.
-Move it into a named profile (for example `accepted`) and add
-`response_profile: accepted` to each customer. Each HTTP-error profile must also
-supply its complete response, including `headers`; no response fields are merged.
+With `submit-order` defined in `request_profiles`, selecting `response_profile:
+accepted` also selects that request unless a customer/product overrides it.
+A product's response-profile override supplies its own request default; it does
+not inherit the original response profile's link. If the selected response has
+no link, the built-in default applies. An explicit `request_profile: default` at
+any supported level selects POST with JSON `{}`.
+
+The link is optional and is configuration metadata, not a WireMock response
+field. All links are validated before HTTP, including unused response profiles.
+Error profiles cannot declare request defaults: HTTP-error and timeout selection
+retain the request resolved from the normal response profile and explicit
+overrides. Errors therefore do not change what verification sends.
+
+The reserved `default` profile is POST with JSON `{}`. It may be selected
+explicitly to reset inheritance, but cannot be redefined in `request_profiles`.
+Unknown names, null and empty selections fail, including on unselected customers.
+Inline `request_method`/`probe_body` customer or product settings are not supported.
+Mock assignments and CLI flags do not override request profiles.
+
+```yaml
+request_profiles:
+  submit-order:
+    method: POST
+    probe_body:
+      type: json
+      value:
+        correlationId: wb-check
+  update-text:
+    method: PUT
+    probe_body:
+      type: text
+      value: "example payload"
+  read-only:
+    method: GET
+    probe_body:
+      type: none
+
+customers:
+  "2342342":
+    name: SecondCustomer
+    endpoint_scope: product-class
+    response_profile: empty-ok
+    delay_ms: 1000
+    request_profile: submit-order
+    ProductClasses:
+      Inherited:
+      Update:
+        request_profile: update-text
+      Read:
+        request_profile: read-only
+      Reset:
+        request_profile: default
+```
+
+Supported methods are uppercase `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`,
+`OPTIONS`. Other spellings and methods fail validation.
+
+| Probe type | Required fields | Bytes and Content-Type sent |
+| --- | --- | --- |
+| `json` | `type`, `value` (any finite JSON value) | UTF-8 JSON, `application/json` |
+| `text` | `type`, `value` (string, including `""`) | Exact UTF-8 text, `text/plain; charset=utf-8` |
+| `none` | `type` only | No body and no configured Content-Type |
+
+GET and HEAD profiles require `probe_body: {type: none}`. Bodies are never
+silently discarded. Null for `probe_body` is invalid;
+`{type: json, value: null}` deliberately sends JSON `null`. JSON arrays/scalars
+are supported. Probe bodies cannot reference external files or templates.
+
+The method is installed in the WireMock mapping. Probe bodies are verification
+inputs only: mappings still match method and path, without body/header matchers.
+Verify sends the resolved method/body. List, dry-run and JSON reports expose the
+same settings plus `request_profile` and `request_profile_source` (`default`,
+`response-profile`, `customer`, `product`, or `mixed` for a shared route with mixed selection sources).
+HEAD verification checks status, headers, delay and an empty received body; the
+configured response body remains in the mapping and is checked through the admin API.
+
+Mapping IDs remain stable when profiles change. Applying a profile with another
+method updates the existing mapping. Products sharing a customer endpoint must
+select the same request profile and response profile; otherwise configuration
+fails. A shared mapping ID cannot represent multiple methods. Distinct mapping
+IDs may use the same path with different methods. Probe-body differences do not
+create additional mappings or verification probes.
+
+All profile definitions and references are validated before HTTP. Existing files
+that omit request profiles retain POST with a JSON `{}` probe.
+
+### Repeatable error-profile selection
+
+Customer `error_profile` is optional and defaults to `none` when omitted.
+When supplied, use `none` or the name of a profile in `error_profiles`. A mock/customer assignment may override `error_profile`;
+omitting it inherits the customer setting. Apply and verify may override both
+with `--error-profile NAME` or `--error-profile none`.
+
+Precedence: **CLI → mock/customer assignment → customer → default `none`**. Error-profile and
+normal delay selection are independent. Product-class error overrides are not
+supported; all endpoints for that customer on that mock share the selection.
+`none` is reserved and cannot name a profile definition. Null, empty, non-string
+and unknown selections are errors, including on unselected customers/targets.
+
+```yaml
+customers:
+  "2342342":
+    name: SecondCustomer
+    endpoint_scope: customer
+    response_profile: empty-ok
+    error_profile: none
+    delay_ms: 1000
+wiremocks:
+  mock-1:
+    api: http://localhost:19081/mock-1
+    prefix_handling: strip
+    customers:
+      "2342342": {}
+  mock-2:
+    api: http://localhost:19081/mock-2
+    prefix_handling: strip
+    customers:
+      "2342342":
+        error_profile: server-error
+        delay_ms: 6000
+```
+
+This fragment uses the `empty-ok` response and `server-error` definitions in
+`wb.yaml`: mock-1 returns the normal response after 1000ms; mock-2 returns the
+configured HTTP error after 6000ms. Apply and verify the same file without
+repeating error flags. Explicitly override a file's errors for a normal run with:
+
+```sh
+./wb apply -f wb.yaml --all-mocks --all-customers --error-profile none
+./wb verify -f wb.yaml --all-customers --error-profile none
+```
+
+A resolved timeout profile supplies its own delay and keeps the resolved normal
+response. `--delay` fails if **any selected endpoint** still resolves to a
+timeout. `--error-profile none --delay MS` is valid and uses normal delay
+constraints. Unselected timeout customers do not block a normal delay override.
+Named HTTP errors replace the response and use normal delay precedence.
+
+List, apply, verify and their JSON reports show `error_profile` and
+`error_profile_source` (`default`, `customer`, `mock-customer`, or `cli`) alongside delay
+resolution. List shows file selections; it does not inspect live state.
+Reapplying without a CLI override restores the file's behavior, which may itself
+be an error profile. Mapping IDs and ownership remain unchanged across profiles.
+Existing schema-1 files may omit customer `error_profile`; normal responses are
+the default. Explicit null and empty values remain invalid. An omitted mock
+override inherits the customer selection, while explicit `none` clears it.
+
+### File format and delay selection
+
+Every file requires the integer `schema_version: 1`. This is the first version
+embedded in YAML; earlier documentation revision numbers were not file versions.
+Missing, non-integer or unsupported versions fail before HTTP requests. No legacy
+format detection or automatic conversion is performed.
+
+A file defines a repeatable profile. Apply and verify without a delay argument:
+
+```sh
+./wb apply -f wb.baseline.yaml --all-mocks --all-customers
+./wb verify -f wb.baseline.yaml --all-customers
+./wb list -f wb.baseline.yaml --all-customers
+```
+
+```yaml
+schema_version: 1
+wiremocks:
+  mock-1:
+    api: http://localhost:19081/mock-1
+    prefix_handling: strip
+    customers:
+      "2342342": {}
+  mock-2:
+    api: http://localhost:19081/mock-2
+    prefix_handling: strip
+    customers:
+      "2342342":
+        delay_ms: 6000
+customer_groups: {}
+response_profiles:
+  empty-ok:
+    status: 200
+    headers: {}
+    body: ""
+customers:
+  "2342342":
+    name: SecondCustomer
+    endpoint_scope: customer
+    response_profile: empty-ok
+    error_profile: none
+    delay_ms: 1000
+    allowed_delays_ms:
+      - 0
+      - 1000
+      - 6000
+error_profiles: {}
+```
+
+Here mock-1 uses 1000ms and mock-2 uses 6000ms. Normal delay precedence is:
+**CLI `--delay` → mock/customer `delay_ms` → customer `delay_ms`**. The customer
+value is required. A target assignment uses `{}` to inherit it or
+`{delay_ms: N}` to override it. Null assignments are invalid. Delays are integers
+from 0 through 2147483647 milliseconds; zero is a valid explicit override.
+
+`allowed_delays_ms` is an optional customer constraint. When present it must be a
+nonempty list of unique valid delays. Customer defaults, all configured target
+assignment overrides (even on unselected targets), and normal CLI overrides must
+satisfy it. When omitted, any delay in the supported range is permitted.
+No product-level delay override is supported.
+
+A timeout error profile uses its required `delay_ms` instead of the normal delay
+and deliberately bypasses `allowed_delays_ms`. Combining it with `--delay` fails.
+An HTTP-error profile changes the response but uses normal delay precedence.
+List shows file-configured delays and sources; apply/dry-run/verify report their
+resolved delays and sources, including explicit CLI and timeout overrides.
+
+To migrate an unversioned file: add `schema_version: 1`; replace every customer
+`delay` list with a chosen scalar `delay_ms`, optionally retaining the list as
+`allowed_delays_ms`; change each target's customer list to a mapping of code to
+`{}` or `{delay_ms: N}`; rename timeout profile `delay` to `delay_ms`.
+Customer `error_profile` may be omitted for normal responses.
+Mapping IDs and ownership metadata are unchanged, so applying the new profile
+updates existing mappings. Applying another file does not remove old mappings;
+preview `clean --stale-only --dry-run` if you need to remove obsolete routes.
+
+The configuration requires `schema_version`, `wiremocks`, `customer_groups`,
+`response_profiles`, `customers` and `error_profiles`. `request_profiles` is optional.
+Unknown fields, duplicate
+keys and invalid settings fail before HTTP requests. YAML is data, not executable
+code. The loader and shared delay resolver implement this contract.
 
 - `wiremocks`: a nonempty mapping of target names. Every target requires `api`,
-  `prefix_handling` and `customers` (a nonempty list of customer codes). Assignment
+  `prefix_handling` and `customers` (a nonempty mapping of customer codes to assignment settings). Assignment
   lists may overlap when the same customer should exist on several mocks.
   Duplicate assignments, unknown codes and duplicate normalized API URLs fail.
   URLs must identify independent WireMock instances; DNS/proxy aliases to the
@@ -403,18 +837,23 @@ supply its complete response, including `headers`; no response fields are merged
   group and unknown codes fail. Nested groups, wildcards and implicit assignments
   are not supported.
 - `customers`: mapping keyed by customer code. Quote numeric codes to preserve
-  leading zeros. Each customer requires `name`, `endpoint_scope`, `response_profile`, a nonempty
-  `delay` list of allowed integer milliseconds. `ProductClasses` is optional for
+  leading zeros. Each customer requires `name`, `endpoint_scope`, `response_profile`
+  and a scalar `delay_ms` default. Optional `error_profile` defaults to `none`.
+  Optional `request_profile` selects a reusable request definition; omission uses
+  the normal response profile's request default, or built-in `default` (POST with
+  JSON `{}`) if that response has no link. `allowed_delays_ms` optionally
+  constrains normal delays. `ProductClasses` is optional for
   customer scope and required/nonempty for product-class scope. The required
   customer `response_profile` names its default success response. `ProductClasses`
   maps each product name either to null (an empty YAML value, inheriting the
   customer's profile, scope and extension), or to a nonempty mapping containing
-  `response_profile`, `endpoint_scope`, `uri_extension`, or any combination for explicit overrides.
+  `response_profile`, `endpoint_scope`, `uri_extension`, `request_profile`,
+  or any combination for explicit overrides.
   Empty objects, unknown fields, missing customer profiles and unknown
-  profile names are errors, including on unselected customers. The delay list is an allowlist, not a
-  randomly sampled distribution. One selected delay applies to every selected
-  product class. Duplicate delays are invalid.
+  profile names are errors, including on unselected customers. Each customer uses one resolved delay per mock, shared by all its endpoints.
 - `response_profiles`: a nonempty mapping of named, complete success responses.
+  Optional `request_profile` supplies the default request for endpoints using
+  that response; customer and product request selections take precedence.
   Each requires `status` (200–299), `headers` (a mapping of string values; `{}`
   explicitly selects no configured headers), and **exactly one** of `body`
   (a string, including `""`) or `jsonBody` (a JSON object). An empty 200 uses
@@ -424,7 +863,7 @@ supply its complete response, including `headers`; no response fields are merged
 - `error_profiles`: named profiles (may be `{}`). `type: http-error` requires a
   complete `response` with `status` (400–599), `headers`, and exactly one of
   `body` or `jsonBody`. It replaces the selected success response completely,
-  including headers. `type: timeout` requires a positive integer `delay` in
+  including headers. `type: timeout` requires a positive integer `delay_ms` in
   milliseconds and retains each product's resolved success response, including
   empty bodies. Choose a delay longer than the application's request
   timeout. It is a delayed response, not a socket fault or a guaranteed timeout
@@ -443,16 +882,17 @@ customers are included in the plan and reported with a warning; no request is
 sent to them. Every active target lists the exact selected customer codes. There
 is no silent customer or target omission.
 
-`--delay MS` is required for success and HTTP-error responses, and must appear in
-every selected customer's allowlist. A timeout profile supplies its own delay,
-outside that allowlist; combining it with `--delay` is an error. `--error-profile
-NAME` selects a profile; omitting it selects the success response. There is no
+`--delay MS` optionally overrides success and HTTP-error delays, subject to any
+selected customer allowlists. A timeout profile supplies its own delay,
+outside those allowlists; combining it with `--delay` is an error. `--error-profile
+NAME` selects a profile; `none` explicitly selects normal responses. Omitting
+the flag uses the resolved file selection. There is no
 implicit customer, delay, error profile or deployment selection.
 
 `--dry-run` validates and prints every selected target, customer codes, warnings,
 public request URLs and exact mapping JSON without connecting. Each target's
 `resolved_profiles` lists the profile for every mapping and its `source`
-(`customer` or `product`), plus any CLI error profile. This is a read-only
+(`customer` or `product`), plus the effective error profile and its source. This is a read-only
 explanation of the generated mappings, not another configuration source.
 `--admin-timeout SECONDS` bounds each admin request
 (default 15); it does not set the mock response delay. Exit codes: 0 success,
@@ -480,7 +920,9 @@ customers:
     name: Test Customer
     endpoint_scope: product-class
     response_profile: empty-ok
-    delay:
+    error_profile: none
+    delay_ms: 1000
+    allowed_delays_ms:
       - 0
       - 1000
       - 6000
@@ -493,7 +935,8 @@ customers:
 ProductA inherits `empty-ok`; ProductB explicitly uses `accepted`. Both inherit
 `product-class` scope. There is no implicit global profile or property merging.
 Selecting an error profile temporarily overrides the resolved success behavior;
-rerunning without it restores each product's own response. Existing target,
+rerunning without the CLI flag restores the file's selection. Use
+`--error-profile none` to restore each product's normal response. Existing target,
 customer, group and delay CLI flags are unchanged.
 
 ## Paths and updates
@@ -512,7 +955,7 @@ Names are used literally and percent-encoded as individual path segments. Thus
 `Test Customer` becomes `Test%20Customer`; use `name: Test_Customer` if your caller
 sends underscores. Legal path punctuation such as `+` stays literal. Slashes,
 backslashes, `%`, `?`, `#`, semicolons (servlet path parameters), control characters and
-`.`/`..` segments are rejected. Matching is case-sensitive, requires POST, and
+`.`/`..` segments are rejected. Matching is case-sensitive, requires the configured method (POST by default), and
 ignores query parameters. No request body or correlation header is required.
 
 For a target with `api: http://HOST:19081/mock-1`, a sample public URL is:
@@ -558,7 +1001,10 @@ WireMock references: [stub creation and editing](https://wiremock.org/docs/stubb
 ## Verification
 
 ```sh
-python3 -m unittest tools.test_wb tools.test_wb_list tools.test_wb_verify -v
+python3 -m unittest tools.test_wb tools.test_wb_list tools.test_wb_verify \
+  tools.test_wb_http_errors tools.test_wb_help tools.test_wb_endpoint_scope \
+  tools.test_wb_clean tools.test_wb_uri_extension tools.test_wb_profiles_v1 \
+  tools.test_wb_report tools.test_wb_error_profiles tools.test_wb_requests -v
 # Adds unique mappings to a dedicated test instance; use its public Nginx route:
 WB_INTEGRATION_API=http://localhost:19081/mock-1 \
   python3 -m unittest tools.test_wb_integration -v
@@ -572,6 +1018,42 @@ WB_INTEGRATION_API=http://localhost:19081/mock-1 \
 WB_INTEGRATION_FIVE_BASE=http://localhost:19081 \
   python3 -m unittest tools.test_wb_verify_integration -v
 ```
+
+On 16 October 2026, response-profile request defaults passed 135 focused tests.
+Checks cover resolved response selection, product/customer precedence, explicit
+default selection, invalid unused links, and exclusion of the link from WireMock
+responses. HTTP fixtures confirm apply/list/verify/report agreement and unchanged
+request method/body under normal, HTTP-error and timeout profiles. Running
+WireMocks were not modified by these checks.
+
+On 15 October 2026, reusable request profiles passed 131 focused tests. Coverage
+includes default behavior, customer/product selection, explicit reset, invalid
+and unselected definitions, shared-route conflicts and stable mapping identities.
+HTTP fixtures verify actual JSON/text/no-body bytes, Content-Type, all supported
+methods, HEAD expectations, and apply/list/verify/report agreement after a method
+change. These checks did not modify running WireMocks.
+
+Earlier that day, file-configured error profiles passed 121 focused tests.
+Coverage includes customer/mock/CLI precedence, explicit `none`, reserved and
+unknown names, unselected-target validation, timeout/delay conflicts, stable
+mapping IDs, and report provenance. HTTP fixtures apply and verify configured
+HTTP errors, short delayed responses, and restoration of normal responses. This
+did not apply errors to running WireMocks.
+
+Earlier that day, the report-enabled CLI passed 115 focused tests. Report tests
+exercise all four commands against an HTTP fixture, partial write/delete failures,
+failed verification, invalid configuration, Ctrl-C, missing dependencies, exclusive
+file creation and late output failures. These checks do not modify running
+WireMocks.
+
+Earlier that day, schema version 1 passed 101 focused tests, including HTTP
+fixtures applying and verifying a single file with different per-target delays,
+explicit zero overrides, and failure when verify omits an apply override. Tests
+also cover version rejection, constraints on unselected targets, optional
+allowlists, timeout behavior and preservation of mapping identities. The updated
+example's dry-run resolves 1000ms defaults and a 6000ms mock-2/customer override.
+This check did not change the running WireMocks. Earlier checks below refer to
+documentation revisions of the previously unversioned configuration.
 
 On 14 October 2026, all 16 validation/HTTP tests passed. The opt-in integration
 test also passed against isolated upstream WireMock 3.13.2 through Nginx using

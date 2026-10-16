@@ -29,14 +29,14 @@ class WireMockCliSmoke(unittest.TestCase):
         suffix = uuid.uuid4().hex[:10]
         first, second = "first-" + suffix, "second-" + suffix
         config["customers"] = {
-            first: dict(name="Test Customer", response_profile="accepted", delay=[0, 1000, 6000],
+            first: dict(name="Test Customer", response_profile="accepted", error_profile="none", delay_ms=1000, allowed_delays_ms=[0, 1000, 6000], endpoint_scope="product-class",
                         ProductClasses={"Productclass": None}),
-            second: dict(name="Customer Two", response_profile="accepted", delay=[0, 1000, 6000],
+            second: dict(name="Customer Two", response_profile="accepted", error_profile="none", delay_ms=1000, allowed_delays_ms=[0, 1000, 6000], endpoint_scope="product-class",
                          ProductClasses={"C++": None, "Prödüct.v1": None}),
         }
-        config["wiremocks"] = {"smoke": dict(api=base, prefix_handling="strip", customers=[first, second])}
+        config["wiremocks"] = {"smoke": dict(api=base, prefix_handling="strip", customers={first: {}, second: {}})}
         config["customer_groups"] = {"one-customer": [first]}
-        config["error_profiles"]["timeout"]["delay"] = 600
+        config["error_profiles"]["timeout"]["delay_ms"] = 600
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "wb.yaml"
             path.write_text(yaml.safe_dump(config))

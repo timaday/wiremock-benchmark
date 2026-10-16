@@ -10,10 +10,10 @@ from unittest.mock import patch
 
 import yaml
 
-from tools.wb_cli import main
-from tools.wb_config import ConfigError, load_config
-from tools.wb_identity import mapping_id, owned_customer
-from tools.wb_plan import make_plans
+from wiremock_benchmark_cli.cli import main
+from wiremock_benchmark_cli.config import ConfigError, load_config
+from wiremock_benchmark_cli.identity import mapping_id, owned_customer
+from wiremock_benchmark_cli.plan import make_plans
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -117,7 +117,7 @@ class UriExtensionTest(unittest.TestCase):
             "Root": {"endpoint_scope": "customer", "uri_extension": "productClasses/Normal"},
         }
         self.load()
-        with patch("tools.wb_api.WireMockAdmin.request") as http, contextlib.redirect_stderr(io.StringIO()) as errors:
+        with patch("wiremock_benchmark_cli.api.WireMockAdmin.request") as http, contextlib.redirect_stderr(io.StringIO()) as errors:
             self.assertEqual(main(["--mock", "mock-5", "--customer", "2342342", "--delay", "1000", "-f", str(self.path)]), 2)
         self.assertIn("Conflicting endpoint scopes", errors.getvalue())
         http.assert_not_called()
@@ -157,7 +157,7 @@ class UriExtensionTest(unittest.TestCase):
         for customer in self.raw["customers"].values():
             customer.update(customer_path_override="shared", endpoint_scope="customer", uri_extension="", ProductClasses={"One": None})
         self.load()
-        with patch("tools.wb_api.WireMockAdmin.request") as http, contextlib.redirect_stderr(io.StringIO()) as errors:
+        with patch("wiremock_benchmark_cli.api.WireMockAdmin.request") as http, contextlib.redirect_stderr(io.StringIO()) as errors:
             self.assertEqual(main(["--mock", "mock-5", "--all-customers", "--delay", "1000", "-f", str(self.path)]), 2)
         self.assertIn("Conflicting endpoint scopes or customers", errors.getvalue())
         http.assert_not_called()

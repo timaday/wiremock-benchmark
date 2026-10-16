@@ -13,11 +13,11 @@ import uuid
 
 import yaml
 
-from tools.wb_api import AdminError
-from tools.wb_clean import clean_targets
-from tools.wb_cli import main
-from tools.wb_config import load_config
-from tools.wb_identity import mapping_id, mapping_metadata, owned_customer
+from wiremock_benchmark_cli.api import AdminError
+from wiremock_benchmark_cli.clean import clean_targets
+from wiremock_benchmark_cli.cli import main
+from wiremock_benchmark_cli.config import load_config
+from wiremock_benchmark_cli.identity import mapping_id, mapping_metadata, owned_customer
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -189,7 +189,7 @@ class CleanHttpTest(unittest.TestCase):
 
     def test_cli_resolves_stale_assignments_and_explicit_dry_run(self):
         config = load_config(ROOT / "wb.yaml")
-        config["wiremocks"] = {"one": {"api": self.base + "/one", "prefix_handling": "strip", "customers": ["3243423434"]}}
+        config["wiremocks"] = {"one": {"api": self.base + "/one", "prefix_handling": "strip", "customers": {"3243423434": {}}}}
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "phase.yaml"
             path.write_text(yaml.safe_dump(config))

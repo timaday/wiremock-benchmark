@@ -28,16 +28,16 @@ class ResponseProfilesSmoke(unittest.TestCase):
         config = yaml.safe_load((ROOT / "wb.yaml").read_text())
         first, other = [prefix + uuid.uuid4().hex[:10] for prefix in ("profiles-", "other-")]
         config["customers"] = {
-            first: dict(name="Profile Customer", response_profile="accepted", delay=[0, 1000],
+            first: dict(name="Profile Customer", response_profile="accepted", error_profile="none", delay_ms=1000, allowed_delays_ms=[0, 1000], endpoint_scope="product-class",
                         ProductClasses={"Inherited": None, "Override": {"response_profile": "accepted"}}),
-            other: dict(name="Unchanged Customer", response_profile="accepted", delay=[0, 1000],
+            other: dict(name="Unchanged Customer", response_profile="accepted", error_profile="none", delay_ms=1000, allowed_delays_ms=[0, 1000], endpoint_scope="product-class",
                         ProductClasses={"Product": None}),
         }
-        config["wiremocks"] = {"smoke": dict(api=base, prefix_handling="strip", customers=[first, other])}
+        config["wiremocks"] = {"smoke": dict(api=base, prefix_handling="strip", customers={first: {}, other: {}})}
         config["customer_groups"] = {"selected": [first]}
         config["response_profiles"]["accepted"]["headers"]["X-Profile"] = "accepted"
         config["response_profiles"]["text-ok"] = {"status": 200, "headers": {"Content-Type": "text/plain"}, "body": "Ready"}
-        config["error_profiles"]["timeout"]["delay"] = 600
+        config["error_profiles"]["timeout"]["delay_ms"] = 600
 
         def request(path, method="GET", timeout=5):
             try:

@@ -7,9 +7,9 @@ import unittest
 from unittest.mock import patch
 from urllib.error import URLError
 
-from tools.wb_api import AdminError, WireMockAdmin
-from tools.wb_http_errors import transport_failure
-from tools.wb_verify import probe
+from wiremock_benchmark_cli.api import AdminError, WireMockAdmin
+from wiremock_benchmark_cli.http_errors import transport_failure
+from wiremock_benchmark_cli.verify import probe
 
 
 class TransportErrorsTest(unittest.TestCase):
@@ -42,9 +42,9 @@ class TransportErrorsTest(unittest.TestCase):
         self.assertEqual(str(caught.exception), "GET /__admin/mappings/test: connection refused")
         mapping = {"request": {"method": "POST"}, "response": {
             "status": 200, "body": "", "headers": {}, "fixedDelayMilliseconds": 0}}
-        with patch("tools.wb_verify.build_opener") as opener:
+        with patch("wiremock_benchmark_cli.verify.build_opener") as opener:
             opener.return_value.open.side_effect = failure
-            self.assertEqual(probe("http://unused.test", mapping, 50, 1000),
+            self.assertEqual(probe("http://unused.test", mapping, 50, 1000, request_settings={"probe_body": {"type": "json", "value": {}}}),
                              (False, "probe transport failure: connection refused"))
 
 

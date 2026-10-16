@@ -26,7 +26,7 @@ class VerifyLiveSmoke(unittest.TestCase):
         config = yaml.safe_load((ROOT / "wb.yaml").read_text())
         for index, target in enumerate(config["wiremocks"].values(), 1):
             target["api"] = f"{base}/mock-{index}"
-        config["error_profiles"]["timeout"]["delay"] = 600
+        config["error_profiles"]["timeout"]["delay_ms"] = 600
 
         def admin(mock, path="/__admin/mappings", method="GET", body=None):
             request = Request(config["wiremocks"][mock]["api"] + path, method=method,
